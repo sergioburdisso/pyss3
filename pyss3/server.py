@@ -248,7 +248,7 @@ class Server:
         """
          Assign the test set to visualize.
 
-        :param x_test: the list of documents to classify
+        :param x_test: the list of documents to classify and visualize
         :type x_test: list (of str)
         :param y_label: the list of category labels
         :type y_label: list (of str)
