@@ -39,6 +39,8 @@ version = __version__
 release = version
 
 
+master_doc = 'index'
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
