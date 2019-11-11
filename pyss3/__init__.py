@@ -1480,7 +1480,7 @@ class SS3:
         :type prep: bool
         :param sort: sort the classification result (from best to worst)
         :type sort: bool
-        :param json: return the result in json format
+        :param json: return the result in JSON format
         :type json: bool
         :returns: the document confidence vector if ``sort`` is False.
                   If ``sort`` is True, a list of pairs

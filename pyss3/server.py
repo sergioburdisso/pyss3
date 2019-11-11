@@ -250,7 +250,7 @@ class Server:
 
         :param x_test: the list of documents to classify
         :type x_test: list (of str)
-        :param y_label: the list of labels
+        :param y_label: the list of category labels
         :type y_label: list (of str)
         """
         Server.__clear_testset__()
@@ -390,11 +390,10 @@ class Server:
 
         :param clf: the SS3 model to be attached to this server.
         :type clf: pyss3.SS3
-        :param test_path: the test set path to visualize.
-        :type test_path: str
-        :param folder_label: if True, read category labels from folders,
-                             otherwise, from file names. (default: True)
-        :type folder_label: bool
+        :param x_test: the list of documents to (preload and) classify
+        :type x_test: list (of str)
+        :param y_label: the list of category labels
+        :type y_label: list (of str)
         :param port: the port to listen on (default: random free port)
         :type port: int
         :param browser: if True, it automatically opens up the live test on
