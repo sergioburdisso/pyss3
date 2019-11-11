@@ -201,7 +201,7 @@ def parse_hparams_args(op_args, defaults=True):
                 hparams[hp_str] = round_fix(op_args[argi + 1])
             except IndexError:
                 Print.error(ERROR_HVM % hp_str, raises=ArgsParseError)
-            except:
+            except BaseException:
                 Print.error(
                     ERROR_HIV % op_args[argi + 1], raises=ArgsParseError
                 )
@@ -902,7 +902,7 @@ def delete_results_slpa(rh_metric, hparams, only_count=False, best=True):
                     del values[s][l][p]
 
             if not values[s][l]:
-                    del values[s][l]
+                del values[s][l]
 
         if not values[s]:
             del values[s]
@@ -2214,7 +2214,7 @@ class SS3Prompt(Cmd):
                 n_grams = int(n_grams_arg.group(1))
                 if n_grams <= 0:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WNGRAM, raises=ArgsParseError)
 
         unkown_args = subtract(range(len(op_args)), op_args_ix)
@@ -2290,7 +2290,7 @@ class SS3Prompt(Cmd):
                 n_grams = int(n_grams_arg.group(1))
                 if n_grams <= 0:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WNGRAM, raises=ArgsParseError)
 
         k_fold_arg = re_in(r"(.+)-" + STR_FOLD, op_args)
@@ -2301,7 +2301,7 @@ class SS3Prompt(Cmd):
 
                 if k_fold < 2:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WKFOLD, raises=ArgsParseError)
 
         folder_arg = intersect([STR_FILE, STR_FOLDER], op_args)
@@ -2350,7 +2350,7 @@ class SS3Prompt(Cmd):
                 n_grams = int(n_grams_arg.group(1))
                 if n_grams <= 0:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WNGRAM, raises=ArgsParseError)
 
         k_fold_arg = re_in(r"(.+)-" + STR_FOLD, op_args)
@@ -2361,7 +2361,7 @@ class SS3Prompt(Cmd):
 
                 if k_fold < 2:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WKFOLD, raises=ArgsParseError)
 
         folder_arg = intersect([STR_FILE, STR_FOLDER], op_args)
@@ -2381,7 +2381,7 @@ class SS3Prompt(Cmd):
                     hparams[hp_str] = eval(op_args[argi + 1])
                 except IndexError:
                     Print.error(ERROR_HVM % hp_str, raises=ArgsParseError)
-                except:
+                except BaseException:
                     Print.error(
                         "[python] error: "
                         "the value for the hyper-parameter '%s' is not valid"
@@ -2392,7 +2392,7 @@ class SS3Prompt(Cmd):
                 # just in case the hyper-parameter value is a single number
                 try:
                     hparams[hp_str] = [float(hparams[hp_str])]
-                except:
+                except BaseException:
                     pass
 
                 try:
@@ -2538,7 +2538,7 @@ class SS3Prompt(Cmd):
                 n_grams = int(n_grams_arg.group(1))
                 if n_grams <= 0:
                     raise Exception
-            except:
+            except BaseException:
                 Print.error(ERROR_WNGRAM, raises=ArgsParseError)
 
         def_cat_arg = subtract(range(len(op_args)), op_args_ix)
@@ -2667,6 +2667,7 @@ def main():
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
         prompt.do_exit()
+
 
 if __name__ == '__main__':
     main()

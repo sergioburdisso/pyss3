@@ -492,7 +492,7 @@ class SS3:
             for word in ngram[1:]:
                 word_info = word_info[NEXT][word]
             return word_info
-        except:
+        except BaseException:
             return EMPTY_WORD_INFO
 
     def __get_category__(self, name):
@@ -681,11 +681,9 @@ class SS3:
 
     def __update_needed__(self):
         """Return True if an update is needed, false otherwise."""
-        return (
-            self.__s__ != self.__s_update__ or
-            self.__l__ != self.__l_update__ or
-            self.__p__ != self.__p_update__
-        )
+        return (self.__s__ != self.__s_update__ or
+                self.__l__ != self.__l_update__ or
+                self.__p__ != self.__p_update__)
 
     def __save_cat_vocab__(self, icat, path, n_grams):
         """Save the category vocabulary inside ``path``."""
@@ -900,7 +898,7 @@ class SS3:
         """
         try:
             return self.__word_to_index__[word]
-        except:
+        except KeyError:
             return None
 
     def get_word(self, index):
@@ -1722,16 +1720,6 @@ class InvalidCategoryError(Exception):
             "The given category is not valid"
         )
 
-# aliases
-SS3.set_smoothness = SS3.set_s
-SS3.get_smoothness = SS3.get_s
-SS3.set_significance = SS3.set_l
-SS3.get_significance = SS3.get_l
-SS3.set_sanction = SS3.set_p
-SS3.get_sanction = SS3.get_p
-SS3.set_alpha = SS3.set_a
-SS3.get_alpha = SS3.get_a
-
 
 def sigmoid(v, l):
     """A sigmoid function."""
@@ -1750,7 +1738,7 @@ def mad(values, n):
         return (values[0], values[0])
     values_m = n // 2 if n % 2 else n // 2 - 1
     m = values[values_m]  # Median
-    sd = sum([abs(m - lv) for lv in values]) / n  # sd Mean
+    sd = sum([abs(m - lv) for lv in values]) / float(n)  # sd Mean
     return m, sd
 
 
@@ -1778,3 +1766,14 @@ def vmax(v0, v1):
 def vdiv(v0, v1):
     """Vectorial version of division."""
     return [v0[i] / v1[i] if v1[i] else 0 for i in xrange(len(v0))]
+
+
+# aliases
+SS3.set_smoothness = SS3.set_s
+SS3.get_smoothness = SS3.get_s
+SS3.set_significance = SS3.set_l
+SS3.get_significance = SS3.get_l
+SS3.set_sanction = SS3.set_p
+SS3.get_sanction = SS3.get_p
+SS3.set_alpha = SS3.set_a
+SS3.get_alpha = SS3.get_a

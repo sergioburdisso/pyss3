@@ -23,7 +23,7 @@ import re
 # python 2 and 3 compatibility
 try:
     from urllib.parse import unquote as url_decode
-except:
+except ImportError:
     from urllib import unquote as url_decode
 
 
@@ -450,6 +450,7 @@ class Server:
             Print.info("closing server...")
             server_socket.close()
             Server.__server_socket__ = None
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='SS3 Server')

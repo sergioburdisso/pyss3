@@ -47,7 +47,7 @@ class Preproc:
         if normalize:
             try:
                 text = text.decode("utf-8")
-            except:
+            except BaseException:
                 pass
 
             text = ''.join(
