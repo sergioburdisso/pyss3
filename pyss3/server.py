@@ -390,7 +390,7 @@ class Server:
 
         :param clf: the SS3 model to be attached to this server.
         :type clf: pyss3.SS3
-        :param x_test: the list of documents to (preload and) classify
+        :param x_test: the list of documents to classify and visualize
         :type x_test: list (of str)
         :param y_label: the list of category labels
         :type y_label: list (of str)
