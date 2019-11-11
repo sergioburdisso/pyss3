@@ -14,22 +14,20 @@ The SS3 text classifier was originally introduced in Section 3 of the [paper](ht
 ## Installation
 
 
-PyPi installation
------------------
+### PyPi installation
 
 Simply type:
 
     pip install pyss3
 
 
-Installation from source
-------------------------
+### Installation from source
 
 To install latest version from github, clone the source from the project repository and install with setup.py::
 
     git clone https://github.com/sergioburdisso/pyss3
     cd pyss3
-    pip install .
+    python setup.py install
  
 
 ## API Documentation

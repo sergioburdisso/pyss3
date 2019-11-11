@@ -1,3 +1,4 @@
+sphinx==2.2.1
 Cython
 numpy>=1.13.0
 scipy>= 0.17.0
