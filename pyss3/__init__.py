@@ -1562,8 +1562,8 @@ class SS3:
         :type n_grams: int
         :param prep: enables input preprocessing (default: True)
         :type prep: bool
-        :param leave_pbar: controls whether to leave the progress bar after
-                           finishing or remove it.
+        :param leave_pbar: controls whether to leave the progress bar or
+                           remove it after finishing.
         :type leave_pbar: bool
         """
         cats = sorted(list(set(y_train)))
@@ -1633,8 +1633,8 @@ class SS3:
         :type labels: bool
         :param prep: enables input preprocessing (default: True)
         :type prep: bool
-        :param leave_pbar: controls whether to leave the progress bar after
-                           finishing or remove it.
+        :param leave_pbar: controls whether to leave the progress bar or
+                           remove it after finishing.
         :type leave_pbar: bool
         :returns: if ``labels`` is True, the list of category names,
                   otherwise, the list of category indexes.
