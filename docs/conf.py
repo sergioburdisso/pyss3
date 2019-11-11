@@ -34,7 +34,6 @@ copyright = '{year}, Sergio Burdisso (sergio.burdisso@gmail.com)'.format(
 )
 author = 'Sergio Burdisso'
 
-# The short X.Y version.
 version = __version__
 release = version
 
