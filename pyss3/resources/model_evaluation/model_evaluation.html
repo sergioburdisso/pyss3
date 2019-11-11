@@ -1,0 +1,969 @@
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    table {
+      display: inline;
+      border-collapse: collapse;
+    }
+    tbody {
+      border-bottom: 5px solid rgba(0, 0, 0, 0);
+      border: 1px solid #ddd;
+    }
+    td {
+      padding: 0;
+      /*border: 1px solid #ddd;*/
+    }
+    h3 {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      width: 100%;
+      height: 45px;
+      text-align: center;
+      background-color: transparent;
+      z-index: 10;
+      margin: 0;
+      font-size: 30px;
+    }
+    select {
+      background-color: #ffffff;
+      padding: 10px;
+      border: 0;
+      border-bottom: 1px solid #e91e6352;
+      /*font-size: unset;*/
+      font-weight: bold;
+    }
+    .prop-value {
+      font-size: small;
+      font-weight: bold;
+      color: gray;
+      line-height: 30px;
+    }
+    .title {
+      text-shadow: #e91e636b 0px 10px 10px;
+      color: #e91e63
+    }
+    .subtitle {
+      text-shadow: #1976d27a 0px 10px 10px;
+      color: #1976D2;
+    }
+    .desciption {
+      font-size: 15px;
+      color: gray;
+    }
+    .modebar-container {
+      z-index: 20;
+    }
+    .hovertext, .colorbar, #confusion-matrix {
+      user-select: none;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
+    }
+    .snippet {
+      position: relative;
+    }
+    .snippet .btn {
+      -webkit-transition: opacity .3s ease-in-out;
+      -o-transition: opacity .3s ease-in-out;
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: -10px;
+    }
+    .snippet:hover .btn, .snippet .btn:focus {
+      opacity: 1;
+    }
+    .btn {
+      position: relative;
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc,#eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-appearance: none;
+    }
+    #confusion-matrix {
+      position: absolute;
+      left: 0;
+      top: 0;
+      line-height: 4px;
+    }
+    #op-panel {
+      position: absolute;
+      padding: 10px;
+      top: 0;
+      left: 0;
+      z-index: 30;
+      font-size: smaller;
+      background-color: white;
+      background-color: lavenderblush;
+      box-shadow: 0px 0px 19px -5px #e91e636b;
+    }
+    #op-panel .title {
+      font-weight: bold;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e91e6352;
+    }
+    #point-info {
+      position: absolute;
+      bottom: 0px;
+      right: 100px;
+      box-shadow: 0px 0px 19px -5px #e91e636b;
+      border-radius: 5px 5px 0 0;
+      height: 300px;
+      width: 600px;
+      z-index: 1000;
+      border-radius: 5px;
+      background-color: lavenderblush;
+
+      -webkit-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+         -moz-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+           -o-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+              transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+
+      opacity:1;
+      transform: translateY(0);
+    }
+    #point-info .cmd {
+      margin-bottom: 10px;
+      margin-top: 5px;
+      margin-left: 15px;
+      background-color: #6a6a6a;
+      color: white;
+      border: 1px dotted black;
+      font-weight: bold;
+      overflow: auto;
+    }
+    #point-info pre {
+      margin-left: 5px;
+      opacity: 1;
+    }
+    .point-info-hidden {
+      -webkit-transition: all 0.15s linear !important;
+         -moz-transition: all 0.15s linear !important;
+           -o-transition: all 0.15s linear !important;
+              transition: all 0.15s linear !important;
+
+      opacity:0 !important;
+      transform: translate(0, 10px)  !important;
+      pointer-events: none;
+    }
+    /*.show-down-top.ng-hide-remove.ng-hide-remove-active,
+    .show-down-top {
+      -webkit-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+         -moz-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+         -o-transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+          transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+
+      opacity:1;
+      transform: translateY(0);
+    }*/
+    .show-left-right.ng-hide-add.ng-hide-add-active,
+    .show-left-right.ng-hide {
+      -webkit-transition: all 0.15s linear;
+         -moz-transition: all 0.15s linear;
+         -o-transition: all 0.15s linear;
+          transition: all 0.15s linear;
+
+      transform: translateX(-50px);
+      opacity:0;
+    }
+    .show-left-right.ng-hide-remove.ng-hide-remove-active,
+    .show-left-right {
+      -webkit-transition: all 0.3s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+         -moz-transition: all 0.3s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+         -o-transition: all 0.3s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+          transition: all 0.3s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+
+      opacity:1;
+      transform: translate(0, 0);
+    }
+    [ng-cloak], .ng-cloak {
+      display: none !important;
+    }
+  </style>
+  <script src="plotly.min.js" type="text/javascript"></script>
+  <script src="angular.min.js" type="text/javascript"></script>
+  <script src="data.js" type="text/javascript"></script>
+</head>
+
+<body ng-controller="$controller" ng-app="ss3">
+  <h3 ng-cloak>
+    <span class="title">{{title|uppercase}}</span><span class="subtitle">{{subtitle}}</span><br>
+    <span class="desciption" style="font-weight: normal">
+      (*) The Global Best is <b style="color:#e91e63">{{global_best["value"]}}</b><span ng-if="single_global_best"> (σ={{global_best["s"]}}, λ={{global_best["l"]}}, ρ={{global_best["p"]}} and α={{global_best["a"]}})</span>
+      <br>
+      <span ng-show="local_best['value'] != global_best['value']">(*) Local Best is <b style="color:#6c1ee9">{{local_best["value"]}}</b><span ng-if="single_local_best"> (σ={{local_best["s"]}}, λ={{local_best["l"]}}, ρ={{local_best["p"]}})</span></span>
+      <br>
+    </span>
+  </h3>
+  <span id="op-panel" ng-cloak>
+    <div class="title" style="margin: 0">Data</div>
+    Model name: <span class="prop-value">{{model_name}}</span>
+    <br>
+    Path:
+    <select ng-model="c.p" ng-change="update(true, true)" ng-show="_keys_(results).length > 1">
+      <option ng-repeat="(path, _) in results" ng-value="path">{{path}}</option>
+    </select>
+    <span class="prop-value" ng-if="_keys_(results).length == 1">{{_keys_(results)[0]}}</span>
+    <br>
+    Evaluation Method:
+    <select ng-model="c.m" ng-change="update(true, true)" ng-show="_keys_(results[c.p]).length > 1">
+      <option ng-repeat="(method, _) in results[c.p]" ng-value="method">{{method}}</option>
+    </select>
+    <span class="prop-value" ng-if="_keys_(results[c.p]).length == 1">{{_keys_(results[c.p])[0]}}</span>
+    <br>
+    Default Category:
+    <select ng-model="c.dc" ng-change="update(true, true)" ng-show="_keys_(results[c.p][c.m]).length > 1">
+      <option ng-repeat="(def_cat, _) in results[c.p][c.m]" ng-value="def_cat">{{def_cat}}</option>
+    </select>
+    <span class="prop-value" ng-if="_keys_(results[c.p][c.m]).length == 1">{{_keys_(results[c.p][c.m])[0]}}</span>
+    <br>
+    Measure:
+    <select ng-model="c.mc" ng-change="update()">
+      <option ng-repeat="(metric, _) in results[c.p][c.m][c.dc]" ng-value="metric" ng-if="metric != 'confusion_matrix' && metric != 'categories'">{{metric}}</option>
+    </select>
+    <span ng-show="c.mo && c.mc != 'accuracy'" class="show-left-right">
+      <br>
+      Option:
+      <select ng-model="c.mo" ng-change="update()">
+        <option ng-repeat="(metric_op, _) in results[c.p][c.m][c.dc][c.mc]" ng-value="metric_op">{{metric_op}}</option>
+      </select>
+    </span>
+    <span ng-show="c.c && c.mc != 'accuracy' && c.mo == 'categories'" class="show-left-right">
+      <br>
+      Category:
+      <select ng-model="c.c" ng-change="update()">
+        <option ng-repeat="(category, _) in results[c.p][c.m][c.dc][c.mc][c.mo]" ng-value="category">{{category}}</option>
+      </select>
+    </span>
+    <br>
+    <div class="title">Plot</div>
+    <input type="checkbox" id="show_volume" ng-model="cfg.volume_visible" ng-change="toggle_visible(0)">
+    <label for="show_volume">Show volume</label>
+    <br>
+    <input type="checkbox" id="show_values" ng-model="cfg.values_visible" ng-change="toggle_visible(1)">
+    <label for="show_values">Show values</label>
+    <br>
+    <input type="checkbox" id="show_best" ng-model="cfg.best_visible" ng-change="toggle_visible(2)">
+    <label for="show_best">Show best</label>
+    <br>
+    <div class="title">Data points (on hover)</div>
+    <input type="checkbox" id="hover_info" ng-model="cfg.hover_info" ng-change="toggle_hoverinfo()">
+    <label for="hover_info">Show info</label>
+    <br>
+    <input type="checkbox" id="hover_conf_matrix" ng-model="cfg.hover_conf_matrix">
+    <label for="hover_conf_matrix">Show confusion matrices</label>
+    <br>
+    <div class="title">Alpha (α) parameter</div>
+    <input type="range" ng-model="c.ai" min="0" max="{{alphas.length - 1}}" ng-change="update_alpha()" style="width: 100%" ng-show="alphas.length > 1">
+    <div ng-style="{'text-align': alphas.length > 1? 'center' : 'left' }">value= <b>{{alphas[c.ai]}}</b></div>
+  </span>
+  <div id="point-info" ng-class="{'point-info-hidden' : !point_info.visible}" ng-cloak>
+    <div class="title" style="padding: 10px">
+      <b>Useful commands</b>
+      <small style="color:black">(σ={{point_info.s}}, λ={{point_info.l}}, ρ={{point_info.p}}, α={{point_info.a}})</small>
+    </div>
+    <div style="padding: 10px">
+      <span class="info-label">● Interactively test this configuration:</span>
+      <div class="cmd">
+        <pre class="snippet"><button class="btn" title="Copy to clipboard" ng-click="copy_to_clipboard(point_info.cmd_set)"><img src="data:image/svg+xml;base64, PHN2ZyBoZWlnaHQ9IjEwMjQiIHdpZHRoPSI4OTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTEyOCA3NjhoMjU2djY0SDEyOHYtNjR6IG0zMjAtMzg0SDEyOHY2NGgzMjB2LTY0eiBtMTI4IDE5MlY0NDhMMzg0IDY0MGwxOTIgMTkyVjcwNGgzMjBWNTc2SDU3NnogbS0yODgtNjRIMTI4djY0aDE2MHYtNjR6TTEyOCA3MDRoMTYwdi02NEgxMjh2NjR6IG01NzYgNjRoNjR2MTI4Yy0xIDE4LTcgMzMtMTkgNDVzLTI3IDE4LTQ1IDE5SDY0Yy0zNSAwLTY0LTI5LTY0LTY0VjE5MmMwLTM1IDI5LTY0IDY0LTY0aDE5MkMyNTYgNTcgMzEzIDAgMzg0IDBzMTI4IDU3IDEyOCAxMjhoMTkyYzM1IDAgNjQgMjkgNjQgNjR2MzIwaC02NFYzMjBINjR2NTc2aDY0MFY3Njh6TTEyOCAyNTZoNTEyYzAtMzUtMjktNjQtNjQtNjRoLTY0Yy0zNSAwLTY0LTI5LTY0LTY0cy0yOS02NC02NC02NC02NCAyOS02NCA2NC0yOSA2NC02NCA2NGgtNjRjLTM1IDAtNjQgMjktNjQgNjR6IiAvPgo8L3N2Zz4K" width="13"></button><code>{{point_info.cmd_set}}</code></pre>
+      </div>
+      <span class="info-label">● Replicate this experiment:</span>
+      <div class="cmd">
+        <pre class="snippet"><button class="btn" title="Copy to clipboard" ng-click="copy_to_clipboard(point_info.cmd_eval)"><img src="data:image/svg+xml;base64, PHN2ZyBoZWlnaHQ9IjEwMjQiIHdpZHRoPSI4OTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTEyOCA3NjhoMjU2djY0SDEyOHYtNjR6IG0zMjAtMzg0SDEyOHY2NGgzMjB2LTY0eiBtMTI4IDE5MlY0NDhMMzg0IDY0MGwxOTIgMTkyVjcwNGgzMjBWNTc2SDU3NnogbS0yODgtNjRIMTI4djY0aDE2MHYtNjR6TTEyOCA3MDRoMTYwdi02NEgxMjh2NjR6IG01NzYgNjRoNjR2MTI4Yy0xIDE4LTcgMzMtMTkgNDVzLTI3IDE4LTQ1IDE5SDY0Yy0zNSAwLTY0LTI5LTY0LTY0VjE5MmMwLTM1IDI5LTY0IDY0LTY0aDE5MkMyNTYgNTcgMzEzIDAgMzg0IDBzMTI4IDU3IDEyOCAxMjhoMTkyYzM1IDAgNjQgMjkgNjQgNjR2MzIwaC02NFYzMjBINjR2NTc2aDY0MFY3Njh6TTEyOCAyNTZoNTEyYzAtMzUtMjktNjQtNjQtNjRoLTY0Yy0zNSAwLTY0LTI5LTY0LTY0cy0yOS02NC02NC02NC02NCAyOS02NCA2NC0yOSA2NC02NCA2NGgtNjRjLTM1IDAtNjQgMjktNjQgNjR6IiAvPgo8L3N2Zz4K" width="13"></button><code>{{point_info.cmd_eval}}</code></pre>
+      </div>
+      <span class="info-label">● Remove this evaluation:</span>
+      <div class="cmd">
+        <pre class="snippet"><button class="btn" title="Copy to clipboard" ng-click="copy_to_clipboard(point_info.cmd_remove)"><img src="data:image/svg+xml;base64, PHN2ZyBoZWlnaHQ9IjEwMjQiIHdpZHRoPSI4OTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTEyOCA3NjhoMjU2djY0SDEyOHYtNjR6IG0zMjAtMzg0SDEyOHY2NGgzMjB2LTY0eiBtMTI4IDE5MlY0NDhMMzg0IDY0MGwxOTIgMTkyVjcwNGgzMjBWNTc2SDU3NnogbS0yODgtNjRIMTI4djY0aDE2MHYtNjR6TTEyOCA3MDRoMTYwdi02NEgxMjh2NjR6IG01NzYgNjRoNjR2MTI4Yy0xIDE4LTcgMzMtMTkgNDVzLTI3IDE4LTQ1IDE5SDY0Yy0zNSAwLTY0LTI5LTY0LTY0VjE5MmMwLTM1IDI5LTY0IDY0LTY0aDE5MkMyNTYgNTcgMzEzIDAgMzg0IDBzMTI4IDU3IDEyOCAxMjhoMTkyYzM1IDAgNjQgMjkgNjQgNjR2MzIwaC02NFYzMjBINjR2NTc2aDY0MFY3Njh6TTEyOCAyNTZoNTEyYzAtMzUtMjktNjQtNjQtNjRoLTY0Yy0zNSAwLTY0LTI5LTY0LTY0cy0yOS02NC02NC02NC02NCAyOS02NCA2NC0yOSA2NC02NCA2NGgtNjRjLTM1IDAtNjQgMjktNjQgNjR6IiAvPgo8L3N2Zz4K" width="13"></button><code>{{point_info.cmd_remove}}</code></pre>
+      </div>
+    </div>
+  </div>
+  <svg height="100%" width="100%" style="position: absolute; left: 0; top: 0; pointer-events: none; z-index: 1" class="main-svg" ng-show="point_info.visible">
+    <circle id="info-circle" cx="-100" cy="-100" r="5" stroke-width="0" fill="rgba(0,0,0,.5)" />
+    <line id="info-line" x1="0" y1="0" x2="0" y2="0" style="stroke:rgba(0,0,0,.5);stroke-width:2" stroke-dasharray="5,5"/>
+  </svg>
+  <div id="plot" class="plotly-graph-div" style="height:100%; width:100%;"></div>
+  <div id="confusion-matrix">
+    <span ng-show="cfg.hover_conf_matrix" ng-repeat="cm_fold in confusion_matrix">
+      <!-- <span ng-if="confusion_matrix.length > 1" class="prop-value">fold {{$index + 1}}<br></span> -->
+      <table>
+        <tbody>
+          <tr ng-repeat="row in cm_fold track by $index">
+            <td ng-repeat="val in row track by $index" ng-style="{'background-color': get_gbcolor(val)}" height="{{conf_matrix_cell_size}}" width="{{conf_matrix_cell_size}}"></td>
+          </tr>
+        </tbody>
+      </table>
+      <span ng-if="!(($index + 1) % 3)"><br><br></span>
+    </span>
+  </div>
+</body>
+<script type="text/javascript">
+  "use strict";
+  // global
+  var DOM_PLOT = document.getElementById("plot");
+  var DOM_CONF_MATRIX = document.getElementById("confusion-matrix");
+  var DOM_INFO_LINE = document.getElementById("info-line");
+  var DOM_INFO_CIRC = document.getElementById("info-circle");
+  var DOM_INFO_PANEL = document.getElementById("point-info");
+  var DEF_METRIC = "accuracy";
+  var CM_MAX_SIZE = 50;
+  var CM_MAX_FOLD_SIZE = 150;
+  var DATA = null;
+  var CM = {// confusion matrix
+    matrix: null,
+    p: null,   // path
+    m: null,   // method
+    dc: null   // default category
+  };
+  var app = angular.module("ss3", ["ngAnimate"]);
+  window.PLOTLYENV=window.PLOTLYENV || {};
+
+  function sorted(obj){
+    var ps = [];
+    Object.keys(obj).forEach(p => {
+      ps.push(parseFloat(p));
+    });
+    return ps.sort().map(v => {return ((v|0) == v)? v + '.0' : v});
+  }
+
+  function sum(arr){
+    var res = 0, n = arr.length;
+    while(n--) {
+      res += +arr[n];
+    }
+    return res;
+  }
+
+  function _fp_(n, p){
+    return parseFloat(n)
+  }
+
+  function color_li(c0, c1, alpha){
+    return c0 + (c1 - c0) * alpha;
+  }
+
+  function hoverinfo_text(s, l, p, a, metric, v, title){
+    title = title? `<b>${title}</b><br>` : '';
+    return title +
+           `<b>${metric}</b>: ${_fp_(v, 3)}<br>` +
+           `<b>σ</b>: ${_fp_(s, 3)}<br>` +
+           `<b>λ</b>: ${_fp_(l, 3)}<br>` +
+           `<b>ρ</b>: ${_fp_(p, 3)}<br>` +
+           `<b>α</b>: ${_fp_(a, 3)}<br>`;
+  }
+
+  app.controller("$controller",  function($scope){
+    // angular $scope
+    $scope.cfg = {
+      volume_visible: false,
+      values_visible: true,
+      best_visible: true,
+      hover_conf_matrix: true,
+      hover_info: true
+    }
+    $scope.model_name = $model_name;
+    $scope.results = $results;
+    $scope.title = null;
+    $scope.subtitle = null;
+    $scope.global_best = null;
+    $scope.local_best = null;
+    $scope.single_global_best = false;
+    $scope.single_local_best = false;
+    $scope.alphas = null;
+    $scope.conf_matrix_cell_size = 1;
+    $scope.point_info = {
+      s: null, l: null, p: null, a: null,
+      cmd_set: null, cmd_eval: null,
+      cmd_remove: null, visible: false
+    }
+    $scope.c = {// current plot
+      p: null,   // path
+      m: null,   // method
+      dc: null,  // default category
+      mc: null,  // metric
+      mo: null,  // metric option
+      c: null,   // category
+      a: null,   // alpha
+      ai: 0      // alpha index (only needed for the slider)
+    };
+
+
+    $scope._keys_ = function(dic){
+      return Object.keys(dic)
+    }
+
+
+    $scope.get_gbcolor = function(alpha){
+      var r =  color_li(255, 63, alpha), g = color_li(255, 0, alpha), b = color_li(255, 125, alpha);
+      // var r =  color_li(255, 85, alpha), g = color_li(255, 58, alpha), b = color_li(255, 99, alpha);
+      // var r =  color_li(255, 233, alpha), g = color_li(255, 30, alpha), b = color_li(255, 99, alpha);
+      return "rgb(" + r + ", " + g + ", " + b + ")";
+    }
+
+
+    $scope.copy_to_clipboard = function(str){
+      const temp = document.createElement('textarea');
+      document.body.appendChild(temp);
+      temp.value = str;
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+    }
+
+
+    $scope.toggle_visible = function(trace){
+      let value = null;
+      switch(trace){
+        case 0: value = $scope.cfg.volume_visible; break;
+        case 1: value = $scope.cfg.values_visible; break;
+        case 2: value = $scope.cfg.best_visible; break;
+      }
+      unselect_point();
+      Plotly.restyle(DOM_PLOT, {visible: value}, trace);
+    }
+
+
+    $scope.toggle_hoverinfo = function(){
+      let hoverinfo = $scope.cfg.hover_info? "text" : "none";
+      Plotly.restyle(DOM_PLOT, {hoverinfo: hoverinfo}, 1);
+      Plotly.restyle(DOM_PLOT, {hoverinfo: hoverinfo}, 2);
+    }
+
+
+    $scope.update = function(update_data, new_plot){
+      var C = $scope.c;
+
+      if (!$results[C.p]){
+        set_default_data_options();
+      }
+      if (!$results[C.p][C.m]){
+        C.m = Object.keys($results[C.p])[0];
+      }
+      if (!$results[C.p][C.m][C.dc]){
+        C.dc = Object.keys($results[C.p][C.m])[0];
+      }
+
+      if (C.p != CM.p || C.m != CM.m || C.dc != CM.dc){
+        update_confusion_matrix();
+      }
+
+      if (C.mc == "accuracy"){
+        update_plot_metric($results[C.p][C.m][C.dc][C.mc], C.mc, '', new_plot, update_data);
+      }else
+      if (C.mo != "categories"){
+        if (!C.mo)
+          C.mo = "macro avg";
+        update_plot_metric($results[C.p][C.m][C.dc][C.mc][C.mo], C.mc, ` (${C.mo})`, new_plot, update_data);
+      }else{
+        if (!C.c || !$results[C.p][C.m][C.dc][C.mc][C.mo][C.c])
+          C.c = Object.keys($results[C.p][C.m][C.dc][C.mc][C.mo])[0];
+        update_plot_metric($results[C.p][C.m][C.dc][C.mc][C.mo][C.c], C.mc, ` (${C.c})`, new_plot, update_data);
+      }
+
+      if (new_plot || update_data){
+        unselect_point();
+      }
+    }
+
+
+    $scope.update_alpha = function(){
+      $scope.c.a = $scope.alphas[$scope.c.ai];
+      $scope.update(true);
+    }
+
+
+    function set_default_data_options(){
+      var C = $scope.c, best_size = 0;
+
+      C.mc = DEF_METRIC;
+
+      for (let ph in $results) {
+        for (let m in $results[ph]) {
+          for (let dc in $results[ph][m]) {
+            let size = 0;
+
+            for (let s in $results[ph][m][dc]['accuracy']){
+              for (let l in $results[ph][m][dc]['accuracy'][s]){
+                for (let p in $results[ph][m][dc]['accuracy'][s][l]){
+                  for (let a in $results[ph][m][dc]['accuracy'][s][l][p]){
+                    size++;
+                  }
+                }
+              }
+            }
+
+            if (size > best_size){
+              best_size = size;
+              C.p = ph;
+              C.m = m;
+              C.dc = dc;
+            }
+
+          }
+        }
+      }
+    }
+
+
+    function set_default_alpha(){
+      var C = $scope.c;
+      $scope.c.a = parseFloat($results[C.p][C.m][C.dc]["accuracy"]["best"]["a"]);
+
+      if (($scope.c.a|0) == $scope.c.a)
+        $scope.c.a = $scope.c.a + '.0';
+
+      $scope.c.ai = $scope.alphas.indexOf($scope.c.a);
+
+
+      /* the alpha with more data points
+      var ai = 0,
+        best_ai = 0,
+        best_a = $scope.alphas[ai];
+
+      $scope.alphas.forEach(a => {
+        if (DATA[a].x.length > DATA[best_a].x.length){
+          best_a = a;
+          best_ai = ai;
+        }
+        ai++;
+      });
+      $scope.c.a = best_a;
+      $scope.c.ai = best_ai;
+      */
+    }
+
+
+    function unselect_point(){
+      $scope.point_info.s = undefined;
+      $scope.point_info.visible = false;
+      setTimeout(function() {$scope.$apply()}, 10);
+    }
+
+
+    function select_point(x, y, z, point_x, point_y){
+      let C = $scope.c;
+      let info = $scope.point_info;
+      let cmd_eval = '', cmd_path;
+      let m_x, m_y;
+      let def_cat = C.dc != 'most-probable'? ' ' + C.dc : ''
+      let info_panel_x = DOM_INFO_PANEL.offsetLeft;
+      let info_panel_y = DOM_INFO_PANEL.offsetTop;
+      let hparams = `s ${x} l ${y} p ${z} a ${C.a}`;
+
+      if ($scope.point_info.visible){
+        return;
+      }
+
+
+
+      if (C.m != 'test'){
+        cmd_eval = `k_fold ${C.p} ${C.m}${def_cat} `;
+      }else{
+        cmd_eval = `test ${C.p}${def_cat} `;
+      }
+      cmd_eval += hparams;
+
+      info.cmd_set = 'set ' + hparams;
+      info.cmd_eval = cmd_eval;
+      info.cmd_remove = `evaluations remove ${C.p} ${C.m}${def_cat} ` + hparams;
+      info.s = x;
+      info.l = y;
+      info.p = z;
+      info.a = C.a;
+
+      $scope.copy_to_clipboard(hparams);
+      cmd_path = C.p.indexOf(' ') != -1? ` "${C.p}"` : ` ${C.p}`;
+      info.cmd_set += "\nlive_test" + (C.m == "test"? cmd_path : '')
+
+      DOM_INFO_CIRC.setAttributeNS(null, 'cx', point_x);
+      DOM_INFO_CIRC.setAttributeNS(null, 'cy', point_y);
+
+      DOM_INFO_LINE.setAttributeNS(null, 'x1', point_x);
+      DOM_INFO_LINE.setAttributeNS(null, 'y1', point_y);
+      DOM_INFO_LINE.setAttributeNS(
+        null, 'x2', info_panel_x > point_x? info_panel_x: info_panel_x + 300
+      );
+      DOM_INFO_LINE.setAttributeNS(null, 'y2', info_panel_y);
+    }
+
+    function create_plot(rh){
+      var rh_metric = rh["accuracy"];  // it is just to store s, l, p and a values (all metrics share them)
+      DATA = {};
+      $scope.alphas = [];
+
+      // storing static x, y and z values (need it only once)
+      sorted(rh_metric["value"]).forEach(s => {
+        sorted(rh_metric["value"][s]).forEach(l => {
+          sorted(rh_metric["value"][s][l]).forEach(p => {
+            sorted(rh_metric["value"][s][l][p]).forEach(a => {
+              if (!DATA[a]){
+                DATA[a] = {
+                  x: [], y: [], z: []
+                }
+                $scope.alphas.push(a);
+              }
+
+              DATA[a].x.push(s);
+              DATA[a].y.push(l);
+              DATA[a].z.push(p);
+            })
+          })
+        })
+      });
+
+      $scope.alphas = sorted(DATA);
+      set_default_alpha();
+
+      var traces = !rh_metric["value"]? [] : [
+        {
+          name: "Volume",
+          type: "volume",
+          opacity: 0.2,
+          surface: {count: 40},
+          colorscale: "Viridis",
+          hoverinfo: "skip",
+          visible: $scope.cfg.volume_visible
+        },
+        {
+          name: "Values",
+          type: "scatter3d",
+          hoverinfo: "text",
+          mode: "markers",
+          visible: $scope.cfg.values_visible,
+          marker: {
+            size: 13,
+            colorscale: "Viridis",
+            opacity: 1
+          }
+        },
+        {
+          name: "Best",
+          type: "scatter3d",
+          hoverinfo: "text",
+          mode: "markers",
+          visible: $scope.cfg.best_visible,
+          marker: {
+            opacity: 0.75
+          }
+        }
+      ];
+      var layout = {
+        hovermode:'closest',
+        showspikes: false,
+        //showlegend: false,
+        legend: {
+          x:0, y:0,
+          traceorder:"normal",
+          orientation: "h"
+        },
+        margin: {
+          l: 0,
+          r: 0,
+          b: 0,
+          t: 60
+        },
+        scene: {
+          xaxis: {
+            title: "<b>smoothness (σ)</b>",
+            showspikes: false
+          },
+          yaxis: {
+            title: "<b>significance (λ)</b>",
+            showspikes: false
+          },
+          zaxis: {
+            title: "<b>sanction (ρ)</b>",
+            showspikes: false
+          },
+          camera: {
+            eye: {x:2.25, y:2.25, z:2.25}
+          }
+        }
+      };
+
+      Plotly.newPlot(DOM_PLOT, traces, layout);
+
+      DOM_PLOT.removeAllListeners('plotly_click')
+      DOM_PLOT.on('plotly_click', function(data){
+
+        let point = data.points[0];
+        select_point(point.x, point.y, point.z, data.x, data.y);
+
+      }).on('plotly_hover', function(data){
+
+        let point = data.points[0];
+        DOM_CONF_MATRIX.style.top = data.y + ($scope.cfg.hover_info? 53 : 0);
+        DOM_CONF_MATRIX.style.left = data.x + 5;
+        $scope.confusion_matrix = CM.matrix[point.x][point.y][point.z][$scope.c.a];
+        $scope.$apply();
+
+      }).on('plotly_unhover', function(data){
+
+        setTimeout(function(){
+          $scope.confusion_matrix = null;
+          $scope.$apply();
+        }, 10, false);
+
+      }).on('plotly_relayout', function(data){
+        if ($scope.point_info.s !== undefined && $scope.point_info.visible){
+          unselect_point();
+        }
+
+        if ($scope.point_info.s !== undefined){
+          $scope.point_info.visible = true;
+        }
+
+      });
+    }
+
+
+    function update_plot_data(){
+      var C = $scope.c;
+      Plotly.animate(DOM_PLOT, {
+          data: [{
+            x: DATA[C.a].x,
+            y: DATA[C.a].y,
+            z: DATA[C.a].z
+          },{
+            x: DATA[C.a].x,
+            y: DATA[C.a].y,
+            z: DATA[C.a].z
+          }],
+          layout: {}
+        }, {
+        transition: { duration: 0 },
+        frame: { duration: 0}
+      })
+    }
+
+
+    function update_plot_metric(rh_metric, title, subtitle, new_plot, update_data){
+      var global_best = rh_metric["best"]["value"];
+      var best = {}, C = $scope.c, max_v, min_v;
+
+      if (new_plot){
+        create_plot($results[C.p][C.m][C.dc]);
+      }
+
+      if (update_data){
+        update_plot_data();
+      }
+
+      $scope.single_global_best = true;
+      $scope.global_best = rh_metric["best"];
+      $scope.title = title;
+      $scope.subtitle = subtitle;
+
+      var global_worst = 1  // +inf
+      var hoverinfo = [];
+      var hoverinfo_best = [];
+      var x_best = [], y_best = [], z_best = [];
+      var v= [], local_best = 0;
+      sorted(rh_metric["value"]).forEach(s => {
+        sorted(rh_metric["value"][s]).forEach(l => {
+          sorted(rh_metric["value"][s][l]).forEach(p => {
+            sorted(rh_metric["value"][s][l][p]).forEach(a => {
+              let metric_v = rh_metric["value"][s][l][p][a];
+
+              if (metric_v < global_worst)
+                global_worst = metric_v
+
+              if (a == C.a){
+                v.push(metric_v);
+                hoverinfo.push(
+                  hoverinfo_text(s, l, p, C.a, $scope.c.mc, metric_v)
+                );
+
+                if (metric_v > local_best){
+                  local_best = metric_v;
+                }
+
+                if (metric_v == global_best){
+                  x_best.push(s); y_best.push(l); z_best.push(p);
+                  hoverinfo_best.push(hoverinfo_text(
+                    s, l, p, C.a,
+                    $scope.c.mc, metric_v,
+                    "(Global Best)"
+                  ));
+                }
+              }
+            })
+          })
+        })
+      });
+
+      $scope.local_best = {"value": local_best};
+      var marker, name;
+      if (local_best != global_best){
+        x_best = [], y_best = [], z_best = [];
+        hoverinfo_best = [];
+        $scope.single_local_best = x_best.length == 1;
+        $scope.single_global_best = true;
+        name = "Local"
+        marker = {
+          size: 18,
+          color: '#6c1ee9'
+        }
+        sorted(rh_metric["value"]).forEach(s => {
+          sorted(rh_metric["value"][s]).forEach(l => {
+            sorted(rh_metric["value"][s][l]).forEach(p => {
+              sorted(rh_metric["value"][s][l][p]).forEach(a => {
+                let metric_v = rh_metric["value"][s][l][p][a]
+                if (a == C.a && metric_v == local_best){
+                  x_best.push(s); y_best.push(l); z_best.push(p);
+                  hoverinfo_best.push(hoverinfo_text(
+                    s, l, p, C.a,
+                    $scope.c.mc, metric_v,
+                    "(Local Best)"
+                  ));
+                }
+              })
+            })
+          })
+        });
+      }else{
+        name = "Global"
+        marker = {
+          size: 20,
+          color: '#e91e63'
+        }
+        $scope.single_global_best = x_best.length == 1;
+      }
+
+      $scope.local_best["s"] = x_best[0];
+      $scope.local_best["l"] = y_best[0];
+      $scope.local_best["p"] = z_best[0];
+
+      max_v = global_best;
+      min_v = global_worst;
+
+      if (min_v == max_v)
+        min_v = 0;
+
+      Plotly.animate(DOM_PLOT, {
+          data: [{
+            value: v,
+            isomin: min_v,
+            isomax: max_v,
+            colorbar: {
+              title: title
+            }
+          },{
+            text: hoverinfo,
+            marker: {
+              color: v,
+              cmin: min_v,
+              cmax: max_v,
+              colorbar:{title: title}
+            }
+          },{
+            name: `${name} Best`,
+            x: x_best,
+            y: y_best,
+            z: z_best,
+            text: hoverinfo_best,
+            marker: marker
+          }],
+          layout: {}
+        }, {
+        transition: {
+          duration: 0 /*300,
+          easing: 'cubic-in-out'*/
+        },
+        frame: {
+          duration: 0//300,
+          //redraw: true
+        }
+      });
+    }
+
+
+    function update_confusion_matrix(){
+      var C = $scope.c, keys = Object.keys;
+      var cm_size = cats_n > 2? CM_MAX_FOLD_SIZE : 90;
+      var cats_n = $results[C.p][C.m][C.dc]["categories"].length;
+
+      CM = $results[C.p][C.m][C.dc]["confusion_matrix"];
+
+      var s = keys(CM)[0];
+      var l = keys(CM[s])[0];
+      var p = keys(CM[s][l])[0];
+      var a = keys(CM[s][l][[p]])[0];
+
+      // if it is not already normalized (i.e. not an integer)
+      if (!CM["normalized"]){
+        // normalize
+        sorted(CM).forEach(s => {
+          sorted(CM[s]).forEach(l => {
+            sorted(CM[s][l]).forEach(p => {
+              sorted(CM[s][l][p]).forEach(a => {
+
+                if (!CM["folds"])
+                  CM["folds"] = CM[s][l][p][a].length;
+
+                CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
+                  return cm_fold.map(r => {
+                    let r_sum = sum(r);
+                    return r.map(v => {
+                      return r_sum? +v / r_sum : 0;
+                    });
+                  });
+                });
+
+              });
+            });
+          });
+        });
+        CM["normalized"] = true;
+      }
+
+      CM.matrix = CM;
+      CM.p = $scope.c.p;
+      CM.m = $scope.c.m;
+      CM.dc = $scope.c.dc;
+
+      cm_size /= CM["folds"];
+      // $scope.conf_matrix_cell_size =  Math.min(cm_size,  (cats_n > 2? CM_MAX_SIZE : 30)) / cats_n;
+      $scope.conf_matrix_cell_size =  Math.min(cm_size, CM_MAX_SIZE) / cats_n;
+    }
+
+    $scope.update(true, true);
+
+    /*document.onmousemove = function(e){
+      if ($scope.confusion_matrix){
+        DOM_CONF_MATRIX.style.top = e.clientY + 50;
+        DOM_CONF_MATRIX.style.left = e.clientX;
+      }
+    }*/
+
+    DOM_PLOT.onmousedown = function(e){
+      if ($scope.point_info.visible){
+          unselect_point();
+      }
+    }
+  });
+</script>
+</html>

@@ -1,0 +1,17 @@
+language: python
+
+jobs:
+  include:
+    - python: "2.7"
+    - python: "3.4"
+    - python: "3.5"
+    - python: "3.6"
+    - python: "3.7"
+
+install:
+  - pip install -r requirements-dev.txt
+  - pip install .
+
+script:
+  - flake8 pyss3
+  - pytest tests

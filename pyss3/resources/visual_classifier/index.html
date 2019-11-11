@@ -1,0 +1,439 @@
+<html>
+<head>
+  <title>SS3 Live Test</title>
+  <link rel="stylesheet" type="text/css" href="css/icon.css">
+  <link rel="stylesheet" type="text/css" href="css/materialize.min.css" />
+  <link rel="stylesheet" type="text/css" href="fonts/cmu.css" />
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8">
+  <style type="text/css">
+    .footer{
+      background-image: url(sb-blanco.png);
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      background-size: 128px;
+      /*background-blend-mode: soft-light;*/
+    }
+    .menu_item, .animate *{
+      transition: all ease-out 0.25s;
+    }
+    .menu_item{
+      border-left: 3px #ee6e73 solid;
+    }
+    a.menu_item{
+      display: block;
+      color: black;
+      padding: 5px;
+    }
+    a.menu_item:hover {
+      background-color: rgba(0,0,0,0.05);
+    }
+    .active label,
+    div.active a {
+      color: #fff !important;
+    }
+    .menu_item.active {
+      background-color: #ee6e73;
+    }
+    .menu_item.disabled {
+      color: gray;
+    }
+    .math{
+      font-family: cmunti;
+      /* font-size: large; */
+      /* font-weight: bold; */
+      margin-bottom: 0;
+    }
+    .sidenav li>a {
+      /*color: #009688;*/
+    }
+    .missclass {
+      color: #FF5722 !important;
+    }
+    .sidenav .collapsible-body>ul:not(.collapsible)>li.active i,
+    .sidenav.sidenav-fixed .collapsible-body>ul:not(.collapsible)>li.active i {
+      color: white !important;
+    }
+    .pointer{cursor: pointer;}
+    .select-wrapper input.select-dropdown,
+    .bold{ font-weight: bold; }
+    .animate-show-3d-top.ng-hide-add.ng-hide-add-active,
+    .animate-show-3d-top.ng-hide {
+      transform: perspective(1000px) rotateX(-10deg) translateY(10px);
+      transition: all 0;
+      opacity:0;
+    }
+    .animate-show-3d-top.ng-hide-remove.ng-hide-remove-active,
+    .animate-show-3d-top {
+      transition: all 0.5s cubic-bezier(0.280, 0.720, 0.110, 1.005);
+      transform: perspective(1000px) rotateX(0deg);
+      transform-origin: 50% 0;
+      opacity:1;
+    }
+    .no-animate *{
+      -webkit-transition: none !important;
+      transition: none !important;
+    }
+    [type="checkbox"]+span:not(.lever){
+      margin-right: 40px;
+    }
+    [ng-cloak], .ng-cloak {
+      display: none !important;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1 0 auto;
+    }
+    header, main, footer {
+      padding-left: 300px;
+    }
+    .no-documents header,
+    .no-documents main,
+    .no-documents footer {
+      padding-left: 0;
+    }
+    .model_info {
+      color: black;
+      font-weight: bold;
+      line-height: normal;
+      padding-top: 10px !important;
+      text-align: right;
+    }
+    ul.sidenav.sidenav-fixed {
+      overflow: hidden;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+      border-right: 1px solid rgba(0,0,0,0.14);
+    }
+    ul.sidenav.sidenav-fixed:hover {
+        overflow-y: auto;
+    }
+    .collapsible-header {
+      font-weight: 500;
+    }
+    .sidenav .collapsible-body li a {
+      font-weight: 400;
+      padding: 0 37.5px 0 45px;
+    }
+    #index-banner {
+        border-bottom: 1px solid rgba(0,0,0,0.14);
+    }
+    .section {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+    #index-banner .container {
+      position: relative;
+    }
+    #index-banner h1 {
+      margin-top: 16px;
+    }
+    .mtop-60 {
+      margin-top: 60px;
+    }
+    .header {
+      color: #ee6e73;
+      font-weight: 300;
+    }
+    #index-banner h4 {
+      line-height: 44px;
+      color: rgba(0,0,0,0.7);
+    }
+    .light {
+      font-weight: 300;
+    }
+    .recall {
+      position: absolute;
+      right: 0px;
+      padding-right: 5px;
+      /*background-color: white;*/
+    }
+    a.sidenav-trigger.top-nav {
+      position: absolute;
+      text-align: center;
+      height: 48px;
+      width: 48px;
+      top: 28px;
+      float: none;
+      margin-left: 1.5rem;
+      color: #f3989b;
+      font-size: 36px;
+      z-index: 2;
+    }
+    a.sidenav-trigger.top-nav i {
+      font-size: 32px;
+    }
+    @media only screen and (max-width: 992px){ header, main, footer {
+      padding-left: 0;
+    }}
+    @media only screen and (max-width: 992px) {
+    #index-banner h1 {
+      margin-top: 60px;
+    }}
+    @media only screen and (max-width: 992px) {
+    #index-banner h4 {
+      margin-bottom: 15px;
+    }}
+  </style>
+</head>
+<body ng-app="ss3live" ng-controller="mainCtrl" ng-class="{'no-documents': keys(info.docs).length == 0}">
+  <header>
+    <div class="container">
+      <a href="#" data-target="slide-out" class="top-nav sidenav-trigger waves-effect waves-light circle hide-on-large-only"><i class="material-icons">menu</i></a>
+    </div>
+    <ul id="slide-out" class="sidenav sidenav-fixed" ng-show="keys(info.docs).length">
+      <li><a class="subheader">Test Documents by Category</a></li>
+      <ul class="collapsible">
+        <li ng-repeat="c in keys(info.docs)" ng-cloak>
+          <div class="collapsible-header"><i class="material-icons right" ng-style="{'color': get_cat_rgb(info.categories.indexOf(c))}">
+            style</i>{{c}} ({{info.docs[c].file.length}}) <small class="recall blue-text text-darken-2 right" title="recall (% of hits)">{{get_accuracy(c)|number:1}}%</small>
+          </div>
+          <div class="collapsible-body">
+            <ul>
+              <li ng-repeat="f in info.docs[c].file track by $index" ng-class="{'active': $index == i_doc && c == c_doc}">
+                <a class="waves-effect" href="#" ng-click="get_doc(c, $index)">
+                  {{f}} 
+                  <i class="material-icons right missclass" ng-if="get_clf_result(c, $index) != c" title="missclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </ul>
+  </header>
+  <main>
+    <div class="section" id="index-banner">
+      <div class="container">
+        <div class="row" style="margin-bottom: 0;">
+          <div class="col s12 m8 xl6 center-on-small-only">
+            <h1 class="header">SS3 Live Test</h1>
+            <h4 class="light" ng-cloak>{{info.model_name|uppercase}}</h4>
+          </div>
+          <div class="col s12 m4 xl5 offset-xl1">
+            <div class="buysellads-header center-on-small-only" ng-cloak>
+              Model name: <span class="blue-text text-darken-2">{{info.model_name}}</span><br>
+              Hyper-parameters: <span class="blue-text text-darken-2">σ={{info.hps[0]}}; λ={{info.hps[1]}}; ρ={{info.hps[2]}}; α={{info.hps[3]}};</span><br>
+              Categories: <span class="blue-text text-darken-2">{{info.categories[0]}}<span ng-repeat="c in info.categories" ng-if="!$first && !$last">, {{c}}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="section col s12 m12 xl12">
+          <div ng-if="error" class="row red-text darken-3 mtop-60" style="text-align:center" ng-cloak><i class="material-icons small">error</i><br>{{error}}</div>
+          <div class="row">
+            <div class="input-field mtop-60" ng-hide="ss3">
+              <i class="material-icons prefix">mode_edit</i>
+              <textarea id="document" name="document" required class="materialize-textarea" ng-disabled="loading" ng-model="document" ng-change="update_document()"></textarea>
+              <label for="document">Input document</label>
+            </div>
+          </div>
+          <div class="row center-align" id="buttons" ng-hide="ss3">
+            <div class="row right-align">
+              <button class="btn-large waves-effect waves-light orange darken-4" ng-class="{pulse:pulse_clear}" ng-click="clear()" ng-if="document" ng-disabled="loading">
+                Clear<i class="material-icons right">delete</i>
+              </button>
+              <button class="btn-large waves-effect waves-light light-blue" ng-class="{pulse:pulse_classify}" ng-disabled="!document || loading" type="submit" name="submit" ng-click="classify()">
+                Classify<i class="material-icons right">style</i>
+              </button>
+            </div>
+          </div>
+          <div class="card-panel row" ng-cloak>
+            <button id="btn_edit" class="btn waves-effect waves-light light-blue right" style="margin-left:10px" ng-click="new()" ng-if="ss3">
+              New<i class="material-icons right">playlist_add</i>
+            </button>
+            <button id="btn_edit" class="btn waves-effect waves-light green right" ng-click="edit()" ng-if="ss3">
+              Edit Text<i class="material-icons right">mode_edit</i>
+            </button>
+            <div class="pink-text text-darken-2" style="margin-bottom: 0;">
+              <h5 class="blue-text" ng-if="f_doc && document">Document: <span style="color:black">{{f_doc}}</span> <span style="color:gray">({{c_doc}})</span></h5>
+              <h5 style="margin-top: 0;">
+                <!-- <span style="color: black" id="hashtag">Main Category: </span> -->
+                <span class="blue-text" id="hashtag">Classification Result: </span>
+                <span ng-hide="ss3 || loading">N/A</span>
+                <span ng-show="loading">...</span>
+                <div class="progress" ng-if="loading"><div class="indeterminate"></div></div>
+                <span ng-show="ss3.cvns[0][2] < .75" class="grey-text">
+                  [ more evidence is required <span ng-show="ss3.cvns[0][2] > .25">but if I had to guess, I would say <span class="pink-text">{{ss3.ci[ss3.cvns[0][0]]}}</span></span> ]
+                </span>
+                <span style="display:inline-block" ng-if="ss3 && is_cat_active(ss3.cvns[0])">
+                  <span class="pointer pulse" ng-style="{'opacity': ss3.cvns[0][1]}" ng-click="select_cat(ss3.cvns[0][0])">{{ss3.ci[ss3.cvns[0][0]]}}</span>
+                </span>
+              </h5>
+              <h5 ng-if="ss3 && ncats > 2 && is_cat_active(ss3.cvns[1])">
+                <span style="color: black">
+                  <span ng-show="ss3.cvns[1][1] < .25">Hmmm...Just Guessing...</span>
+                  <span ng-show="ss3.cvns[1][1] < .5">Maybe </span>
+                  Also<span ng-show="ss3.cvns[1][1] >= .4">:</span> 
+                </span>
+                <span style="display:inline-block; padding-right:" ng-repeat="cv_i in ss3.cvns" ng-hide="$first" ng-if="is_cat_active(cv_i) && $index < 3">
+                  <span ng-show="$index > 1" class="black-text">,</span>
+                  <span class="pointer" ng-style="{'opacity': cv_i[1]}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</span>
+                </span>
+              </h5>
+            </div>
+            <div class="row animate-show-3d-top" ng-show="ss3" style="margin-bottom: 0">
+              <hr>
+              <h5 class="blue-text">Visual Description<span ng-if="scat != -1"> (for {{ss3.ci[scat]}})</span></h5>
+              <div style="padding-bottom: 50px"><i class="material-icons small blue-text">live_help</i> Select the <b>description level and topic</b> using the Level and Topic options below. Additionally, click on individual words to see their  <b><span class="math">gv</span> and <span class="math">lv</span> values and <span class="math">frequency</span>.</b></div>
+              <div class="col l9 s12">
+                <h5 style="display: inline" class="blue-text text-darken-2">Level: </h5>
+                <label>
+                  <input type="checkbox" class="_filled-in" checked="checked" ng-model="levels[0]"/>
+                  <span>Paragraphs</span>
+                </label>
+                <label>
+                  <input type="checkbox" class="_filled-in" checked="checked" ng-model="levels[1]"/>
+                  <span>Sentences</span>
+                </label>
+                <label>
+                  <input type="checkbox" class="_filled-in" checked="checked" ng-model="levels[2]"/>
+                  <span>Words</span>
+                </label>
+                <div class="card-panel animate" id="desc-doc">
+                  <p ng-repeat="par in ss3.pars" id="{{'p-' + par.index}}" ng-style="get_cv_style(par, 0)">
+                    <span ng-repeat="sent in par.sents" id="{{'s-' + sent.index}}" ng-style="get_cv_style(sent, 1)"><span ng-repeat="word in sent.words"><span ng-if="need_space(sent.words, $index, par.sents, sent.index - 1)"> </span><span ng-style="get_cv_style(null, 2)">{{word.lexeme[0]}}</span><span id="{{'w-' + word.index}}" style="cursor:pointer" ng-style="get_cv_style(word, 2)" ng-click="show_info(word)">{{word.lexeme[1]}}{{word.lexeme[2]}}</span></span><span ng-if="sent.dot" ng-style="get_cv_style(null, 2)"></span></span>
+                  </p>
+                  <div class="math row no-animate" ng-show="word_info || show_chart" ng-class="{'animate-show-3d-top':!show_chart}">
+                    <hr>
+                    <div ng-show="word_info">
+                      <div class="col m4 s12 l4">
+                        <b>fr</b>({{chart.srow.token}}, {{ss3.ci[chart.srow.scat]}})=<b>{{chart.srow.fr[chart.srow.scat]}}</b>;
+                      </div>
+                      <div class="col m4 s12 l4">
+                        <b>lv</b>({{chart.srow.token}}, {{ss3.ci[chart.srow.scat]}})=<b>{{chart.srow.lv[chart.srow.scat]|number:3}}</b>;
+                      </div>
+                      <div class="col m4 s12 l4">
+                        <b>gv</b>({{chart.srow.token}}, {{ss3.ci[chart.srow.scat]}})=<b>{{chart.srow.cv[chart.srow.scat]|number:3}}</b>;
+                      </div>
+                    </div>
+                    <div ng-if="show_chart && !word_info">
+                      <div class="math col m12 s12 l12">
+                        <span ng-if="!chart.srow">
+                          document confidence vector= (
+                          <span  ng-repeat="vi in ss3.cv track by $index">
+                            <span ng-if="!$first">, </span>
+                            <span class="pointer" ng-class="{bold : $index == scat}" ng-click="select_cat($index)">{{vi|number:2}}</span>
+                          </span>
+                          )
+                        </span>
+                        <span ng-if="chart.srow">
+                          <span class="bold">
+                            <span ng-if="chart.level == 0">paragraph</span>
+                            <span ng-if="chart.level == 1">sentence</span>
+                            <span ng-if="chart.level == 2">word</span>
+                            confidence vector=
+                            <span ng-if="chart.level == 2"> gv({{chart.srow.token}})= </span>
+                          </span>
+                          (
+                          <span ng-repeat="vi in chart.srow.cv track by $index">
+                            <span ng-if="!$first">, </span>
+                            <span ng-class="{bold : $index == scat}">{{vi|number:2}}</span>
+                          </span>
+                          )
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col l3 s12">
+                <h5 class="blue-text text-darken-2">Topic: </h5>
+                <div class="menu_item waves-effect waves-red" ng-class="{active:scat==-1}" style="display: block">
+                  <a href="" class="menu_item" ng-click="select_cat_menu(-1)" style="border-width: 7px; border-color: grey">
+                    [MIXED]
+                  </a>
+                </div>
+                <div ng-repeat="cv_i in ss3.cvns" class="menu_item waves-effect waves-red" ng-click="select_cat_menu(cv_i[0])" ng-class="{active:scat==cv_i[0]}" style="display: block">
+                  <a href="" class="menu_item" ng-class="{'disabled':!is_cat_active(cv_i)}" ng-style="{'border-color':get_cat_rgb(cv_i[0])}" style="border-width: 7px;">
+                    {{ss3.ci[cv_i[0]]|uppercase}} <label title="confidence value">({{cv_i[2]|number:1}}cv)</label>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 0" ng-show="ss3">
+              <div class="col l9 s12">
+                <div class="row right" style="margin-bottom: 0">
+                  <span style="padding-right: 30px">Advanced</span>
+                  <span class="switch">
+                    <label>
+                      Off
+                      <input ng-model="show_chart" ng-change="on_chart_change()" type="checkbox">
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </span>
+                </div>
+              </div>
+              <div class="col l3 s12">
+              </div>
+            </div>
+            <div class="row" ng-show="ss3" id="chart-section">
+              <div class="input-field m4 col s12" ng-show="show_chart"><h5>Interactive Line Chart</h5></div>
+              <div class="input-field m4 col s12" ng-show="show_chart"></div>
+              <div class="input-field m4 col s12" ng-show="show_chart">
+                <select ng-model="chart.level" ng-change="on_chart_change()">
+                  <option value="0">Paragraphs</option>
+                  <option value="1">Sentences</option>
+                  <option value="2">Words</option>
+                </select>
+                <label>Level</label>
+              </div>
+              <div id="chart" class="m12 col s12"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer footer">
+    <div class="container" style="min-height:70px;">
+      <div class="row">
+        <div class="col l6 s12">
+        </div>
+        <div class="col l4 offset-l2 s12">
+          <!-- <h5 class="white-text"><img src="unsl.png" style="vertical-align: text-top;"> UNSL</h5> -->
+          <!-- <p class="grey-text text-lighten-4">Universidad Nacional de San Luis, <span class="light-blue-text text-lighten-4">Arg</span>ent<span class="light-blue-text text-lighten-4">ina</span></p> -->
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+        <span class="right">
+        <span class="grey-text text-lighten-4">Universidad Nacional de San Luis, <span class="light-blue-text text-lighten-4">Arg</span>ent<span class="light-blue-text text-lighten-4">ina</span></span>
+        <img src="unsl.png"  style="vertical-align: text-bottom;" height="20">
+        </span>
+        <br>
+        <br>
+        <span class="grey-text text-lighten-4 right" style="opacity: 0.75" href="">© 2019 Sergio Burdisso (sburdisso@unsl.edu.ar)</span>
+      </div>
+    </div>
+  </footer>
+</body>
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/angular.min.js"></script>
+<script type="text/javascript" src="js/angular-animate.min.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js" defer onload="google.charts.load('current', {'packages':['corechart']})"></script>
+<script type="text/javascript">
+  "use strict";
+  $(document).ready(function(){
+    $('.tooltipped').tooltip();
+    $('.sidenav').sidenav();
+    $('select').formSelect();
+    $('#document').characterCounter();
+  });
+</script>
+</html>
