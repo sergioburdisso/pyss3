@@ -1,8 +1,7 @@
 # PySS3: A python package implementing a novel text classifier with visualization tools for Explainable AI
 [![Documentation Status](https://readthedocs.org/projects/pyss3/badge/?version=latest)](http://pyss3.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/sergioburdisso/pyss3.svg?branch=master)](https://travis-ci.org/sergioburdisso/pyss3)
-	
-    (preprint avialable here: )
+
 The SS3 text classifier was originally introduced in Section 3 of the [paper](https://dx.doi.org/10.1016/j.eswa.2019.05.023) entitled _"A text classification framework for simple and effective early depression detection over social media streams"_ (preprint available [here](https://arxiv.org/abs/1905.08772)).
 
 **SS3 highlights:**
