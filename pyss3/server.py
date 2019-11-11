@@ -479,5 +479,5 @@ if __name__ == "__main__":
         Server.set_model(clf)
         Server.set_testset_from_files(args.path, args.label == 'folder')
         Server.serve(port=args.port, browser=False)
-    except FileNotFoundError:
+    except IOError:
         Print.error("No such model: '%s'" % args.MODEL)
