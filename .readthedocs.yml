@@ -15,7 +15,9 @@ python:
   install:
     - requirements: docs/requirements.txt
     - method: pip
-      path: .
+        path: .
+        extra_requirements:
+          - docs
     - method: setuptools
   system_packages: true
 
