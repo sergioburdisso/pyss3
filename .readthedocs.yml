@@ -15,10 +15,9 @@ python:
   install:
     - requirements: docs/requirements.txt
     - method: pip
-        path: .
-        extra_requirements:
-          - docs
-    - method: setuptools
+      path: .
+      extra_requirements:
+        - docs
   system_packages: true
 
 # Optionally build your docs in additional formats such as PDF and ePub
