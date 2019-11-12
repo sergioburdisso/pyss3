@@ -18,7 +18,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 
 ENCODING = "utf-8"
 
