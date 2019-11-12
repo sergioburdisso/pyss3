@@ -367,7 +367,7 @@ class Server:
         Server.__port__ = server_socket.getsockname()[1]
 
         Print.info(
-            "SS3 server started (listening on port %d)"
+            "PySS3 server started (listening on port %d)"
             %
             Server.__port__
         )
@@ -452,7 +452,7 @@ class Server:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='SS3 Server')
+    parser = argparse.ArgumentParser(description='PySS3 Live Test Server')
 
     parser.add_argument('MODEL', help="the model name")
     parser.add_argument('-ph', '--path', help="the test set path")
@@ -467,7 +467,7 @@ if __name__ == "__main__":
 
     try:
         Print.warn(
-            'SS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
+            'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
             '\nand you are welcome to redistribute it under certain conditions'
             '\n(read license.txt for more details)\n', decorator=False
         )

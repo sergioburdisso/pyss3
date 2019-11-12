@@ -1086,34 +1086,40 @@ def k_fold_validation(
     x_data, y_data = np.array(x_data), np.array(y_data)
     skf = StratifiedKFold(n_splits=k_fold)
     progress_bar = tqdm(total=k_fold, desc=" K-Fold Progress")
-    for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_data, y_data)):
-        if not cache or not is_in_cache(
-            data_path, method, def_cat, s, l, p, a
-        ):
-            x_train, y_train = x_data[train_ix], y_data[train_ix]
-            y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
-            x_test = x_data[test_ix]
+    try:
+        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_data, y_data)):
+            if not cache or not is_in_cache(
+                data_path, method, def_cat, s, l, p, a
+            ):
+                x_train, y_train = x_data[train_ix], y_data[train_ix]
+                y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
+                x_test = x_data[test_ix]
 
-            CLF = SS3(name=model_name)
-            CLF.set_hyperparameters(s, l, p, a)
-            train(x_train, y_train, n_grams, save=False, leave_pbar=False)
+                CLF = SS3(name=model_name)
+                CLF.set_hyperparameters(s, l, p, a)
+                train(x_train, y_train, n_grams, save=False, leave_pbar=False)
 
-            try:
-                y_pred = CLF.predict(
-                    x_test, def_cat, labels=False, leave_pbar=False
+                try:
+                    y_pred = CLF.predict(
+                        x_test, def_cat, labels=False, leave_pbar=False
+                    )
+                except InvalidCategoryError:
+                    Print.error(ERROR_ICN % def_cat)
+                    return
+
+                results(
+                    y_test, y_pred,
+                    categories, def_cat,
+                    cache, method, data_path,
+                    plots=False, k_fold=k_fold, i_fold=i_fold
                 )
-            except InvalidCategoryError:
-                Print.error(ERROR_ICN % def_cat)
-                return
 
-            results(
-                y_test, y_pred,
-                categories, def_cat,
-                cache, method, data_path,
-                plots=False, k_fold=k_fold, i_fold=i_fold
-            )
-
-        progress_bar.update(1)
+            progress_bar.update(1)
+    except KeyboardInterrupt:
+        Print.set_quiet(False)
+        print()
+        Print.warn("Interrupted!")
+        pass
 
     progress_bar.close()
     CLF = SS3(name=model_name)
@@ -1151,54 +1157,60 @@ def grid_search_loop(
     S, L, P, _ = CLF.get_hyperparameters()
 
     Print.quiet_begin()
-    for s, l, p in slp_list:
-        CLF.set_hyperparameters(s, l, p)
-        updated = False
-        for a in aa:
-            if not cache or not is_in_cache(
-                data_path, method, def_cat, s, l, p, a
-            ):
-                if not updated:
+    try:
+        for s, l, p in slp_list:
+            CLF.set_hyperparameters(s, l, p)
+            updated = False
+            for a in aa:
+                if not cache or not is_in_cache(
+                    data_path, method, def_cat, s, l, p, a
+                ):
+                    if not updated:
+                        progress_desc.set_description_str(
+                            " Status: [updating model...] "
+                            "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
+                            %
+                            (s, l, p, a)
+                        )
+                        CLF.update_values()
+                        updated = True
+
+                    CLF.set_alpha(a)
                     progress_desc.set_description_str(
-                        " Status: [updating model...] "
+                        " Status: [classifying...] "
                         "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
                         %
                         (s, l, p, a)
                     )
-                    CLF.update_values()
-                    updated = True
 
-                CLF.set_alpha(a)
-                progress_desc.set_description_str(
-                    " Status: [classifying...] "
-                    "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
-                    %
-                    (s, l, p, a)
-                )
+                    try:
+                        y_pred = CLF.predict(
+                            x_test, def_cat, labels=False, leave_pbar=False
+                        )
+                    except InvalidCategoryError:
+                        Print.error(ERROR_ICN % def_cat)
+                        return
 
-                try:
-                    y_pred = CLF.predict(
-                        x_test, def_cat, labels=False, leave_pbar=False
+                    results(
+                        y_test, y_pred,
+                        categories, def_cat,
+                        cache, method, data_path,
+                        plots=False, k_fold=k_fold, i_fold=i_fold
                     )
-                except InvalidCategoryError:
-                    Print.error(ERROR_ICN % def_cat)
-                    return
+                else:
+                    progress_desc.set_description_str(
+                        " Status: [skipping (already cached)...] "
+                        "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
+                        %
+                        (s, l, p, a)
+                    )
+                progress_bar.update(1)
+                progress_desc.update(1)
+    except KeyboardInterrupt:
+        Print.set_quiet(False)
+        print()
+        Print.warn("Interrupted!")
 
-                results(
-                    y_test, y_pred,
-                    categories, def_cat,
-                    cache, method, data_path,
-                    plots=False, k_fold=k_fold, i_fold=i_fold
-                )
-            else:
-                progress_desc.set_description_str(
-                    " Status: [skipping (already cached)...] "
-                    "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
-                    %
-                    (s, l, p, a)
-                )
-            progress_bar.update(1)
-            progress_desc.update(1)
     progress_desc.set_description_str(" Status: [finished]")
     progress_bar.close()
     progress_desc.close()
@@ -1251,24 +1263,29 @@ def grid_search(
                 position=0, total=k_fold,
                 desc=" K-Fold Progress"
             )
-            for i_fold, (train_ix, test_ix) in enumerate(
-                skf.split(x_data, y_data)
-            ):
-                x_train, y_train = x_data[train_ix], y_data[train_ix]
-                y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
-                x_test = x_data[test_ix]
+            try:
+                for i_fold, (train_ix, test_ix) in enumerate(
+                    skf.split(x_data, y_data)
+                ):
+                    x_train, y_train = x_data[train_ix], y_data[train_ix]
+                    y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
+                    x_test = x_data[test_ix]
 
-                CLF = SS3(name=model_name)
-                train(x_train, y_train, n_gram, save=False, leave_pbar=False)
+                    CLF = SS3(name=model_name)
+                    train(x_train, y_train, n_gram, save=False, leave_pbar=False)
 
-                grid_search_loop(
-                    data_path, x_test, y_test, categories, def_cat,
-                    k_fold, i_fold, ss, ll, pp, aa, cache, leave_pbar=False
-                )
+                    grid_search_loop(
+                        data_path, x_test, y_test, categories, def_cat,
+                        k_fold, i_fold, ss, ll, pp, aa, cache, leave_pbar=False
+                    )
 
-                save_results_history()
+                    save_results_history()
 
-                progress_bar.update(1)
+                    progress_bar.update(1)
+            except KeyboardInterrupt:
+                Print.set_quiet(False)
+                print()
+                Print.warn("Interrupted!")
 
             progress_bar.close()
             CLF = SS3(name=model_name)
@@ -2634,11 +2651,11 @@ def main():
     """Main function."""
     global MODELS
     prompt = SS3Prompt()
-    prompt.prompt = '(ss3) >>> '
+    prompt.prompt = '(pyss3) >>> '
     prompt.doc_header = "Documented commands (type help <command>):"
     Print.info(
-        'SS3 Command Line v%s | Sergio Burdisso (sergio.burdisso@gmail.com).\n'
-        'SS3 comes with ABSOLUTELY NO WARRANTY. This is free software,\n'
+        'PySS3 Command Line v%s | Sergio Burdisso (sergio.burdisso@gmail.com).\n'
+        'PySS3 comes with ABSOLUTELY NO WARRANTY. This is free software,\n'
         'and you are welcome to redistribute it under certain conditions\n'
         '(Type "license" for more details).\n'
         'Type "help" or "help <command>" for more information.\n'

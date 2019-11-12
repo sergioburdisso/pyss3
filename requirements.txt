@@ -1,6 +1,6 @@
 Cython
 numpy>=1.13.0
 scipy>= 0.17.0
-scikit-learn>=0.20
+scikit-learn==0.20.1
 tqdm>=4.8.4
 matplotlib
