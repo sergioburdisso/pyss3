@@ -2,6 +2,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pyss3/badge/?version=latest)](http://pyss3.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/sergioburdisso/pyss3.svg?branch=master)](https://travis-ci.org/sergioburdisso/pyss3)
 [![Requirements Status](https://requires.io/github/sergioburdisso/pyss3/requirements.svg?branch=master)](https://requires.io/github/sergioburdisso/pyss3/requirements/?branch=master)
+[![MIT License][license-badge]][license]
 
 The SS3 text classifier is a novel supervised machine learning model for text classification. SS3 was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ (preprint available [here](https://arxiv.org/abs/1905.08772)).
 
@@ -43,9 +44,9 @@ As shown in the image below, this will open up, locally, an interactive tool in 
 
 ![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/ss3_live_test.gif)
 
-### And last but not least, the _PySS3 Command Line_
+### And last but not least, the ``PySS3 Command Line``
 
-This is probably the most useful component of PySS3. When you install the package (for instance by using `pip install pyss3`) a new command line is automatically added to your environment, called _"pyss3"_. This command allows you to access to the _PySS3 Command Line_, an interactive command-line query tool. This tool will let you interact with your SS3 models through special commands while assisting you during the whole machine learning pipeline (model selection, training, testing, etc.). Probably one of the most important features is the ability to automatically (and permanently) record the history of every evaluation result of any type (tests, k-fold cross-validations, grid searches, etc.) that you've performed. This will allow you (with a single command) to interactively visualize and analyze your classifier performance in terms of its different hyper-parameters values (and select the best model according to your needs). For instance, let's perform a grid search with a 4-fold cross-validation on the three hyper-parameters, smoothness(`s`), significance(`l`), and sanction(`p`) as follows:
+This is probably the most useful component of PySS3. When you install the package (for instance by using `pip install pyss3`) a new command ``pyss3`` is automatically added to your environment's command line. This command allows you to access to the _PySS3 Command Line_, an interactive command-line query tool. This tool will let you interact with your SS3 models through special commands while assisting you during the whole machine learning pipeline (model selection, training, testing, etc.). Probably one of the most important features is the ability to automatically (and permanently) record the history of every evaluation result of any type (tests, k-fold cross-validations, grid searches, etc.) that you've performed. This will allow you (with a single command) to interactively visualize and analyze your classifier performance in terms of its different hyper-parameters values (and select the best model according to your needs). For instance, let's perform a grid search with a 4-fold cross-validation on the three hyper-parameters, smoothness(`s`), significance(`l`), and sanction(`p`) as follows:
 
 ```console
 your@user:/your/project/path$ pyss3
@@ -58,7 +59,7 @@ In this illustrative example, `s` will take 6 different values between .2 and .8
 ```
 ![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/plot_evaluations.gif)
 
-Each dot represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, dots are painted proportional to how good the performance was using that configuration of the model. Researchers can interactively change the evaluation metrics to be used (accuracy, precision, recall, f1, etc.) and plots will update "on the fly". Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file containing the plots and stores it locally. This allows researchers to store, send or upload the plots to another place using this single HTML file (their papers can now link to these types of plots to increase experimentation transparency!). For example, we have uploaded two of these files we've obtained for the "Tutorials" section: ["Movie Review Classification"](http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html) evaluation plots.
+Each dot represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, dots are painted proportional to how good the performance was using that configuration of the model. Researchers can interactively change the evaluation metrics to be used (accuracy, precision, recall, f1, etc.) and plots will update "on the fly". Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates and save a single and portable HTML file in your project folder containing the interactive plots. This allows researchers to store, send or upload the plots to another place using this single HTML file (or even provide a link to this file in their own papers, which would be nicer for readers, plus it would increase experimentation transparency). For example, we have uploaded two of these files we've obtained for the "Tutorials" section: ["Movie Review Classification"](http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html) evaluation plots.
 
 
 ## The PySS3 Workflow
@@ -95,3 +96,7 @@ pip install .
 
 
 Full API documentation can be found [here](https://pyss3.readthedocs.io)
+
+
+[license-badge]: https://img.shields.io/github/license/boyney123/performance-budgets.svg
+[license]: LICENSE.txt

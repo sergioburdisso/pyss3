@@ -1416,18 +1416,7 @@ class SS3:
         :param cat: the category name
         :type cat:str
         """
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError:
-            Print.error(
-                "matplotlib is not installed: "
-                "matplotlib is required to plot value distributions"
-            )
-            Print.warn(
-                "Suggestion: close this program and then install it "
-                "with 'pip install matplotlib'"
-            )
-            return
+        import matplotlib.pyplot as plt
 
         icat = self.get_category_index(cat)
         vocab_metrics = self.__get_category_vocab__(icat)

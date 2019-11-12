@@ -58,11 +58,13 @@ if __name__ == "__main__":
           install_requires=['six',
                             'cython',
                             'scikit-learn[alldeps]>=0.20',
-                            'tqdm>=4.8.4'],
+                            'tqdm>=4.8.4',
+                            'matplotlib'],
           tests_require=['pytest',
                          'flake8',
                          'six',
                          'cython',
                          'scikit-learn[alldeps]>=0.20',
-                         'tqdm>=4.8.4'],
-          entry_points={'console_scripts': ['pyss3=pyss3.cmd:main']})
+                         'tqdm>=4.8.4',
+                         'matplotlib'],
+          entry_points={'console_scripts': ['pyss3=pyss3.cmd_line:main']})

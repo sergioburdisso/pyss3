@@ -20,7 +20,6 @@ from . import SS3, InvalidCategoryError, __version__
 from .server import Server
 from .util import Print, RecursiveDefaultDict
 
-import matplotlib.pyplot as plt
 import numpy as np
 import webbrowser
 import json
@@ -294,6 +293,8 @@ def k_fold_classification_report(data_path, method, def_cat, s, l, p, a):
 
 def plot_confusion_matrices(cms, classes, info='', max_colums=3):
     """Show and plot the confusion matrices."""
+    import matplotlib.pyplot as plt
+
     n_cms = len(cms)
 
     rows = ceil(n_cms / (max_colums + .0))
