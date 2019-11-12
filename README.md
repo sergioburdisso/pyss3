@@ -40,7 +40,7 @@ which allows you to interactively test your model and visually see the reasons b
 ```
 As shown in the image below, this will open up, locally, an interactive tool in your browser which you can use to (live) test your models with the documents given in `x_test` (or typing in your own!). This will allow you to visualize and understand what your model is actually learning.
 
-![img](docs/_static/ss3_live_test.gif)
+![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/ss3_live_test.gif)
 
 ### And last but not least, the _PySS3 Command Line_
 
@@ -55,7 +55,7 @@ In this illustrative example, `s` will take 6 different values between .2 and .8
 ```console
 (pyss3) >>> plot evaluations
 ```
-![img](docs/_static/plot_evaluations.gif)
+![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/plot_evaluations.gif)
 
 Each dot represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, dots are painted proportional to how good the performance was using that configuration of the model. Researchers can interactively change the evaluation metrics to be used (accuracy, precision, recall, f1, etc.) and plots will update "on the fly". Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file containing the plots and stores it locally. This allows researchers to store, send or upload the plots to another place using this single HTML file (their papers can now link to these types of plots to increase experimentation transparency!). For example, we have uploaded two of these files we've obtained for the "Tutorials" section: ["Movie Review Classification"](http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html) evaluation plots.
 

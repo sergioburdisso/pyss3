@@ -49,6 +49,7 @@ if __name__ == "__main__":
           license=LICENSE,
           url=URL,
           long_description=LONG_DESCRIPTION,
+          long_description_content_type='text/markdown',
           packages=find_packages(),
           package_data={DISTNAME: ['resources/**/*', 'resources/**/**/*']},
           include_package_data=True,

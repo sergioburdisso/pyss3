@@ -2,6 +2,7 @@ docs/_build
 __extra__
 pyss3/__pycache__
 .pytest_cache
+build/
 *.pyc
 *~
 *.ipynb
