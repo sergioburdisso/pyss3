@@ -2,6 +2,12 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.3.4] 2019-11-12
+
+### Fixed
+- Dependencies and compatibility with python 2 Improved
+
+
 ## [0.3.3] 2019-11-12
 
 ### Fixed
