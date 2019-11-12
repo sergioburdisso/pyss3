@@ -18,7 +18,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 ENCODING = "utf-8"
 
@@ -428,12 +428,9 @@ class SS3:
         get_word = self.get_word
         if not json:
             words_cvs = [classify_trans(seq) for _, seq in sent]
-
             if words_cvs:
-                cv = reduce(vsum, words_cvs)
-            else:
-                return self.__zero_cv__
-            return cv
+                return SS3.summary_op_ngrams(words_cvs)
+            return self.__zero_cv__
         else:
             get_tip = self.__trie_node__
             local_value = self.__lv__
@@ -449,7 +446,7 @@ class SS3:
             ]
             return {
                 "words": info,
-                "cv": reduce(vsum, [v["cv"] for v in info]),
+                "cv": SS3.summary_op_ngrams([v["cv"] for v in info]),
                 "wmv": reduce(vmax, [v["cv"] for v in info])  # word max value
             }
 
@@ -462,10 +459,8 @@ class SS3:
                 if sent
             ]
             if sents_cvs:
-                cv = reduce(vsum, sents_cvs)
-            else:
-                cv = self.__zero_cv__
-            return cv
+                return SS3.summary_op_sentences(sents_cvs)
+            return self.__zero_cv__
         else:
             info = [
                 self.__classify_sentence__(sent, prep=prep, json=True)
@@ -474,7 +469,7 @@ class SS3:
             ]
             if info:
                 sents_cvs = [v["cv"] for v in info]
-                cv = reduce(vsum, sents_cvs)
+                cv = SS3.summary_op_sentences(sents_cvs)
                 wmv = reduce(vmax, [v["wmv"] for v in info])
             else:
                 cv = self.__zero_cv__
@@ -714,6 +709,102 @@ class SS3:
                     f.write("%s,%d,%f,%f\n" % tuple(trans))
                 f.close()
                 Print.info("\t[ %s stored in '%s'" % (term, voc_path))
+
+    @staticmethod
+    def summary_op_ngrams(cvs):
+        """
+        Summary operator for n-gram confidence vectors.
+
+        By default it returns the addition of all confidence
+        vectors. However, in case you want to use a custom
+        wants to use a custom summary operator, this function
+        must be replaced as shown in the following example:
+
+            >>> def dummy_summary_op(cvs):
+            >>>     return cvs[0]
+            >>> ...
+            >>> SS3.summary_op_ngrams = dummy_summary_op
+            >>> ...
+            >>> clf = SS3()
+
+        Note that any function receiving a list of (confidence)
+        vectors and returning a single (confidence) vector
+        could be used. In the example above the summary operator
+        is replaced by the user-defined ``dummy_summary_op`` which
+        ignores all confidence vectors returning only the confidence
+        vector of the first n-gram (which besides being an
+        illustrative example, makes no real sense).
+
+        :param cvs: a list n-grams confidence vectors
+        :type cvs: list (of list of float)
+        :returns: a sentence confidence vector
+        :rtype: list (of float)
+        """
+        return reduce(vsum, cvs)
+
+    @staticmethod
+    def summary_op_sentences(cvs):
+        """
+        Summary operator for sentence confidence vectors.
+
+        By default it returns the addition of all confidence
+        vectors. However, in case you want to use a custom
+        wants to use a custom summary operator, this function
+        must be replaced as shown in the following example:
+
+            >>> def dummy_summary_op(cvs):
+            >>>     return cvs[0]
+            >>> ...
+            >>> SS3.summary_op_sentences = dummy_summary_op
+            >>> ...
+            >>> clf = SS3()
+
+        Note that any function receiving a list of (confidence)
+        vectors and returning a single (confidence) vector
+        could be used. In the example above the summary operator
+        is replaced by the user-defined ``dummy_summary_op`` which
+        ignores all confidence vectors returning only the confidence
+        vector of the first sentence (which besides being an
+        illustrative example, makes no real sense).
+
+        :param cvs: a list sentence confidence vectors
+        :type cvs: list (of list of float)
+        :returns: a paragraph confidence vector
+        :rtype: list (of float)
+        """
+        return reduce(vsum, cvs)
+
+    @staticmethod
+    def summary_op_paragraphs(cvs):
+        """
+        Summary operator for paragraph confidence vectors.
+
+        By default it returns the addition of all confidence
+        vectors. However, in case you want to use a custom
+        wants to use a custom summary operator, this function
+        must be replaced as shown in the following example:
+
+            >>> def dummy_summary_op(cvs):
+            >>>     return cvs[0]
+            >>> ...
+            >>> SS3.summary_op_paragraphs = dummy_summary_op
+            >>> ...
+            >>> clf = SS3()
+
+        Note that any function receiving a list of (confidence)
+        vectors and returning a single (confidence) vector
+        could be used. In the example above the summary operator
+        is replaced by the user-defined ``dummy_summary_op`` which
+        ignores all confidence vectors returning only the confidence
+        vector of the first paragraph (which besides being an
+        illustrative example, makes no real sense).
+
+        :param cvs: a list paragraph confidence vectors
+        :type cvs: list (of list of float)
+        :returns: the document confidence vector
+        :rtype: list (of float)
+        """
+        return reduce(vsum, cvs)
 
     def get_name(self):
         """
@@ -1505,7 +1596,7 @@ class SS3:
                 if parag
             ]
             if paragraphs_cvs:
-                cv = reduce(vsum, paragraphs_cvs)
+                cv = SS3.summary_op_paragraphs(paragraphs_cvs)
             else:
                 cv = self.__zero_cv__
             if sort:
@@ -1523,27 +1614,26 @@ class SS3:
                 for parag in doc.split(PARA_DELTR)
                 if parag
             ]
+
             nbr_cats = len(self.__categories__)
-            confidence_vector = reduce(vsum, [v["cv"] for v in info])
-            max_v = max(confidence_vector)
+            cv = SS3.summary_op_paragraphs([v["cv"] for v in info])
+            max_v = max(cv)
+
             if max_v > 1:
-                confidence_vector_norm = map(
-                    lambda x: x / max_v, confidence_vector
-                )
+                norm_cv = map(lambda x: x / max_v, cv)
             else:
-                confidence_vector_norm = confidence_vector
-            confidence_vector_norm_sorted = sorted(
-                [
-                    (i, nv, confidence_vector[i])
-                    for i, nv in enumerate(confidence_vector_norm)
-                ],
+                norm_cv = cv
+
+            norm_cv_sorted = sorted(
+                [(i, nv, cv[i]) for i, nv in enumerate(norm_cv)],
                 key=lambda e: -e[1]
             )
+
             return {
                 "pars": info,
-                "cv": confidence_vector,
+                "cv": cv,
                 "wmv": reduce(vmax, [v["wmv"] for v in info]),
-                "cvns": confidence_vector_norm_sorted,
+                "cvns": norm_cv_sorted,
                 "ci": [self.get_category_name(ic) for ic in xrange(nbr_cats)]
             }
 

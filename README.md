@@ -64,7 +64,11 @@ Each dot represents an experiment/evaluation performed using that particular com
 
 ### The somewhat standard way
 
+(TODO: tutorial WIP)
+
 ### The "Command-Line" way
+
+(TODO: tutorial WIP)
 
 ## Installation
 

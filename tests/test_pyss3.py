@@ -9,10 +9,10 @@ import pytest
 
 DATASET_FOLDER = "dataset"
 
-x_train = []
-y_train = []
+x_train = []  # loaded later from disk
+y_train = []  # loaded later from disk
 x_test = [
-    "sports nfl nba superbowl football team soccer learns jersey air bowl hockey "
+    "sports nfl nba superbowl soccer football team. learns jersey air bowl hockey.\n"
     "baseball helmet mccutchen jordan curry poker",
 
     "travel pictures images moment glamour canvas photoshoot lens dslr portrait "
@@ -59,7 +59,6 @@ dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 for file in listdir(dataset_path):
     with open(path.join(dataset_path, file), encoding="utf-8") as cat_file:
         docs = cat_file.readlines()
-        print(path.splitext(file)[0])
         x_train.extend(docs)
         y_train.extend([path.splitext(file)[0]] * len(docs))
 
@@ -69,7 +68,7 @@ def argmax(lst):
     return max(range(len(lst)), key=lst.__getitem__)
 
 
-def perform_tests_with(clf):
+def perform_tests_with(clf, cv):
     """Perform some tests with the given classifier."""
     assert clf.get_category_index("SpOrTs") == clf.get_category_index("sports")
 
@@ -92,6 +91,7 @@ def perform_tests_with(clf):
 
     y_pred = clf.predict_proba(x_test)
     assert y_test == [clf.get_category_name(argmax(cv)) for cv in y_pred]
+    assert [round(p, 5) for p in y_pred[0]] == cv
 
     y_pred = clf.predict_proba(["bla bla bla"])
     assert y_pred[0] == [0] * len(clf.get_categories())
@@ -124,15 +124,15 @@ def test_pyss3_functions():
     assert pyss3.sigmoid(1, 1) == .5
     assert pyss3.sigmoid(.2, .2) == .5
     assert pyss3.sigmoid(.5, .5) == .5
-    assert round(pyss3.sigmoid(0, .5), 5) == round(.002472623156634768, 5)
-    assert round(pyss3.sigmoid(1, .5), 5) == round(.9975273768433652, 5)
-    assert round(pyss3.sigmoid(1, 2), 5) == round(.0474258731775668, 5)
+    assert round(pyss3.sigmoid(0, .5), 5) == .00247
+    assert round(pyss3.sigmoid(1, .5), 5) == .99753
+    assert round(pyss3.sigmoid(1, 2), 5) == .04743
 
     assert pyss3.mad([1, 1, 1], 3) == (1, .0)
     assert pyss3.mad([1, 1, 1], 3) == (1, .0)
     assert pyss3.mad([], 1) == (0, .0)
-    assert round(pyss3.mad([1, 2, 1], 3)[1], 5) == round(.3333333333333333, 5)
-    assert round(pyss3.mad([1, 10, 1], 3)[1], 5) == round(3.0, 5)
+    assert round(pyss3.mad([1, 2, 1], 3)[1], 5) == .33333
+    assert round(pyss3.mad([1, 10, 1], 3)[1], 5) == 3.0
 
     with pytest.raises(IndexError):
         pyss3.mad([], 0)
@@ -156,7 +156,7 @@ def test_pyss3_ss3():
 
     clf.fit(x_train, y_train)
 
-    perform_tests_with(clf)
+    perform_tests_with(clf, [.00032, .00056, 0, 0, 0, .00019, .0021, 7.03651])
 
     clf = SS3(
         s=.32, l=1.24, p=1.1, a=0, name="test-3grams",
@@ -164,15 +164,19 @@ def test_pyss3_ss3():
     )
     clf.fit(x_train, y_train, n_grams=3)
 
-    perform_tests_with(clf)
+    perform_tests_with(clf, [.00037, .0006, 0, 0, 0, .00028, .00082, 9.03427])
 
     pred = clf.classify("android mobile and video games", json=True)
     assert pred["pars"][0]["sents"][0]["words"][0]["lexeme"] == "android mobile"
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "video games"
     assert argmax(pred["cv"]) == clf.get_category_index("science&technology")
+    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 3.8183, 0, 0]
 
     pred = clf.classify("playing football soccer", json=True)
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "football soccer"
     assert argmax(pred["cv"]) == clf.get_category_index("sports")
+    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.70975, 0]
 
-test_pyss3_ss3()
+
+# if __name__ == "__main__":
+#     test_pyss3_ss3()

@@ -1,8 +1,9 @@
-docs/_build
-__extra__
-pyss3/__pycache__
-.pytest_cache
 build/
+__extra__
+.pytest_cache
+docs/_build
+*/__pycache__
+tests/pyss3
 *.pyc
 *~
 *.ipynb
