@@ -68,7 +68,7 @@ def argmax(lst):
     return max(range(len(lst)), key=lst.__getitem__)
 
 
-def perform_tests_with(clf, cv):
+def perform_tests_with(clf, cv_test):
     """Perform some tests with the given classifier."""
     assert clf.get_category_index("SpOrTs") == clf.get_category_index("sports")
 
@@ -91,7 +91,7 @@ def perform_tests_with(clf, cv):
 
     y_pred = clf.predict_proba(x_test)
     assert y_test == [clf.get_category_name(argmax(cv)) for cv in y_pred]
-    assert [round(p, 5) for p in y_pred[0]] == cv
+    assert [round(p, 5) for p in y_pred[0]] == cv_test
 
     y_pred = clf.predict_proba(["bla bla bla"])
     assert y_pred[0] == [0] * len(clf.get_categories())

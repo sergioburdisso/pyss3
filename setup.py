@@ -27,15 +27,18 @@ CLASSIFIERS = ['Programming Language :: Python',
                'Topic :: Scientific/Engineering :: Visualization',
                'Operating System :: OS Independent']
 
-with open('README.md', encoding=__encode__) as readme:
+
+__cwd__ = path.abspath(path.dirname(__file__))
+__readme_file__ = path.join(__cwd__, 'README.md')
+with open(__readme_file__, encoding=__encode__) as readme:
     LONG_DESCRIPTION = readme.read()
 
-with open('requirements.txt') as requirements:
+__requirements_file__ = path.join(__cwd__, 'requirements.txt')
+with open(__requirements_file__, encoding=__encode__) as requirements:
     INSTALL_REQS = requirements.read().splitlines()
 
 
 _version_re__ = r"__version__\s*=\s*['\"]([^'\"]+)['\"]"
-__cwd__ = path.abspath(path.dirname(__file__))
 __init_file__ = path.join(__cwd__, '%s/__init__.py' % DISTNAME)
 with open(__init_file__, encoding=__encode__) as __init__py:
     VERSION = re.search(_version_re__, __init__py.read()).group(1)
