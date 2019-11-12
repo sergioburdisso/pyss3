@@ -1,7 +1,7 @@
 """Setup script."""
 import re
 from os import path
-from codecs import open
+from io import open
 from setuptools import setup, find_packages
 
 __encode__ = 'utf8'
@@ -33,15 +33,12 @@ __readme_file__ = path.join(__cwd__, 'README.md')
 with open(__readme_file__, encoding=__encode__) as readme:
     LONG_DESCRIPTION = readme.read()
 
-__requirements_file__ = path.join(__cwd__, 'requirements.txt')
-with open(__requirements_file__, encoding=__encode__) as requirements:
-    INSTALL_REQS = requirements.read().splitlines()
-
 
 _version_re__ = r"__version__\s*=\s*['\"]([^'\"]+)['\"]"
 __init_file__ = path.join(__cwd__, '%s/__init__.py' % DISTNAME)
 with open(__init_file__, encoding=__encode__) as __init__py:
     VERSION = re.search(_version_re__, __init__py.read()).group(1)
+
 
 if __name__ == "__main__":
     setup(name=DISTNAME,
@@ -58,6 +55,14 @@ if __name__ == "__main__":
           include_package_data=True,
           classifiers=CLASSIFIERS,
           python_requires='>=2.7',
-          install_requires=INSTALL_REQS,
-          tests_require=['pytest'] + INSTALL_REQS,
+          install_requires=['six',
+                            'cython',
+                            'scikit-learn[alldeps]>=0.20',
+                            'tqdm>=4.8.4'],
+          tests_require=['pytest',
+                         'flake8',
+                         'six',
+                         'cython',
+                         'scikit-learn[alldeps]>=0.20',
+                         'tqdm>=4.8.4'],
           entry_points={'console_scripts': ['pyss3=pyss3.cmd:main']})

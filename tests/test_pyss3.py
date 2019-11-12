@@ -1,6 +1,6 @@
 """Tests for pytest."""
 from os import listdir, path
-from codecs import open
+from io import open
 from pyss3 import SS3, STR_NORM_GV_XAI, STR_XAI
 from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY
 

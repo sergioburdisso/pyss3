@@ -6,7 +6,7 @@ SS3 classification server with visual explanations for live tests.
 """
 from __future__ import print_function
 from os import path, listdir
-from codecs import open
+from io import open
 from tqdm import tqdm
 from select import select
 from datetime import datetime

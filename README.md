@@ -30,13 +30,13 @@ which implements the classifier using a clear API (very similar to that of `skle
 
 which allows you to interactively test your model and visually see the reasons behind classification decisions, **with just one line of code**:
 ```python
-    import pyss3
+    from pyss3.server import Server
     from pyss3 import SS3
 
     clf = SS3(name="my_model")
     ...
     clf.fit(x_train, y_train)
-    pyss3.Server.serve(clf, x_test, y_test) # <- this one! cool uh? :)
+    Server.serve(clf, x_test, y_test) # <- this one! cool uh? :)
 ```
 As shown in the image below, this will open up, locally, an interactive tool in your browser which you can use to (live) test your models with the documents given in `x_test` (or typing in your own!). This will allow you to visualize and understand what your model is actually learning.
 
@@ -77,16 +77,17 @@ Each dot represents an experiment/evaluation performed using that particular com
 
 Simply type:
 ```console
-$ pip install pyss3
+pip install pyss3
 ```
 
 ### Installation from source
 
 To install latest version from github, clone the source from the project repository and install with setup.py:
 ```console
-$ git clone https://github.com/sergioburdisso/pyss3
-$ cd pyss3
-$ python setup.py install
+git clone https://github.com/sergioburdisso/pyss3
+cd pyss3
+pip install -r requirements.txt
+pip install .
  ```
 
 ## API Documentation

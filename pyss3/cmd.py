@@ -6,7 +6,7 @@ This module lets you interact with your SS3 models through a Command Line.
 """
 from __future__ import print_function
 from os import listdir, path, remove as remove_file, rename as rename_file
-from codecs import open
+from io import open
 from cmd import Cmd
 from tqdm import tqdm
 from math import ceil

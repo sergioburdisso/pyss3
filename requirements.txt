@@ -1,6 +1,4 @@
-Cython
-numpy>=1.13.0
-scipy>= 0.17.0
-scikit-learn==0.20.1
+six
+cython
+scikit-learn[alldeps]>=0.20
 tqdm>=4.8.4
-matplotlib
