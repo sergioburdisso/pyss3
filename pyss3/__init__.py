@@ -9,6 +9,7 @@ import os
 import re
 import json
 
+from io import open
 from time import time
 from tqdm import tqdm
 from math import pow, tanh
@@ -18,7 +19,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.4"
+__version__ = "0.3.5"
 
 ENCODING = "utf-8"
 
@@ -702,11 +703,11 @@ class SS3:
                 voc_path = os.path.join(
                     path, "ss3_vocab_%s(%s).csv" % (cat_name, term)
                 )
-                f = open(voc_path, "w+")
+                f = open(voc_path, "w+", encoding=ENCODING)
                 vocabularies_out[ilen].sort(key=lambda k: -k[-1])
-                f.write("%s,%s,%s,%s\n" % ("term", "fr", "gv", "norm_gv"))
+                f.write(u"%s,%s,%s,%s\n" % ("term", "fr", "gv", "norm_gv"))
                 for trans in vocabularies_out[ilen]:
-                    f.write("%s,%d,%f,%f\n" % tuple(trans))
+                    f.write(u"%s,%d,%f,%f\n" % tuple(trans))
                 f.close()
                 Print.info("\t[ %s stored in '%s'" % (term, voc_path))
 
@@ -1107,9 +1108,13 @@ class SS3:
                 self.__models_folder__,
                 self.__name__,
                 self.__models_ext__
-            ), "w"
+            ), "w", encoding=ENCODING
         )
-        json_file.write(json.dumps(json_file_format))
+        try:  # python 3
+            json_file.write(json.dumps(json_file_format))
+        except TypeError:  # python 2
+            json_file.write(json.dumps(json_file_format).decode(ENCODING))
+
         json_file.close()
         Print.info("(%.1fs)" % (time() - stime))
 
@@ -1127,7 +1132,7 @@ class SS3:
                 self.__models_folder__,
                 self.__name__,
                 self.__models_ext__
-            ), "r"
+            ), "r", encoding=ENCODING
         )
         json_file_format = json.loads(json_file.read(), object_hook=key_as_int)
         json_file.close()
@@ -1586,7 +1591,7 @@ class SS3:
 
         try:
             doc = doc.decode(ENCODING)
-        except AttributeError:
+        except BaseException:
             pass
 
         if not json:

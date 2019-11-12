@@ -30,9 +30,9 @@ try:
 except ImportError:
     readline = None
 
-# histfile = path.expanduser('~/.ss3_history')
-histfile = '.ss3_history'
-histfile_size = 1000
+# HISTFILE = path.expanduser('~/.ss3_history')
+HISTFILE = '.ss3_history'
+HISTFILE_SIZE = 1000
 
 STOPWORDS_FILE = "./ss3_stopwords[%s].txt"
 RESULT_HTML_OUT_FILE = "./ss3_model_evaluation[%s].html"
@@ -112,6 +112,12 @@ F_PRECISION = 4
 r = linspace  # an alias for grid_search command
 
 
+try:
+    input = raw_input  # Python 2
+except NameError:
+    pass
+
+
 class GetTestDataError(Exception):
     """Exception thrown when an error occur while retrieving the test data."""
 
@@ -165,7 +171,7 @@ def requires_args(func):
 def json2rh(dct):
     """Convert a given dictionary to a RecursiveDefaultDict."""
     r_ddct = RecursiveDefaultDict()
-    for key in dct:
+    for key in dct.keys():
         try:
             r_ddct[float(key)] = dct[key]
         except ValueError:
@@ -270,12 +276,13 @@ def k_fold_classification_report(data_path, method, def_cat, s, l, p, a):
         report += '\n'
     report += '\n'
     for avg in AVGS:
-        report += '{:>{width}s} '.format(avg, width=width)
-        for metric in METRICS:
-            report += ' {:>9.2f}'.format(
-                rh[metric][avg]["value"][s][l][p][a]
-            )
-        report += '\n'
+        if avg in rh[metric]:
+            report += '{:>{width}s} '.format(avg, width=width)
+            for metric in METRICS:
+                report += ' {:>9.2f}'.format(
+                    rh[metric][avg]["value"][s][l][p][a]
+                )
+            report += '\n'
 
     report += "\n\n %s: %.3f\n" % (
         Print.style.bold("avg accuracy"), rh["accuracy"]["value"][s][l][p][a]
@@ -297,7 +304,7 @@ def plot_confusion_matrices(cms, classes, info='', max_colums=3):
 
     n_cms = len(cms)
 
-    rows = ceil(n_cms / (max_colums + .0))
+    rows = int(ceil(n_cms / (max_colums + .0)))
     columns = max_colums if n_cms > max_colums else n_cms
 
     title = 'Confusion Matri%s' % ('x' if n_cms == 1 else 'ces')
@@ -317,14 +324,12 @@ def plot_confusion_matrices(cms, classes, info='', max_colums=3):
             continue
 
         cm = np.array(cms[axi])
+        ax.set_xticks(np.arange(cm.shape[1]))
+        ax.set_yticks(np.arange(cm.shape[0]))
         im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Purples)
 
         if n_cms == 1:
             ax.figure.colorbar(im, ax=ax)
-
-        # We want to show all ticks...
-        ax.set(xticks=np.arange(cm.shape[1]),
-               yticks=np.arange(cm.shape[0]))
 
         if n_cms == 1:
             ax.set_title(title + '\n', fontweight="bold")
@@ -439,7 +444,10 @@ def save_results_history():
         CLF.__name__ + RESULT_HISTORY_EXT
     )
     with open(rh_path, "w", encoding=ENCODING) as json_file:
-        json_file.write(json.dumps(RESULTS_HISTORY))
+        try:  # Python 3
+            json_file.write(json.dumps(RESULTS_HISTORY))
+        except TypeError:  # Python 2
+            json_file.write(json.dumps(RESULTS_HISTORY).decode(ENCODING))
 
 
 def get_global_best(values):
@@ -483,26 +491,26 @@ def save_html_evaluations(show_plot=True):
         if "plotly.min.js" in line:
             plotly_path = module_path(html_src + "plotly.min.js")
             with open(plotly_path, 'r', encoding=ENCODING) as fplotly:
-                fout.write('    <script type="text/javascript">')
+                fout.write(u'    <script type="text/javascript">')
                 fout.write(fplotly.read())
-                fout.write('</script>\n')
+                fout.write(u'</script>\n')
 
         elif "angular.min.js" in line:
             angular_path = module_path(html_src + "angular.min.js")
             with open(angular_path, 'r', encoding=ENCODING) as fangular:
-                fout.write('    <script type="text/javascript">')
+                fout.write(u'    <script type="text/javascript">')
                 fout.write(fangular.read())
-                fout.write('</script>\n')
+                fout.write(u'</script>\n')
 
         elif "data.js" in line:
-            fout.write('    <script type="text/javascript">')
-            fout.write('var $model_name = "%s"; ' % CLF.get_name())
+            fout.write(u'    <script type="text/javascript">')
+            fout.write(u'var $model_name = "%s"; ' % CLF.get_name())
             fout.write(
-                'var $results = JSON.parse("%s");'
+                u'var $results = JSON.parse("%s");'
                 %
                 json.dumps(RESULTS_HISTORY).replace('"', r'\"')
             )
-            fout.write('</script>\n')
+            fout.write(u'</script>\n')
         else:
             fout.write(line)
 
@@ -640,7 +648,8 @@ def save_results(
     if rh["accuracy"]["best"]["value"] == {}:
         rh["accuracy"]["best"]["value"] = -1
         for metric, avg in product(METRICS, AVGS):
-            rh[metric][avg]["best"]["value"] = -1
+            if avg in report:  # scikit-learn > 0.20 does not include 'micro avg' in report
+                rh[metric][avg]["best"]["value"] = -1
         for cat in categories:
             for metric in METRICS:
                 rh[metric]["categories"][cat]["best"]["value"] = -1
@@ -650,7 +659,8 @@ def save_results(
         rh["accuracy"]["fold_values"][s][l][p][a] = [0] * k_fold
         rh["confusion_matrix"][s][l][p][a] = [None] * k_fold
         for metric, avg in product(METRICS, AVGS):
-            rh[metric][avg]["fold_values"][s][l][p][a] = [0] * k_fold
+            if avg in report:
+                rh[metric][avg]["fold_values"][s][l][p][a] = [0] * k_fold
         for cat in categories:
             for metric in METRICS:
                 rh[metric]["categories"][cat]["fold_values"][s][l][p][a] = [0] * k_fold
@@ -658,7 +668,8 @@ def save_results(
     # saving fold results
     rh["accuracy"]["fold_values"][s][l][p][a][i_fold] = rf(accuracy)
     for metric, avg in product(METRICS, AVGS):
-        rh[metric][avg]["fold_values"][s][l][p][a][i_fold] = rf(report[avg][metric])
+        if avg in report:
+            rh[metric][avg]["fold_values"][s][l][p][a][i_fold] = rf(report[avg][metric])
     for cat in categories:
         for metric in METRICS:
             rh[metric]["categories"][cat]["fold_values"][s][l][p][a][i_fold] = rf(
@@ -678,14 +689,15 @@ def save_results(
             best_acc["p"], best_acc["a"] = p, a
 
         for metric, avg in product(METRICS, AVGS):
-            metric_avg = rf(mean(rh[metric][avg]["fold_values"][s][l][p][a]))
-            rh[metric][avg]["value"][s][l][p][a] = metric_avg
+            if avg in report:
+                metric_avg = rf(mean(rh[metric][avg]["fold_values"][s][l][p][a]))
+                rh[metric][avg]["value"][s][l][p][a] = metric_avg
 
-            best_metric_avg = rh[metric][avg]["best"]
-            if metric_avg > best_metric_avg["value"]:
-                best_metric_avg["value"] = metric_avg
-                best_metric_avg["s"], best_metric_avg["l"] = s, l
-                best_metric_avg["p"], best_metric_avg["a"] = p, a
+                best_metric_avg = rh[metric][avg]["best"]
+                if metric_avg > best_metric_avg["value"]:
+                    best_metric_avg["value"] = metric_avg
+                    best_metric_avg["s"], best_metric_avg["l"] = s, l
+                    best_metric_avg["p"], best_metric_avg["a"] = p, a
 
         for cat in categories:
             for metric in METRICS:
@@ -1886,11 +1898,11 @@ class SS3Prompt(Cmd):
         elif arg == STR_VOCABULARY:
             if value:
                 try:
-                    CLF.save_cat_vocabulary(value)
+                    CLF.save_cat_vocab(value)
                 except InvalidCategoryError:
                     Print.error(ERROR_ICN % value)
             else:
-                CLF.save_vocabulary()
+                CLF.save_vocab()
 
         # case 'evaluations'
         elif arg == STR_EVALUATIONS:
@@ -1906,7 +1918,7 @@ class SS3Prompt(Cmd):
             if stopwords:
                 stopwords_file = STOPWORDS_FILE % CLF.__name__
                 with open(stopwords_file, "w", encoding=ENCODING) as fstopws:
-                    fstopws.write('\n'.join(stopwords))
+                    fstopws.write(u'\n'.join(stopwords))
                 Print.info("stopwords saved in '%s'" % stopwords_file)
             else:
                 Print.warn(WARN_NO_STOPWORDS)
@@ -2156,8 +2168,11 @@ class SS3Prompt(Cmd):
         """Quit the program."""
         print("Bye")
         if readline:
-            readline.set_history_length(histfile_size)
-            readline.write_history_file(histfile)
+            readline.set_history_length(HISTFILE_SIZE)
+            try:
+                readline.write_history_file(HISTFILE)
+            except IOError:
+                pass
         raise SystemExit
 
     def complete_info(self, text, line, begidx, endidx):
@@ -2625,8 +2640,8 @@ class SS3Prompt(Cmd):
 
     def preloop(self):
         """Hook method executed once when cmdloop() is called."""
-        if readline and path.exists(histfile):
-            readline.read_history_file(histfile)
+        if readline and path.exists(HISTFILE):
+            readline.read_history_file(HISTFILE)
 
     def precmd(self, line):
         """Hook method executed just before the command."""

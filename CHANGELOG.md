@@ -2,6 +2,15 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.3.5] 2019-11-12
+
+### Added
+- PySS3 Command Line Python 2 full compatibility support
+
+### Fixed
+- Matplotlib set_yaxis bug fixed
+
+
 ## [0.3.4] 2019-11-12
 
 ### Fixed
