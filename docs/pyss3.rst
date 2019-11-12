@@ -22,7 +22,7 @@ pyss3.server module
    :undoc-members:
    :show-inheritance:
 
-pyss3.cmd module
+pyss3.cmd_line module
 ----------------
 
 .. automodule:: pyss3.cmd_line
