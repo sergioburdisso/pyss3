@@ -190,16 +190,16 @@
     <ul id="slide-out" class="sidenav sidenav-fixed" ng-show="keys(info.docs).length">
       <li><a class="subheader">Test Documents by Category</a></li>
       <ul class="collapsible">
-        <li ng-repeat="c in keys(info.docs)" ng-cloak>
+        <li ng-repeat="c in keys(info.docs)" ng-cloak ng-class="{active:keys(info.docs).length == 1}">
           <div class="collapsible-header"><i class="material-icons right" ng-style="{'color': get_cat_rgb(info.categories.indexOf(c))}">
-            style</i>{{c}} ({{info.docs[c].file.length}}) <small class="recall blue-text text-darken-2 right" title="recall (% of hits)">{{get_accuracy(c)|number:1}}%</small>
+            style</i>{{c}} ({{info.docs[c].file.length}}) <small class="recall blue-text text-darken-2 right" title="recall (% of hits)" ng-if="info.categories.indexOf(c) != -1">{{get_accuracy(c)|number:1}}%</small>
           </div>
           <div class="collapsible-body">
             <ul>
               <li ng-repeat="f in info.docs[c].file track by $index" ng-class="{'active': $index == i_doc && c == c_doc}">
                 <a class="waves-effect" href="#" ng-click="get_doc(c, $index)">
                   {{f}} 
-                  <i class="material-icons right missclass" ng-if="get_clf_result(c, $index) != c" title="missclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
+                  <i class="material-icons right missclass" ng-if="info.categories.indexOf(c) != -1 && get_clf_result(c, $index) != c" title="missclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
                 </a>
               </li>
             </ul>
