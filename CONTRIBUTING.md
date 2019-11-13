@@ -27,17 +27,18 @@ If you want to contribute to our codebase, please send an email to sergio.burdis
 
 3. Inside the top level project directory, install the project for development purpose:
 
+    ```console
     pip install -e .
+    ```
 
 4. Make a new branch for development
 
-5. Hook your Travis CI to your development branch to enable continuous testing
+5. Hook your [Travis CI](https://travis-ci.org/) to your development branch to enable continuous testing
 
 6. Write code in the development branch
 
-7. Write unit tests in tests/ and run pytest to test your code locally
+7. Write unit tests in `tests/` and run pytest to test your code locally
 
-8. Write documentation in docs/
+8. Write documentation in `docs/`
 
 9. Make a Pull Request [here](https://github.com/sergioburdisso/pyss3/pulls)
-

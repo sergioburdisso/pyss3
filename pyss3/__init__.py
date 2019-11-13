@@ -1122,7 +1122,7 @@ class SS3:
         """
         Load model from disk.
 
-        :raises: FileNotFoundError
+        :raises: IOError
         """
         stime = time()
         Print.info("loading '%s' model from disk..." % self.__name__)
@@ -1419,7 +1419,7 @@ class SS3:
         Plot the category's global and local value distribution.
 
         :param cat: the category name
-        :type cat:str
+        :type cat: str
         """
         import matplotlib.pyplot as plt
 

@@ -36,6 +36,7 @@ HTTP_RESPONSE = ("HTTP/1.1 200 OK\r\n"
                  "Content-length: %d\r\n\r\n")
 HTTP_404 = ("HTTP/1.1 404 Not Found\r\n"
             "Connection: close\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
             "Server: SS3\r\n"
             "Content-length: 0\r\n\r\n").encode()
 CONTET_TYPE = {
@@ -463,20 +464,32 @@ if __name__ == "__main__":
     parser.add_argument(
         '-p', '--port', type=int, default=0, help="the server port"
     )
+    parser.add_argument(
+        '-q', '--quiet', help="quiet mode", action="store_true"
+    )
     args = parser.parse_args()
 
-    try:
-        Print.warn(
-            'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
-            '\nand you are welcome to redistribute it under certain conditions'
-            '\n(read license.txt for more details)\n', decorator=False
-        )
+    if args.quiet:
+        Print.quiet_begin()
 
+    Print.warn(
+        'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
+        '\nand you are welcome to redistribute it under certain conditions'
+        '\n(read license.txt for more details)\n', decorator=False
+    )
+
+    try:
         clf = SS3(name=args.MODEL)
         clf.load_model()
-
-        Server.set_model(clf)
-        Server.set_testset_from_files(args.path, args.label == 'folder')
-        Server.serve(port=args.port, browser=False)
     except IOError:
         Print.error("No such model: '%s'" % args.MODEL)
+        exit()
+
+    Server.set_model(clf)
+    if args.path:
+        Server.set_testset_from_files(args.path, args.label == 'folder')
+
+    try:
+        Server.serve(port=args.port, browser=False)
+    except IOError:
+        Print.error("Error: port number already in use")

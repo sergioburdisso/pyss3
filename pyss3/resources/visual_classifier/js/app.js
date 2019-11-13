@@ -8,7 +8,7 @@ app.controller("mainCtrl", function($scope) {
   var active_cats = null;
 
   $scope.ss3 = null;
-  $scope.loading = false;
+  $scope.loading = true;
   $scope.error = false;
   $scope.show_chart = false;
   $scope.word_info = false;
@@ -75,6 +75,8 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.get_doc = function(c, i){
+    $scope.loading = true;
+    $scope.ss3 = null;
     $scope.i_doc = i;
     $scope.c_doc = c;
     $scope.f_doc = $scope.info.docs[c]["file"][i];
@@ -452,6 +454,7 @@ app.controller("mainCtrl", function($scope) {
     __rgb_colors__ = cats.map(function(_, i){
       return "rgb(" + __get_rgb__(i, cats.length) + ')';
     });
+    $scope.loading = false;
     $scope.$apply();
     $(document).ready(function(){
       $('.collapsible').collapsible();

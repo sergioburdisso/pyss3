@@ -23,7 +23,7 @@ pyss3.server module
    :show-inheritance:
 
 pyss3.cmd_line module
-----------------
+---------------------
 
 .. automodule:: pyss3.cmd_line
    :members:
