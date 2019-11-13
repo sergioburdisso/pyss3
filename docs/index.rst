@@ -56,9 +56,7 @@ allow you to visualize and understand what your model is actually
 learning.
 
 .. figure:: _static/ss3_live_test.gif
-   :alt: img
 
-   img
 For example, we have uploaded two of these live tests online for you to
 try out: `"Movie Review
 Classification" <http://tworld.io/ss3/live_test_online/#30305>`__ and
@@ -103,9 +101,7 @@ interactive 3D plot in the browser:
     (pyss3) >>> plot evaluations
 
 .. figure:: _static/plot_evaluations.gif
-   :alt: img
 
-   img
 Each dot represents an experiment/evaluation performed using that
 particular combination of values (s, l, and p). Also, dots are painted
 proportional to how good the performance was using that configuration of
