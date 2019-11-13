@@ -74,12 +74,12 @@ Each dot represents an experiment/evaluation performed using that particular com
 ## The PySS3 Workflow
 
 
-### Classical
+### Classic Workflow
 
 (TODO: tutorial WIP)
 
 
-### The "PySS3 Command-Line" way
+### The "PySS3 Command-Line" Workflow
 
 (TODO: tutorial WIP)
 
@@ -107,9 +107,9 @@ pip install .
 ## Further Readings
 
 
-[PySS3's documentation](https://pyss3.readthedocs.io)
+[Full documentation](https://pyss3.readthedocs.io)
 
-[PySS3's API documentation](https://pyss3.readthedocs.io/api/)
+[API documentation](https://pyss3.readthedocs.io/en/latest/api/)
 
 
 [license-badge]: https://img.shields.io/github/license/boyney123/performance-budgets.svg
