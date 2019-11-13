@@ -1,3 +1,5 @@
+.. _api-doc:
+
 pyss3 package
 =============
 

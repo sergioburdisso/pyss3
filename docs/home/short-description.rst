@@ -48,6 +48,13 @@ Tutorials
 
 * :ref:`movie-reviews` [Work in Progress]. 
 
+
+API Documentation
+-----------------
+
+* :ref:`api-doc` the API documentation of *PySS3*. 
+
+
 About
 -------
 

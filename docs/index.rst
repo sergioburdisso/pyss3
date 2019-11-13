@@ -143,12 +143,6 @@ Further Readings
    user_guide/workflow
    user_guide/customization
 
-.. toctree::
-   :maxdepth: 1
-   :caption: API Documentation
-
-   api/index
-
 .. _tutorials:
 
 .. toctree::
@@ -157,6 +151,12 @@ Further Readings
 
    tutorials/topic-categorization
    tutorials/movie-reviews
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Documentation
+
+   api/index
 
 .. toctree::
    :maxdepth: 2
