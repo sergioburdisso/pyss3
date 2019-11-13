@@ -1,10 +1,10 @@
 .. _api-doc:
 
-pyss3 package
+PySS3 Package
 =============
 
 
-Module contents
+Main module
 ---------------
 
 .. automodule:: pyss3
@@ -17,7 +17,7 @@ Submodules
 ----------
 
 pyss3.server module
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyss3.server
    :members:
@@ -25,7 +25,7 @@ pyss3.server module
    :show-inheritance:
 
 pyss3.cmd_line module
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyss3.cmd_line
    :members:
@@ -33,7 +33,7 @@ pyss3.cmd_line module
    :show-inheritance:
 
 pyss3.util module
------------------
+~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyss3.util
    :members:

@@ -153,7 +153,7 @@ Further Readings
    tutorials/movie-reviews
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: API Documentation
 
    api/index
