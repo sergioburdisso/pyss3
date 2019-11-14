@@ -43,7 +43,7 @@ class Dataset:
         """
         Load category documents from disk.
 
-        :param data_path:the training or the test set path
+        :param data_path: the training or the test set path
         :type data_path: str
         :param folder_label: if True, read category labels from folders,
                              otherwise, read category labels from file names.
