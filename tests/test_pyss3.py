@@ -1,16 +1,17 @@
 """Tests for pytest."""
-from os import listdir, path
-from io import open
+from os import path
 from pyss3 import SS3, STR_NORM_GV_XAI, STR_XAI
 from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY
+from pyss3.util import Dataset
 
 import pyss3
 import pytest
 
 DATASET_FOLDER = "dataset"
 
-x_train = []  # loaded later from disk
-y_train = []  # loaded later from disk
+dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
+
+x_train, y_train = Dataset.load_from_files(dataset_path, folder_label=False)
 x_test = [
     "sports nfl nba superbowl soccer football team. learns jersey air bowl hockey.\n"
     "baseball helmet mccutchen jordan curry poker",
@@ -54,13 +55,6 @@ y_test = ["sports",
 
 stopwords = ['by', 'the', 'for', 'of', 'new', 'to', 'on', 'with', 'is', 'at',
              'and', 'in', 'my', 'this', 'it', 'times', 'out', 'how']
-
-dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
-for file in listdir(dataset_path):
-    with open(path.join(dataset_path, file), encoding="utf-8") as cat_file:
-        docs = cat_file.readlines()
-        x_train.extend(docs)
-        y_train.extend([path.splitext(file)[0]] * len(docs))
 
 
 def argmax(lst):

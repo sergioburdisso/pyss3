@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 """This is a helper module with utility classes and functions."""
 from __future__ import print_function
+from io import open
+from os import listdir, path
+from tqdm import tqdm
+
 import unicodedata
 import re
+
+ENCODING = "utf-8"
 
 re_url_noise = "(?P<url_noise>%s|%s|%s|%s)" % (
     r"(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}"
@@ -27,6 +33,78 @@ regex_percent = re.compile(r"(?:\d+([.,]\d+)?\s*%)")
 regex_number = re.compile(r"(?:\d+([.,]\d+)?)")
 regex_dots_chars = re.compile(r"(?:([(),;:?!=\"/.|<>\[\]]+)|(#(?![a-zA-Z])))")
 regex_dots_chained = re.compile(r"(?:(#[a-zA-Z0-9]+)(\s)*(?=#))")
+
+
+class Dataset:
+    """A helper class with methods to read/write datasets."""
+
+    @staticmethod
+    def load_from_files(data_path, folder_label=True, as_single_doc=False):
+        """
+        Load category documents from disk.
+
+        :param data_path:the training or the test set path
+        :type data_path: str
+        :param folder_label: if True, read category labels from folders,
+                             otherwise, read category labels from file names.
+                             (default: True)
+        :type folder_label: bool
+        :returns: the (x_train, y_train) or the (x_test, y_test) pairs.
+        :rtype: tuple
+        """
+        x_data = []
+        y_data = []
+        cat_info = {}
+
+        Print.info("reading files...")
+
+        if not folder_label:
+
+            files = listdir(data_path)
+            for file in tqdm(files, desc=" Category files", leave=False):
+                file_path = path.join(data_path, file)
+                if path.isfile(file_path):
+                    cat = path.splitext(file)[0]
+
+                    with open(file_path, "r", encoding=ENCODING) as fcat:
+                        docs = (fcat.readlines()
+                                if not as_single_doc else [fcat.read()])
+
+                    x_data.extend(docs)
+                    y_data.extend([cat] * len(docs))
+
+                    cat_info[cat] = len(docs)
+        else:
+
+            folders = listdir(data_path)
+            for item in tqdm(folders, desc=" Categories", leave=False):
+                item_path = path.join(data_path, item)
+                if not path.isfile(item_path):
+                    cat_info[item] = 0
+                    files = listdir(item_path)
+                    for file in tqdm(files, desc=" Documents", leave=False):
+                        file_path = path.join(item_path, file)
+                        if path.isfile(file_path):
+                            with open(file_path, "r", encoding=ENCODING) as ffile:
+                                x_data.append(ffile.read())
+                                y_data.append(item)
+                            cat_info[item] += 1
+
+        Print.info("%d categories found" % len(cat_info))
+        for cat in cat_info:
+            Print.info(
+                "'%s'%s"
+                %
+                (
+                    cat,
+                    '' if as_single_doc else " (%d documents)" % cat_info[cat]
+                ),
+                offset=4
+            )
+
+        return x_data, y_data
+
+    # TODO: save_to_files(x_train, y_train, x_test, y_test)
 
 
 class RecursiveDefaultDict(dict):
