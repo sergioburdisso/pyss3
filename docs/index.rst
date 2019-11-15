@@ -63,7 +63,7 @@ try out: `"Movie Review
 Classification" <http://tworld.io/ss3/live_test_online/#30305>`__ and
 `"Topic
 Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
-were obtained following the tutorials.
+were obtained following the :ref:`tutorials`.
 
 
 And last but not least, the ``PySS3 Command Line``
@@ -122,7 +122,7 @@ have uploaded two of these files for you to see: `"Movie Review
 Classification" <http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html>`__
 and `"Topic
 Categorization" <http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html>`__,
-both evaluation plots were obtained following the tutorials given below.
+both evaluation plots were obtained following the :ref:`tutorials` given below.
 
 
 

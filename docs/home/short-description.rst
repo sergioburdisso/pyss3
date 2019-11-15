@@ -36,11 +36,10 @@ User Guide
 
 * :ref:`getting-started` gives a brief introduction on how to use *PySS3*.
 
-* :ref:`workflow` [Work in Progress]. 
+* :ref:`workflow` briefly describes the two main workflows.
 
 * :ref:`customization` details how to customize *PySS3*. 
 
-.. _tutorials:
 
 Tutorials
 ----------
