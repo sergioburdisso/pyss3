@@ -7,7 +7,7 @@ This is the notebook for the tutorial `"Movie Review - Classic
 Workflow" <https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#classic-workflow>`__
 of `PySS3 <https://pyss3.readthedocs.io>`__.
 
-(the real notebook can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__)
+(the real notebook can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__, and an interactive online version `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__)
 
 --------------
 

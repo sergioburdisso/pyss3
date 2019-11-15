@@ -74,13 +74,13 @@ Each dot represents an experiment/evaluation performed using that particular com
 
 ## The PySS3 Workflow
 
-PySS3 provides two main types of workflow: classic and "command line". Both workflows are briefly described below.
+PySS3 provides two main types of workflow: classic and "command-line". Both workflows are briefly described below.
 
 ### Classic
 
 As usual, importing the needed classes and functions from the package, the user writes a python script to train and test the classifiers. In this workflow, user can use the `PySS3 Command Line` to perform model selection (though hyperparameter optimization). 
 
-### Command Line
+### Command-Line
 
 The whole process is done using only the `PySS3 Command Line`. This workflow provides a faster way to perform experimentations since the user doesn't have to write any python script. Plus, this Command Line tool allows the user to actively interact  "on the fly" with the models being developed.
 
@@ -99,7 +99,7 @@ pip install pyss3
 ```
 Or, if you already have installed an old version, update it with:
 ```console
-    pip install --upgrade pyss3
+pip install --upgrade pyss3
 ```
 
 
