@@ -84,7 +84,7 @@ As usual, importing the needed classes and functions from the package, the user 
 The whole process is done using only the `PySS3 Command Line`. This workflow provides a faster way to perform experimentations since the user doesn't have to write any python script. Plus, this Command Line tool allows the user to actively interact  "on the fly" with the models being developed.
 
 
-Note: [tutorials](https://pyss3.readthedocs.io/en/latest/home/short-description.html#tutorials) are presented in two versions, one for each workflow type, so that the reader can choose the workflow that best suit her/his needs.
+Note: [tutorials](https://pyss3.readthedocs.io/en/latest/#tutorials) are presented in two versions, one for each workflow type, so that the reader can choose the workflow that best suit her/his needs.
 
 
 ## Installation
