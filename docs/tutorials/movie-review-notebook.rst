@@ -26,7 +26,7 @@ Before we begin, let's import needed modules...
 ... and unzip the "movie\_review.zip" dataset inside the ``datasets``
 folder.
 
-.. code:: python
+.. code:: shell
 
     !unzip -u datasets/movie_review.zip -d datasets/
 
