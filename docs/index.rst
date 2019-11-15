@@ -152,7 +152,7 @@ Further Readings
    :caption: Tutorials
 
    tutorials/topic-categorization
-   tutorials/movie-reviews
+   tutorials/movie-review
 
 .. toctree::
    :maxdepth: 3

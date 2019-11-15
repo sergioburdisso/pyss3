@@ -384,7 +384,7 @@ class Server:
 
     @staticmethod
     def serve(
-        clf=None, x_test=None, y_test=None, port=0, browser=True
+        clf=None, x_test=None, y_test=None, port=0, browser=True, quiet=True
     ):
         """
         Wait for classification requests and serve them.
@@ -400,6 +400,9 @@ class Server:
         :param browser: if True, it automatically opens up the live test on
                         your browser
         :type browser: bool
+        :param quiet: if True, use quiet mode. Otherwise use verbose mode
+                      (default: False)
+        :type quiet: bool
         """
         Server.__clf__ = clf or Server.__clf__
 
@@ -423,6 +426,9 @@ class Server:
 
         if browser:
             webbrowser.open("http://localhost:%d" % Server.__port__)
+
+        if quiet:
+            Print.quiet_begin()
 
         Print.info("waiting for requests")
         print()
@@ -450,6 +456,9 @@ class Server:
             Print.info("closing server...")
             server_socket.close()
             Server.__server_socket__ = None
+
+            if quiet:
+                Print.quiet_end()
 
 
 if __name__ == "__main__":
