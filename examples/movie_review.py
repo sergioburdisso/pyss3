@@ -3,7 +3,7 @@
 Movie Review (Sentiment Analysis) Tutorial Code.
 
 This is the code for the tutorial "Movie Review - Classic Workflow"
-(https://pyss3.readthedocs.io/en/latest/tutorials/movie-reviews.html#classic-workflow)
+(https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#classic-workflow)
 ---
 """
 

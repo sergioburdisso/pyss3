@@ -4,7 +4,7 @@ Movie Review (Sentiment Analysis) Jupyter Notebook
 ==================================================
 
 This is the notebook for the tutorial `"Movie Review - Classic
-Workflow" <https://pyss3.readthedocs.io/en/latest/tutorials/movie-reviews.html#classic-workflow>`__
+Workflow" <https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#classic-workflow>`__
 of `PySS3 <https://pyss3.readthedocs.io>`__.
 
 (the real notebook can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__)
