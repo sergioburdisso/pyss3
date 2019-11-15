@@ -59,8 +59,7 @@ learning.
 .. image:: _static/ss3_live_test.gif
 
 For example, we have uploaded two of these live tests online for you to
-try out: `"Movie Review
-Classification" <http://tworld.io/ss3/live_test_online/#30305>`__ and
+try out: `"Movie Review (Sentiment Analysis)" <http://tworld.io/ss3/live_test_online/#30305>`__ and
 `"Topic
 Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
 were obtained following the :ref:`tutorials`.
@@ -118,8 +117,7 @@ interactive plots. This allows researchers to store, send or upload the
 plots to another place using this single HTML file (or even provide a
 link to this file in their own papers, which would be nicer for readers,
 plus it would increase experimentation transparency). For example, we
-have uploaded two of these files for you to see: `"Movie Review
-Classification" <http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html>`__
+have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html>`__
 and `"Topic
 Categorization" <http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html>`__,
 both evaluation plots were obtained following the :ref:`tutorials` given below.
@@ -151,8 +149,8 @@ Further Readings
    :maxdepth: 3
    :caption: Tutorials
 
-   tutorials/topic-categorization
    tutorials/movie-review
+   tutorials/topic-categorization
 
 .. toctree::
    :maxdepth: 3
@@ -168,5 +166,5 @@ Further Readings
    about/license
 
 .. _PySS3: https://github.com/sergioburdisso/pyss3
-.. _“Movie Review Classification”: http://tworld.io/ss3/live_test_online/#30305
+.. _“Movie Review (Sentiment Analysis)”: http://tworld.io/ss3/live_test_online/#30305
 .. _“Topic Categorization”: http://tworld.io/ss3/live_test_online/#30303

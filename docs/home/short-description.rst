@@ -44,9 +44,11 @@ User Guide
 Tutorials
 ----------
 
-* :ref:`topic-categorization` [Work in Progress]. 
+Learn, step by step, how to develop SS3 models for:
 
-* :ref:`movie-reviews` [Work in Progress]. 
+* :ref:`movie-reviews`
+
+* :ref:`topic-categorization` 
 
 
 API Documentation
