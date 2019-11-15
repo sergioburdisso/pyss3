@@ -11,6 +11,9 @@ Simply type::
 
     pip install pyss3
 
+Or, if you already have installed an old version, update it with::
+
+	pip install --upgrade pyss3
 
 
 Installation from source

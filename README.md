@@ -21,7 +21,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 
 ## What is PySS3?
 
-PySS3 is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementations of the SS3 classifier, PySS3 comes with a set of tools to help you to develop your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Server`` class and the ``PySS3 Command Line`` tool, as pointed out below.
+[PySS3](https://github.com/sergioburdisso/pyss3) is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementations of the SS3 classifier, PySS3 comes with a set of tools to help you to develop your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Server`` class and the ``PySS3 Command Line`` tool, as pointed out below.
 
 
 ### The `SS3` class
@@ -68,20 +68,23 @@ In this illustrative example, `s` will take 6 different values between .2 and .8
 ```
 ![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/plot_evaluations.gif)
 
-Each dot represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, dots are painted proportional to how good the performance was using that configuration of the model. Researchers can interactively change the evaluation metrics to be used (accuracy, precision, recall, f1, etc.) and plots will update "on the fly". Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates and save a single and portable HTML file in your project folder containing the interactive plots. This allows researchers to store, send or upload the plots to another place using this single HTML file (or even provide a link to this file in their own papers, which would be nicer for readers, plus it would increase experimentation transparency). For example, we have uploaded two of these files for you to see: ["Movie Review Classification"](http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html), both evaluation plots were also obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/home/short-description.html#tutorials).
+Each dot represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, dots are painted proportional to how good the performance was using that configuration of the model. Researchers can interactively change the evaluation metrics to be used (accuracy, precision, recall, f1, etc.) and plots will update "on the fly". Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file in your project folder containing the interactive plots. This allows researchers to store, send or upload the plots to another place using this single HTML file (or even provide a link to this file in their own papers, which would be nicer for readers, plus it would increase experimentation transparency). For example, we have uploaded two of these files for you to see: ["Movie Review Classification"](http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html), both evaluation plots were also obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/home/short-description.html#tutorials).
 
 
 ## The PySS3 Workflow
 
+PySS3 provides two main types of workflow: classic and "command line". Both workflows are briefly described below.
 
-### Classic Workflow
+### Classic
 
-(TODO: tutorial WIP)
+As usual, importing the needed classes and functions from the package, the user writes a python script to train and test the classifiers. In this workflow, user can use the `PySS3 Command Line` to perform model selection (though hyperparameter optimization). 
+
+### Command Line
+
+The whole process is done using only the `PySS3 Command Line`. This workflow provides a faster way to perform experimentations since the user doesn't have to write any python script. Plus, this Command Line tool allows the user to actively interact  "on the fly" with the models being developed.
 
 
-### The "PySS3 Command-Line" Workflow
-
-(TODO: tutorial WIP)
+Note: [tutorials](https://pyss3.readthedocs.io/en/latest/home/short-description.html#tutorials) are presented in two versions, one for each workflow type, so that the reader can choose the workflow that best suit her/his needs.
 
 
 ## Installation

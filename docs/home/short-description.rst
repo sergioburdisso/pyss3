@@ -6,8 +6,8 @@ Overview
 
 .. _ss3-classifier:
 
-The SS3 Classifier
-==================
+The SS3 Classification Model
+============================
 
 [Work in Progress]
 
@@ -34,12 +34,13 @@ Home
 User Guide
 -----------
 
-* :ref:`quickstart` gives a brief introduction on how to use *PySS3* interface.
+* :ref:`getting-started` gives a brief introduction on how to use *PySS3*.
 
 * :ref:`workflow` [Work in Progress]. 
 
 * :ref:`customization` details how to customize *PySS3*. 
 
+.. _tutorials:
 
 Tutorials
 ----------

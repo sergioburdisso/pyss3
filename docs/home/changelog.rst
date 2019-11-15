@@ -6,6 +6,14 @@ Change Log
 
 All notable changes to PySS3 will be documented here.
 
+[0.3.6] 2019-11-14
+==================
+
+Added
+-----
+- ``Dataset`` class added to ``pyss3.util`` as an interface to help the user to load/read datasets. Method ``Dataset.load_from_files`` added
+- Documentations updated
+
 [0.3.5] 2019-11-12
 ==================
 

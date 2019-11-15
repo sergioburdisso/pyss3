@@ -1,15 +1,14 @@
 .. image:: _static/ss3_logo_banner.png
+    :target: https://github.com/sergioburdisso/pyss3
     :height: 100px
     :align: right
 
-|
-|
 
 Welcome to PySS3's documentation!
 =================================
 
 
-PySS3 is a Python package that allows you to work with :ref:`ss3-classifier` in a very
+`PySS3`_ is a Python package that allows you to work with :ref:`ss3-classifier` in a very
 straightforward, interactive and visual way. In addition to the
 implementations of the classifier, PySS3 comes with a set of tools
 to help you to develop your machine learning models in a clearer and
@@ -18,6 +17,7 @@ models by allowing you see what they have actually learned and why. To
 achieve this, PySS3 provides you with 3 main components: the ``SS3``
 class, the ``Server`` class and the ``PySS3 Command Line`` tool, as
 pointed out below.
+
 
 The ``SS3`` class
 ~~~~~~~~~~~~~~~~~
@@ -32,6 +32,7 @@ of ``sklearn``):
         ...
         clf.fit(x_train, y_train)
         y_pred = clf.predict(x_test)
+
 
 The ``Server`` class
 ~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +56,7 @@ the documents given in ``x_test`` (or typing in your own!). This will
 allow you to visualize and understand what your model is actually
 learning.
 
-.. figure:: _static/ss3_live_test.gif
+.. image:: _static/ss3_live_test.gif
 
 For example, we have uploaded two of these live tests online for you to
 try out: `"Movie Review
@@ -63,6 +64,7 @@ Classification" <http://tworld.io/ss3/live_test_online/#30305>`__ and
 `"Topic
 Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
 were obtained following the tutorials.
+
 
 And last but not least, the ``PySS3 Command Line``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,7 +102,7 @@ interactive 3D plot in the browser:
 
     (pyss3) >>> plot evaluations
 
-.. figure:: _static/plot_evaluations.gif
+.. image:: _static/plot_evaluations.gif
 
 Each dot represents an experiment/evaluation performed using that
 particular combination of values (s, l, and p). Also, dots are painted
@@ -110,7 +112,7 @@ to be used (accuracy, precision, recall, f1, etc.) and plots will update
 "on the fly". Additionally, when the cursor is moved over a data point,
 useful information is shown (including a "compact" representation of the
 confusion matrix obtained in that experiment). Finally, it is worth
-mentioning that, before showing the 3D plots, PySS3 creates and save a
+mentioning that, before showing the 3D plots, PySS3 creates a
 single and portable HTML file in your project folder containing the
 interactive plots. This allows researchers to store, send or upload the
 plots to another place using this single HTML file (or even provide a
@@ -139,7 +141,7 @@ Further Readings
    :maxdepth: 3
    :caption: User Guide
 
-   user_guide/quickstart
+   user_guide/getting-started
    user_guide/workflow
    user_guide/customization
 
@@ -165,6 +167,6 @@ Further Readings
    about/contributing
    about/license
 
-
+.. _PySS3: https://github.com/sergioburdisso/pyss3
 .. _“Movie Review Classification”: http://tworld.io/ss3/live_test_online/#30305
 .. _“Topic Categorization”: http://tworld.io/ss3/live_test_online/#30303
