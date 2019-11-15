@@ -117,9 +117,9 @@ interactive plots. This allows researchers to store, send or upload the
 plots to another place using this single HTML file (or even provide a
 link to this file in their own papers, which would be nicer for readers,
 plus it would increase experimentation transparency). For example, we
-have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <http://tworld.io/ss3/ss3_model_evaluation[movie_review_3grams].html>`__
+have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/ss3_model_evaluation[movie_review_3grams].html>`__
 and `"Topic
-Categorization" <http://tworld.io/ss3/ss3_model_evaluation[topics_3grams].html>`__,
+Categorization" <https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/ss3_model_evaluation[topics_3grams].html>`__,
 both evaluation plots were obtained following the :ref:`tutorials` given below.
 
 

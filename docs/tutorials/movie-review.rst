@@ -3,6 +3,7 @@
 **********************************
 Movie Reviews (Sentiment Analysis)
 **********************************
+.. TODO: meter en tutoriales un "getting started" o algo así, en lo que se explique todo lo que sea datasets, conda, instalacion, etc?
 
 ..  Large Movie Review Dataset v1.0
 
