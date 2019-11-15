@@ -6,6 +6,6 @@ docs/_build
 tests/pyss3
 *.pyc
 *~
-*.ipynb
+*.ipynb_checkpoints
 dist/
 *.egg-info/
