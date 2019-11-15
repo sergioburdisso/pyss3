@@ -2,10 +2,13 @@ build/
 __extra__
 .pytest_cache
 docs/_build
-*/__pycache__
 tests/pyss3
+examples/datasets/movie_review
+examples/datasets/topics
+dist/
+*ss3_models
+*/__pycache__
 *.pyc
 *~
 *.ipynb_checkpoints
-dist/
 *.egg-info/
