@@ -96,7 +96,10 @@ class Server:
     __clf__ = None
     __server_socket__ = None
     __docs__ = RecursiveDefaultDict()
+
     __x_test__ = None
+    __test_path__ = None
+    __folder_label__ = None
 
     @staticmethod
     def __send_as_json__(sock, data):
@@ -224,6 +227,67 @@ class Server:
         Server.__x_test__ = None
 
     @staticmethod
+    def __load_testset_from_files__():
+        """Load the test set files to visualize from ``test_path``."""
+        Print.info("reading files...")
+        classify = Server.__clf__.classify
+        unkwon_cat_i = len(Server.__clf__.get_categories())
+        if not Server.__folder_label__:
+            for file in listdir(Server.__test_path__):
+                file_path = path.join(Server.__test_path__, file)
+                if path.isfile(file_path):
+                    cat = path.splitext(file)[0]
+
+                    with open(file_path, "r", encoding=ENCODING) as fcat:
+                        Server.__docs__[cat]["clf_result"] = [
+                            r[0][0] if r[0][1] else unkwon_cat_i
+                            for r in map(
+                                classify,
+                                tqdm(
+                                    fcat.readlines(),
+                                    desc=" Classifying '%s' docs" % cat
+                                )
+                            )
+                        ]
+                        n_docs = len(Server.__docs__[cat]["clf_result"])
+                        Server.__docs__[cat]["file"] = [
+                            "doc_%d" % line
+                            for line in range(n_docs)
+                        ]
+                        Server.__docs__[cat]["path"] = [
+                            "%s:line:%d" % (file_path, line)
+                            for line in range(n_docs)
+                        ]
+        else:
+            for cat in listdir(Server.__test_path__):
+                cat_path = path.join(Server.__test_path__, cat)
+
+                if not path.isfile(cat_path):
+
+                    Server.__docs__[cat]["path"] = []
+                    Server.__docs__[cat]["file"] = []
+                    Server.__docs__[cat]["clf_result"] = []
+
+                    for file in tqdm(
+                        sorted(listdir(cat_path)),
+                        desc=" Classifying '%s' docs" % cat
+                    ):
+                        file_path = path.join(cat_path, file)
+                        if path.isfile(file_path):
+                            Server.__docs__[cat]["path"].append(file_path)
+                            Server.__docs__[cat]["file"].append(file)
+                            with open(
+                                file_path, "r", encoding=ENCODING
+                            ) as fdoc:
+                                r = classify(fdoc.read())
+                                Server.__docs__[cat]["clf_result"].append(
+                                    r[0][0] if r[0][1] else unkwon_cat_i
+                                )
+
+        Print.info("%d categories found" % len(Server.__docs__))
+        return len(Server.__docs__) > 0
+
+    @staticmethod
     def get_port():
         """
         Return the server port.
@@ -290,65 +354,29 @@ class Server:
                              otherwise, read category labels from file names.
                              (default: True)
         :type folder_label: bool
+        :returns: True if category documents were found, False otherwise
+        :rtype: bool
         """
-        Print.info("reading files...")
         Server.__clear_testset__()
-        classify = Server.__clf__.classify
-        unkwon_cat_i = len(Server.__clf__.get_categories())
-        if not folder_label:
-            for file in listdir(test_path):
-                file_path = path.join(test_path, file)
+        Server.__test_path__ = test_path
+        Server.__folder_label__ = folder_label
+
+        docs = 0
+        if not Server.__folder_label__:
+            for file in listdir(Server.__test_path__):
+                file_path = path.join(Server.__test_path__, file)
                 if path.isfile(file_path):
-                    cat = path.splitext(file)[0]
-
-                    with open(file_path, "r", encoding=ENCODING) as fcat:
-                        Server.__docs__[cat]["clf_result"] = [
-                            r[0][0] if r[0][1] else unkwon_cat_i
-                            for r in map(
-                                classify,
-                                tqdm(
-                                    fcat.readlines(),
-                                    desc=" Classifying '%s' docs" % cat
-                                )
-                            )
-                        ]
-                        n_docs = len(Server.__docs__[cat]["clf_result"])
-                        Server.__docs__[cat]["file"] = [
-                            "doc_%d" % line
-                            for line in range(n_docs)
-                        ]
-                        Server.__docs__[cat]["path"] = [
-                            "%s:line:%d" % (file_path, line)
-                            for line in range(n_docs)
-                        ]
+                    docs += 1
         else:
-            for cat in listdir(test_path):
-                cat_path = path.join(test_path, cat)
-
+            for cat in listdir(Server.__test_path__):
+                cat_path = path.join(Server.__test_path__, cat)
                 if not path.isfile(cat_path):
-
-                    Server.__docs__[cat]["path"] = []
-                    Server.__docs__[cat]["file"] = []
-                    Server.__docs__[cat]["clf_result"] = []
-
-                    for file in tqdm(
-                        sorted(listdir(cat_path)),
-                        desc=" Classifying '%s' docs" % cat
-                    ):
+                    for file in listdir(cat_path):
                         file_path = path.join(cat_path, file)
                         if path.isfile(file_path):
-                            Server.__docs__[cat]["path"].append(file_path)
-                            Server.__docs__[cat]["file"].append(file)
-                            with open(
-                                file_path, "r", encoding=ENCODING
-                            ) as fdoc:
-                                r = classify(fdoc.read())
-                                Server.__docs__[cat]["clf_result"].append(
-                                    r[0][0] if r[0][1] else unkwon_cat_i
-                                )
+                            docs += 1
 
-        Print.info("%d categories found" % len(Server.__docs__))
-        return len(Server.__docs__) > 0
+        return docs > 0
 
     @staticmethod
     def start_listening(port=0):
@@ -419,6 +447,8 @@ class Server:
             else:
                 Print.error("y_test must have the same length as x_test")
                 return
+        elif Server.__test_path__ and not Server.__docs__:
+            Server.__load_testset_from_files__()
 
         server_socket = Server.__server_socket__
         clients = [server_socket]

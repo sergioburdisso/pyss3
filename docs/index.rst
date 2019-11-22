@@ -80,9 +80,9 @@ automatically (and permanently) record the history of every evaluation
 result of any type (tests, k-fold cross-validations, grid searches,
 etc.) that you've performed. This will allow you (with a single command)
 to interactively visualize and analyze your classifier performance in
-terms of its different hyper-parameters values (and select the best
+terms of its different hyperparameters values (and select the best
 model according to your needs). For instance, let's perform a grid
-search with a 4-fold cross-validation on the three hyper-parameters,
+search with a 4-fold cross-validation on the three hyperparameters,
 smoothness(\ ``s``), significance(\ ``l``), and sanction(\ ``p``) as
 follows:
 
@@ -103,8 +103,8 @@ interactive 3D plot in the browser:
 
 .. image:: _static/plot_evaluations.gif
 
-Each dot represents an experiment/evaluation performed using that
-particular combination of values (s, l, and p). Also, dots are painted
+Each point represents an experiment/evaluation performed using that
+particular combination of values (s, l, and p). Also, these points are painted
 proportional to how good the performance was using that configuration of
 the model. Researchers can interactively change the evaluation metrics
 to be used (accuracy, precision, recall, f1, etc.) and plots will update
@@ -117,10 +117,10 @@ interactive plots. This allows researchers to store, send or upload the
 plots to another place using this single HTML file (or even provide a
 link to this file in their own papers, which would be nicer for readers,
 plus it would increase experimentation transparency). For example, we
-have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[movie_review_3grams].html>`__
+have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <_static/ss3_model_evaluation[movie_review_3grams].html>`__
 and `"Topic
-Categorization" <https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[topics_3grams].html>`__,
-both evaluation plots were obtained following the :ref:`tutorials` given below.
+Categorization" <_static/ss3_model_evaluation[topic_categorization_3grams].html>`__,
+both evaluation plots were obtained following the :ref:`tutorials`.
 
 
 
@@ -129,28 +129,23 @@ Further Readings
 
 .. toctree::
    :maxdepth: 3
-   :caption: Home
-
-   home/short-description
-   home/installation
-   home/changelog
-
-.. toctree::
-   :maxdepth: 3
    :caption: User Guide
 
    user_guide/getting-started
+   user_guide/installation
    user_guide/workflow
-   user_guide/customization
+   user_guide/visualizations
+..   user_guide/customization
+..   user_guide/pyss3-command-line
 
-.. _tutorials:
 
 .. toctree::
    :maxdepth: 3
    :caption: Tutorials
 
-   tutorials/movie-review
+   tutorials/setup
    tutorials/topic-categorization
+   tutorials/movie-review
 
 .. toctree::
    :maxdepth: 3
@@ -162,6 +157,7 @@ Further Readings
    :maxdepth: 2
    :caption: About
 
+   about/changelog
    about/contributing
    about/license
 

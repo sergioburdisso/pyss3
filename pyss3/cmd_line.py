@@ -51,10 +51,10 @@ ERROR_WAN = "Wrong number of arguments: expected %d but received %d"
 ERROR_WAT = "Wrong value type: excepted %s"
 ERROR_UA = "Unknown argument: %s"
 ERROR_ICN = "Invalid category name: %s"
-ERROR_HIV = ("Invalid hyper-parameter value: "
+ERROR_HIV = ("Invalid hyperparameter value: "
              "expected a float number but received '%s'")
-ERROR_HVM = ("Hyper-parameter value missing: "
-             "the value for the hyper-parameter '%s' is missing")
+ERROR_HVM = ("Hyperparameter value missing: "
+             "the value for the hyperparameter '%s' is missing")
 ERROR_NSF = "No such file: %s"
 ERROR_NSD = "No such directory: %s"
 ERROR_MNT = "Test not allowed: The model hasn't been trained yet"
@@ -72,7 +72,7 @@ WARN_NO_STOPWORDS = ("There are no stopwords!\n"
                      "Suggestion: try with another threshold value or "
                      "improving your\n"
                      "*             model by changing some of its "
-                     "hyper-parameters")
+                     "hyperparameters")
 
 STR_MODEL, STR_VOCABULARY, STR_STOPWORDS = "model", "vocabulary", "stopwords"
 STR_PARAMETERS, STR_CATEGORIES, STR_ALL = "parameters", "categories", "all"
@@ -185,7 +185,7 @@ def split_args(args):
 
 
 def parse_hparams_args(op_args, defaults=True):
-    """Parse hyper-parameters arguments list."""
+    """Parse hyperparameters arguments list."""
     used_args_ix = []
     hparams = {}
 
@@ -492,10 +492,7 @@ def train(
     global ARGS_CATS
 
     if len(y_train):
-        CLF.fit(
-            x_train, y_train, n_grams,
-            prep=True, leave_pbar=leave_pbar
-        )
+        CLF.fit(x_train, y_train, n_grams, leave_pbar=leave_pbar)
 
         if save:
             CLF.save_model()
@@ -821,7 +818,7 @@ def evaluations_info(data_path=None, method=None):
 
 
 def delete_results_slpa(rh_metric, hparams, only_count=False, best=True):
-    """Remove evaluations from history given hyper-parameters s, l, p, a."""
+    """Remove evaluations from history given hyperparameters s, l, p, a."""
     count = 0
     update_best = False
     hps = hparams
@@ -1271,7 +1268,7 @@ class SS3Prompt(Cmd):
         usage:
             new MODEL_NAME
 
-        positional arguments:
+        required arguments:
          MODEL_NAME      the model's name
         """
         global CLF, RESULTS_HISTORY
@@ -1317,7 +1314,7 @@ class SS3Prompt(Cmd):
         usage:
             load MODEL_NAME
 
-        positional arguments:
+        required arguments:
          MODEL_NAME      the model's name
         """
         global CLF, ARGS_CATS, RESULTS_HISTORY
@@ -1345,7 +1342,7 @@ class SS3Prompt(Cmd):
         usage:
             rename NEW_MODEL_NAME
 
-        positional arguments:
+        required arguments:
          NEW_MODEL_NAME      the model's new name
         """
         args = split_args(args)
@@ -1385,7 +1382,7 @@ class SS3Prompt(Cmd):
         usage:
             clone NEW_MODEL_NAME
 
-        positional arguments:
+        required arguments:
          NEW_MODEL_NAME      the new model's name
         """
         args = split_args(args)
@@ -1407,7 +1404,7 @@ class SS3Prompt(Cmd):
         usage:
             train TRAIN_PATH [LABEL] [N-gram]
 
-        positional arguments:
+        required arguments:
          TRAIN_PATH     the training set path
 
         optional arguments:
@@ -1446,7 +1443,7 @@ class SS3Prompt(Cmd):
         usage:
             k_fold PATH [LABEL] [DEF_CAT] [N-grams] [N-fold] [P VAL ...] [no-cache]
 
-        positional arguments:
+        required arguments:
          PATHthe    dataset path
 
         optional arguments:
@@ -1454,6 +1451,7 @@ class SS3Prompt(Cmd):
                     values:{file,folder} (default: folder)
 
          DEF_CAT    default category to be assigned when the model is not
+                    able to actually classify a document.
                     values: {most-probable,unknown} or a category label
                     (default: most-probable)
 
@@ -1467,7 +1465,7 @@ class SS3Prompt(Cmd):
          K-fold     indicates the number of folds to be used.
                     value: {K-fold} with K integer > 1 (default: 4-fold)
 
-         P VAL      sets a hyper-parameter value (e.g. s 0.45)
+         P VAL      sets a hyperparameter value (e.g. s 0.45)
                     P values: {s,l,p,a}
                     VAL values: float
 
@@ -1500,7 +1498,7 @@ class SS3Prompt(Cmd):
         usage:
             test TEST_PATH [LABEL] [DEF_CAT] [P VAL ...] [no-cache]
 
-        positional arguments:
+        required arguments:
          TEST_PATH  the test set path
 
         optional arguments:
@@ -1508,10 +1506,11 @@ class SS3Prompt(Cmd):
                     values:{file,folder} (default: folder)
 
          DEF_CAT    default category to be assigned when the model is not
+                    able to actually classify a document.
                     values: {most-probable,unknown} or a category label
                     (default: most-probable)
 
-         P VAL      sets a hyper-parameter value
+         P VAL      sets a hyperparameter value
                     examples: s .45; s .5;
                     P values: {s,l,p,a}
                     VAL values: float
@@ -1582,57 +1581,56 @@ class SS3Prompt(Cmd):
         Server.start_listening()
 
         if not verbose:
-            Print.quiet_begin()
+            Print.set_quiet(True)
 
         Server.serve()
 
         if not verbose:
-            Print.quiet_end()
+            Print.set_quiet(False)
 
     @requires_model
     @requires_args
     def do_grid_search(self, args):
         """
-        Given a dataset, perform a grid search using the given hyper-parameters values.
+        Given a dataset, perform a grid search using the given hyperparameters values.
 
         usage:
-            grid_search PATH [LABEL] [DEF_CAT] [N-grams] [K-fold] P EXP [P EXP ...] [no-cache]
+            grid_search PATH [LABEL] [DEF_CAT] [METHOD] P EXP [P EXP ...] [no-cache]
 
-        positional arguments:
+        required arguments:
          PATH       the dataset path
+         P EXP      a list of values for a given hyperparameter.
+                    where:
+                     P    is a hyperparameter name. values: {s,l,p,a}
+                     EXP  is a python expression returning a float or
+                          a list of floats. Note: if this expression
+                          contains whitespaces, use quotations marks
+                          (e.g. "[0.5, 1.5]")
+                    examples:
+                     s [.3,.4,.5]
+                     s "[.3, .4, .5]" (Note the whitespaces and the "")
+                     p r(.2,.8,6)     (i.e. 6 points between .2 to .8)
 
         optional arguments:
          LABEL      where to read category labels from.
                     values:{file,folder} (default: folder)
 
          DEF_CAT    default category to be assigned when the model is not
+                    able to actually classify a document.
                     values: {most-probable,unknown} or a category label
                     (default: most-probable)
 
-         N-grams    indicates the maximum n-grams to be learned (e.g. a
-                    value of "1-grams" means only words will be learned;
-                    "2-grams" only 1-grams and 2-grams;
-                    "3-grams", only 1-grams, 2-grams and 3-grams;
-                    and so on).
-                    value: {N-grams} with N integer > 0 (default: 1-grams)
+         METHOD     the method to be used
+                    values: {test, K-fold} (default: test)
+                    where:
+                      K-fold  indicates the number of folds to be used.
+                              K is an integer > 1 (e.g 4-fold, 10-fold, etc.)
 
-         K-fold     indicates the number of folds to be used.
-                    value: {K-fold} with K integer > 1 (default: 4-fold)
+         no-cache   if present, disable the cache and recompute all the values
 
-         P EXP      gives a list of values for a hyper-parameter.
-                    examples:
-                        s [.3,.4,.5]
-                        s "[.3, .4, .5]" (if spaces use quotations marks (""))
-                        s r(.2,.8,6) (i.e. 6 points from .2 to .8)
-                    P values: {s,l,p,a}
-                    EXP value: a python expression returning a list of floats
-
-         no-cache   if present, disable the cache and recompute values
-
-         examples:
-          grid_search a/testset/path s r(.2,.8,6) l r(.1,2,6) -p r(.5,2,6) a [0,.01]
-
-          grid_search a/dataset/path 4-fold -s [.2,.3,.4,.5] -l [.5,1,1.5] -p r(.5,2,6)
+        examples:
+         grid_search a/testset/path s r(.2,.8,6) l r(.1,2,6) -p r(.5,2,6) a [0,.01]
+         grid_search a/dataset/path 4-fold -s [.2,.3,.4,.5] -l [.5,1,1.5] -p r(.5,2,6)
         """
         try:
             data_path, folder_label, def_cat,\
@@ -1653,7 +1651,7 @@ class SS3Prompt(Cmd):
         usage:
             evaluations OPTION [PATH] [METHOD] [DEF_CAT] [P VAL [P VAL ...]
 
-        positional arguments:
+        required arguments:
          OPTION     indicates the action to perform
                     values: {info,plot,save,remove} (default: info)
                         info - show information about evaluations (including
@@ -1668,11 +1666,12 @@ class SS3Prompt(Cmd):
          PATH       the dataset path used in the evaluate of interest
 
          METHOD     the method that was used in the evaluate of interest
+                    values: {test,K-fold} where K is an integer > 1
 
          DEF_CAT    default category used in the evaluate of interest
                     values: {most-probable,unknown} or a category label
 
-         P VAL      the hyper-parameter value (only for option "remove")
+         P VAL      the hyperparameter value (only for option "remove")
                     P values: {s,l,p,a}
                     VAL values: float
 
@@ -1760,7 +1759,7 @@ class SS3Prompt(Cmd):
         usage:
             learn CAT [N-grams] [DOCUMENT_PATH]
 
-        positional arguments:
+        required arguments:
          CAT            the category label
 
         optional arguments:
@@ -1803,10 +1802,10 @@ class SS3Prompt(Cmd):
         usage:
             save OPTION
 
-        positional arguments:
+        required arguments:
          OPTION     indicates what to save to disk
                     values:
-                        model (default);
+                        model; (default)
                         evaluations;
                         vocabulary [CAT];
                         stopwords [SG_THRESHOLD];
@@ -1876,7 +1875,7 @@ class SS3Prompt(Cmd):
         usage:
             info OPTION
 
-        positional arguments:
+        required arguments:
          OPTION     indicates what information to show
                     values: {all, parameters, categories, evaluations}
                             (default: all)
@@ -1910,7 +1909,7 @@ class SS3Prompt(Cmd):
         usage:
             debug_term N_GRAM
 
-        positional arguments:
+        required arguments:
          N_GRAM     the n-gram (word, bigram, trigram, etc.) to debug
 
         examples:
@@ -1934,7 +1933,7 @@ class SS3Prompt(Cmd):
         usage:
             plot OPTION
 
-        positional arguments:
+        required arguments:
          OPTION     indicates what to plot
                     values:
                         evaluations;
@@ -1973,13 +1972,13 @@ class SS3Prompt(Cmd):
     @requires_args
     def do_set(self, args):
         """
-        Set a given hyper-parameter value.
+        Set a given hyperparameter value.
 
         usage:
             set P VAL [P VAL ...]
 
-        positional arguments:
-         P VAL      sets a hyper-parameter value
+        required arguments:
+         P VAL      sets a hyperparameter value
                     examples: s .45; s .5;
                     P values: {s,l,p,a}
                     VAL values: float
@@ -2005,13 +2004,13 @@ class SS3Prompt(Cmd):
     @requires_args
     def do_get(self, args):
         """
-        Get a given hyper-parameter value.
+        Get a given hyperparameter value.
 
         usage:
             get PARAM
 
-        positional arguments:
-         PARAM      the hyper-parameter name
+        required arguments:
+         PARAM      the hyperparameter name
                     values: {s,l,p,a}
 
         examples:
@@ -2056,7 +2055,7 @@ class SS3Prompt(Cmd):
         usage:
             next_word SENT
 
-        positional arguments:
+        required arguments:
          SENT     a sentence
 
         examples:
@@ -2362,12 +2361,12 @@ class SS3Prompt(Cmd):
                 except BaseException:
                     Print.error(
                         "[python] error: "
-                        "the value for the hyper-parameter '%s' is not valid"
+                        "the value for the hyperparameter '%s' is not valid"
                         %
                         hp_str, raises=ArgsParseError
                     )
 
-                # just in case the hyper-parameter value is a single number
+                # just in case the hyperparameter value is a single number
                 try:
                     hparams[hp_str] = [float(hparams[hp_str])]
                 except BaseException:
@@ -2377,8 +2376,8 @@ class SS3Prompt(Cmd):
                     hparams[hp_str] = [float(v) for v in hparams[hp_str]]
                 except ValueError:
                     Print.error(
-                        "Wrong hyper-parameter value type: "
-                        "Some of values for the hyper-parameter '%s' are not numbers"
+                        "Wrong hyperparameter value type: "
+                        "Some of values for the hyperparameter '%s' are not numbers"
                         %
                         hp_str, raises=ArgsParseError
                     )
@@ -2389,8 +2388,8 @@ class SS3Prompt(Cmd):
 
         if no_hparams:
             Print.error(
-                "hyper-parameters missing: at least one "
-                "hyper-parameter value range must be given",
+                "hyperparameters missing: at least one "
+                "hyperparameter value range must be given",
                 raises=ArgsParseError
             )
 

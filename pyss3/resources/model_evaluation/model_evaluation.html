@@ -330,7 +330,7 @@
   var DOM_INFO_PANEL = document.getElementById("point-info");
   var DEF_METRIC = "accuracy";
   var CM_MAX_SIZE = 50;
-  var CM_MAX_FOLD_SIZE = 150;
+  var CM_MAX_FOLD_SIZE = 90;
   var DATA = null;
   var CM = {// confusion matrix
     matrix: null,
@@ -903,8 +903,8 @@
 
     function update_confusion_matrix(){
       var C = $scope.c, keys = Object.keys;
-      var cm_size = cats_n > 2? CM_MAX_FOLD_SIZE : 90;
       var cats_n = $results[C.p][C.m][C.dc]["categories"].length;
+      var cm_size = CM_MAX_FOLD_SIZE;
 
       CM = $results[C.p][C.m][C.dc]["confusion_matrix"];
 
@@ -945,7 +945,7 @@
       CM.m = $scope.c.m;
       CM.dc = $scope.c.dc;
 
-      cm_size /= CM["folds"];
+      cm_size /= Math.min(CM["folds"], 3);
       // $scope.conf_matrix_cell_size =  Math.min(cm_size,  (cats_n > 2? CM_MAX_SIZE : 30)) / cats_n;
       $scope.conf_matrix_cell_size =  Math.min(cm_size, CM_MAX_SIZE) / cats_n;
     }

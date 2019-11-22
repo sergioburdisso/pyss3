@@ -1,13 +1,12 @@
 .. _movie-reviews-notebook:
 
-Movie Review (Sentiment Analysis) Jupyter Notebook
-==================================================
+Movie Review (Sentiment Analysis) - Jupyter Notebook
+====================================================
 
-This is the notebook for the tutorial `"Movie Review - Classic
-Workflow" <https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#classic-workflow>`__
-of `PySS3 <https://pyss3.readthedocs.io>`__.
+This is the static (html) version of the notebook for the tutorial :ref:`"Movie Review - Classic
+Workflow" <movie-review_classic-workflow>`.
 
-(the real notebook can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__, and an interactive online version `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__)
+(the orginal notebook file, "movie_review.ipynb", can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__, and an interactive online version `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__)
 
 --------------
 
@@ -35,7 +34,7 @@ Ok, now we are ready to begin. Let's create a new SS3 instance
 
     clf = SS3()
 
-What are the default hyper-parameter values? let's see
+What are the default hyperparameter values? let's see
 
 .. code:: python
 
@@ -64,11 +63,6 @@ Ok, now let's load the training and the test set using the
 
 Let's train our model...
 
-Note that we don't have to create any document-term matrix! we are using
-just the plain ``x_train`` documents :D cool uh? (SS3 creates language
-model for each category and therefore it doesn't need to create any
-document-term matrices)
-
 .. code:: python
 
     clf.fit(x_train, y_train)
@@ -77,6 +71,11 @@ document-term matrices)
 .. parsed-literal::
 
      Training: 100%|██████████| 2/2 [00:13<00:00,  6.51s/it]
+
+Note that we don't have to create any document-term matrix! we are using
+just the plain ``x_train`` documents :D cool uh? (SS3 creates a language
+model for each category and therefore it doesn't need to create any
+document-term matrices)
 
 
 Now that the model has been trained, let's test it using the documents
@@ -102,31 +101,28 @@ Let's see how good our model performed
     Accuracy: 0.852
 
 
-Not bad using the default hyper-parameters values, let's now manually
+Not bad using the default hyperparameters values, let's now manually
 analyze what our model has actually learned by using the interactive
-"live test". Makes sense to you? (remember you can select "words" as the
-Description Level if you want to know based on what words is making
-classification decisions)
+"live test".
 
 .. code:: python
 
     Server.serve(clf, x_test, y_test)
 
+Makes sense to you? (remember you can select "words" as the
+Description Level if you want to know based on what words is making
+classification decisions)
+
 Live test doesn't look bad, however, we will create a "more intelligent"
 version of this model, a version that can recognize variable-length word
-n-grams "on the fly". Thus, we will name this new model
-"movie\_review\_3grams" and when calling the ``fit`` we will pass an
+n-grams "on the fly". Thus, when calling the ``fit`` we will pass an
 extra argument ``n_grams=3`` to indicate we want SS3 to learn to
-recognize important words, bigrams, and 3-grams **[*]**.
+recognize important words, bigrams, and 3-grams **[*]**. Additionally, we will name our model "movie\_review\_3grams" so that we can save it and load it later from the ``PySS3 Command Line`` to perform
+the hyperparameter optimization to find better hyperparameters values.
 
-Additionally, we will name our model "movie\_review\_3grams" so that we
-can save it and load it later from the ``PySS3 Command Line`` to perform
-the hyper-parameter optimization to find the best hyper-parameters
-values.
-
-**[*]** If you're curious and want to know how this is actually
+**[*]** *If you're curious and want to know how this is actually
 done by SS3, read the paper "t-SS3: a text classifier with dynamic
-n-grams for early risk detection over text streams" (preprint available
+n-grams for early risk detection over text streams"* (preprint available
 `here <https://arxiv.org/abs/1911.06147>`__).
 
 .. code:: python
@@ -141,8 +137,9 @@ n-grams for early risk detection over text streams" (preprint available
      Training: 100%|██████████| 2/2 [00:19<00:00, 10.00s/it]
 
 
-As mentioned above, we will save this trained model for later use (from
-the ``PySS3 Command Line`` as the tutorial suggest)
+
+
+As mentioned above, we will save this trained model for later use.
 
 .. code:: python
 
@@ -154,7 +151,7 @@ the ``PySS3 Command Line`` as the tutorial suggest)
     [ saving model (ss3_models/movie_review_3grams.ss3m)... ]
 
 
-Now let's see if performance improved...
+Now let's see if the performance has improved...
 
 .. code:: python
 
@@ -186,13 +183,14 @@ what our model has learned (like "was supposed to", "has nothing to",
 
     Server.serve(clf, x_test, y_test)
 
-**At this point you should go back to the tutorial page so that you can
-learn how to use the PySS3 Command Line for model selection, once
-you've completed that part continue with the following paragraph.**
 
-As described in the tutorial, after performing hyper-parameters
+.. _movie-review-notebook-continue:
+
+**Before moving forward, at this point you should read the** :ref:`hyperparameter-optimization` **section of this tutorial.**
+
+As described in the "Hyperparameter Optimization" section, after performing hyperparameters
 optimization using the ``PySS3 Command Line``, we found out that, for
-example, the following hyper-parameter values will slightly improve our
+example, the following hyperparameter values will slightly improve our
 classification performance
 
 .. code:: python
@@ -222,4 +220,4 @@ Let's see if it's true...
 
 
 Great! accuracy improved. Fortunately, this time we got lucky and the
-default hyper-parameters were also quite good.
+default hyperparameters were also quite good.

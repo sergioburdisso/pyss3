@@ -2,6 +2,15 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.3.7] 2019-11-22
+
+### Added
+- Summary operators are not longer static.
+- ``Server.set_testset_from_files`` lazy load.
+
+### Fixed
+- Evaluation plot: confusion matrices size when working with k-folds
+
 ## [0.3.6] 2019-11-14
 
 ### Added

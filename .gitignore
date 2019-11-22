@@ -4,8 +4,10 @@ __extra__
 docs/_build
 tests/pyss3
 examples/datasets/movie_review
-examples/datasets/topics
+examples/datasets/topic
 dist/
+*/pyss3
+*.ss3_history
 *ss3_models
 */__pycache__
 *.pyc

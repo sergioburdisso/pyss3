@@ -49,6 +49,9 @@ class Dataset:
                              otherwise, read category labels from file names.
                              (default: True)
         :type folder_label: bool
+        :param as_single_doc: read the documents as a single (and big) document
+                              (default: False)
+        :type folder_label: bool
         :returns: the (x_train, y_train) or the (x_test, y_test) pairs.
         :rtype: tuple
         """

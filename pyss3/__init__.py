@@ -19,7 +19,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.6"
+__version__ = "0.3.7"
 
 ENCODING = "utf-8"
 
@@ -57,13 +57,13 @@ class SS3:
 
 
 
-    :param s: the "smoothness"(sigma) hyper-parameter value
+    :param s: the "smoothness"(sigma) hyperparameter value
     :type s: float
-    :param l: the "significance"(lambda) hyper-parameter value
+    :param l: the "significance"(lambda) hyperparameter value
     :type l: float
-    :param p: the "sanction"(rho) hyper-parameter value
+    :param p: the "sanction"(rho) hyperparameter value
     :type p: float
-    :param a: the alpha hyper-parameter value (i.e. all terms with a
+    :param a: the alpha hyperparameter value (i.e. all terms with a
               confidence value (cv) less than alpha will be ignored during
               classification)
     :type a: float
@@ -104,13 +104,13 @@ class SS3:
         """
         Class constructor.
 
-        :param s: the "smoothness"(sigma) hyper-parameter value
+        :param s: the "smoothness"(sigma) hyperparameter value
         :type s: float
-        :param l: the "significance"(lambda) hyper-parameter value
+        :param l: the "significance"(lambda) hyperparameter value
         :type l: float
-        :param p: the "sanction"(rho) hyper-parameter value
+        :param p: the "sanction"(rho) hyperparameter value
         :type p: float
-        :param a: the alpha hyper-parameter value (i.e. all terms with a
+        :param a: the alpha hyperparameter value (i.e. all terms with a
                   confidence value (cv) less than alpha will be ignored during
                   classification)
         :type a: float
@@ -430,7 +430,7 @@ class SS3:
         if not json:
             words_cvs = [classify_trans(seq) for _, seq in sent]
             if words_cvs:
-                return SS3.summary_op_ngrams(words_cvs)
+                return self.summary_op_ngrams(words_cvs)
             return self.__zero_cv__
         else:
             get_tip = self.__trie_node__
@@ -447,7 +447,7 @@ class SS3:
             ]
             return {
                 "words": info,
-                "cv": SS3.summary_op_ngrams([v["cv"] for v in info]),
+                "cv": self.summary_op_ngrams([v["cv"] for v in info]),
                 "wmv": reduce(vmax, [v["cv"] for v in info])  # word max value
             }
 
@@ -460,7 +460,7 @@ class SS3:
                 if sent
             ]
             if sents_cvs:
-                return SS3.summary_op_sentences(sents_cvs)
+                return self.summary_op_sentences(sents_cvs)
             return self.__zero_cv__
         else:
             info = [
@@ -470,7 +470,7 @@ class SS3:
             ]
             if info:
                 sents_cvs = [v["cv"] for v in info]
-                cv = SS3.summary_op_sentences(sents_cvs)
+                cv = self.summary_op_sentences(sents_cvs)
                 wmv = reduce(vmax, [v["wmv"] for v in info])
             else:
                 cv = self.__zero_cv__
@@ -711,8 +711,7 @@ class SS3:
                 f.close()
                 Print.info("\t[ %s stored in '%s'" % (term, voc_path))
 
-    @staticmethod
-    def summary_op_ngrams(cvs):
+    def summary_op_ngrams(self, cvs):
         """
         Summary operator for n-gram confidence vectors.
 
@@ -724,9 +723,9 @@ class SS3:
             >>> def dummy_summary_op(cvs):
             >>>     return cvs[0]
             >>> ...
-            >>> SS3.summary_op_ngrams = dummy_summary_op
-            >>> ...
             >>> clf = SS3()
+            >>> ...
+            >>> clf.summary_op_ngrams = dummy_summary_op
 
         Note that any function receiving a list of (confidence)
         vectors and returning a single (confidence) vector
@@ -743,8 +742,7 @@ class SS3:
         """
         return reduce(vsum, cvs)
 
-    @staticmethod
-    def summary_op_sentences(cvs):
+    def summary_op_sentences(self, cvs):
         """
         Summary operator for sentence confidence vectors.
 
@@ -756,9 +754,9 @@ class SS3:
             >>> def dummy_summary_op(cvs):
             >>>     return cvs[0]
             >>> ...
-            >>> SS3.summary_op_sentences = dummy_summary_op
-            >>> ...
             >>> clf = SS3()
+            >>> ...
+            >>> clf.summary_op_sentences = dummy_summary_op
 
         Note that any function receiving a list of (confidence)
         vectors and returning a single (confidence) vector
@@ -775,8 +773,7 @@ class SS3:
         """
         return reduce(vsum, cvs)
 
-    @staticmethod
-    def summary_op_paragraphs(cvs):
+    def summary_op_paragraphs(self, cvs):
         """
         Summary operator for paragraph confidence vectors.
 
@@ -788,9 +785,9 @@ class SS3:
             >>> def dummy_summary_op(cvs):
             >>>     return cvs[0]
             >>> ...
-            >>> SS3.summary_op_paragraphs = dummy_summary_op
-            >>> ...
             >>> clf = SS3()
+            >>> ...
+            >>> clf.summary_op_paragraphs = dummy_summary_op
 
         Note that any function receiving a list of (confidence)
         vectors and returning a single (confidence) vector
@@ -818,15 +815,15 @@ class SS3:
 
     def set_hyperparameters(self, s=None, l=None, p=None, a=None):
         """
-        Set hyper-parameter values.
+        Set hyperparameter values.
 
-        :param s: the "smoothness" (sigma) hyper-parameter
+        :param s: the "smoothness" (sigma) hyperparameter
         :type s: float
-        :param l: the "significance" (lambda) hyper-parameter
+        :param l: the "significance" (lambda) hyperparameter
         :type l: float
-        :param p: the "sanction" (rho) hyper-parameter
+        :param p: the "sanction" (rho) hyperparameter
         :type p: float
-        :param a: the alpha hyper-parameter (i.e. all terms with a
+        :param a: the alpha hyperparameter (i.e. all terms with a
                   confidence value (cv) less than alpha will be ignored during
                   classification)
         :type a: float
@@ -842,84 +839,84 @@ class SS3:
 
     def get_hyperparameters(self):
         """
-        Get hyper-parameter values.
+        Get hyperparameter values.
 
-        :returns: a tuple with hyper-parameters current values (s, l, p, a)
+        :returns: a tuple with hyperparameters current values (s, l, p, a)
         :rtype: tuple
         """
         return self.__s__, self.__l__, self.__p__, self.__a__
 
     def set_s(self, value):
         """
-        Set the "smoothness" (sigma) hyper-parameter value.
+        Set the "smoothness" (sigma) hyperparameter value.
 
-        :param value: the hyper-parameter value
+        :param value: the hyperparameter value
         :type value: float
         """
         self.__s__ = float(value)
 
     def get_s(self):
         """
-        Get the "smoothness" (sigma) hyper-parameter value.
+        Get the "smoothness" (sigma) hyperparameter value.
 
-        :returns: the hyper-parameter value
+        :returns: the hyperparameter value
         :rtype: float
         """
         return self.__s__
 
     def set_l(self, value):
         """
-        Set the "significance" (lambda) hyper-parameter value.
+        Set the "significance" (lambda) hyperparameter value.
 
-        :param value: the hyper-parameter value
+        :param value: the hyperparameter value
         :type value: float
         """
         self.__l__ = float(value)
 
     def get_l(self):
         """
-        Get the "significance" (lambda) hyper-parameter value.
+        Get the "significance" (lambda) hyperparameter value.
 
-        :returns: the hyper-parameter value
+        :returns: the hyperparameter value
         :rtype: float
         """
         return self.__l__
 
     def set_p(self, value):
         """
-        Set the "sanction" (rho) hyper-parameter value.
+        Set the "sanction" (rho) hyperparameter value.
 
-        :param value: the hyper-parameter value
+        :param value: the hyperparameter value
         :type value: float
         """
         self.__p__ = float(value)
 
     def get_p(self):
         """
-        Get the "sanction" (rho) hyper-parameter value.
+        Get the "sanction" (rho) hyperparameter value.
 
-        :returns: the hyper-parameter value
+        :returns: the hyperparameter value
         :rtype: float
         """
         return self.__p__
 
     def set_a(self, value):
         """
-        Set the alpha hyper-parameter value.
+        Set the alpha hyperparameter value.
 
         All terms with a confidence value (cv) less than alpha
         will be ignored during classification.
 
-        :param value: the hyper-parameter value
+        :param value: the hyperparameter value
         :type value: float
         """
         self.__a__ = float(value)
 
     def get_a(self):
         """
-        Get the alpha hyper-parameter value.
+        Get the alpha hyperparameter value.
 
-        :returns: the hyper-parameter value
+        :returns: the hyperparameter value
         :rtype: float
         """
         return self.__a__
@@ -1190,7 +1187,7 @@ class SS3:
         """
         Update model values (cv, gv, lv, etc.).
 
-        :param force: force update (even if hyper-parameters haven't changed)
+        :param force: force update (even if hyperparameters haven't changed)
         :type force: bool
         """
         update = 0
@@ -1274,10 +1271,10 @@ class SS3:
         ))
 
     def print_hyperparameters_info(self):
-        """Print information about hyper-parameters."""
+        """Print information about hyperparameters."""
         print()
         print(
-            " %s:\n" % Print.style.green(Print.style.ubold("HYPER-PARAMETERS"))
+            " %s:\n" % Print.style.green(Print.style.ubold("HYPERPARAMETERS"))
         )
         print("\tSmoothness(s):", Print.style.warning(self.__s__))
         print("\tSignificance(l):", Print.style.warning(self.__l__))
@@ -1601,7 +1598,7 @@ class SS3:
                 if parag
             ]
             if paragraphs_cvs:
-                cv = SS3.summary_op_paragraphs(paragraphs_cvs)
+                cv = self.summary_op_paragraphs(paragraphs_cvs)
             else:
                 cv = self.__zero_cv__
             if sort:
@@ -1621,7 +1618,7 @@ class SS3:
             ]
 
             nbr_cats = len(self.__categories__)
-            cv = SS3.summary_op_paragraphs([v["cv"] for v in info])
+            cv = self.summary_op_paragraphs([v["cv"] for v in info])
             max_v = max(cv)
 
             if max_v > 1:
@@ -1665,8 +1662,9 @@ class SS3:
         stime = time()
 
         x_train = [
-            " \n ".join([
-                x_train[i] for i in xrange(len(x_train))
+            "".join([
+                x_train[i] if x_train[i][-1] == '\n' else x_train[i] + '\n'
+                for i in xrange(len(x_train))
                 if y_train[i] == cat
             ])
             for cat in cats
