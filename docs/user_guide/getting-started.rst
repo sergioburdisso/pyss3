@@ -4,7 +4,7 @@
 Getting Started
 ***************
 
-Don't know where to start? don't worry! , 
+Don't know where to start? don't worry!
 
 1. First, read :ref:`ss3-classifier` to have a general idea of how the classifier works (specially read the :ref:`ss3-hyperparameter` section), then...
 2. Do at least one of the :ref:`tutorials`.
@@ -19,14 +19,6 @@ Documentation Overview
 
 User Guide
 -----------
-
-   user_guide/getting-started
-   user_guide/installation
-   user_guide/workflow
-   user_guide/ss3-classifier
-   user_guide/visualizations
-..   user_guide/customization
-..   user_guide/pyss3-command-line
 
 * :ref:`getting-started` - gives a brief introduction and overview.
 
