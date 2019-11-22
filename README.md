@@ -18,6 +18,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 * Introduces a **domain-independent** classification model that **does not require feature engineering**.
 * Naturally supports **incremental (online) learning** and **incremental classification**.
 * Well suited for classification over **text streams**.
+* Its 3 **hyperparameters** are **intuitive and easy-to-interpret** for humans (it is not an "obscure" model).
 
 **Note:** this package also incorporate different variations of the SS3 classifier, such as the one introduced in _"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams
 "_ (recently submitted to Patter Recognition Letters, preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important word n-grams "on the fly".
