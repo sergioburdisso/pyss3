@@ -134,13 +134,14 @@ Further Readings
    user_guide/getting-started
    user_guide/installation
    user_guide/workflow
+   user_guide/ss3-classifier
    user_guide/visualizations
 ..   user_guide/customization
 ..   user_guide/pyss3-command-line
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Tutorials
 
    tutorials/setup

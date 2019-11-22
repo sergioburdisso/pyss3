@@ -4,20 +4,14 @@
 Getting Started
 ***************
 
-.. _ss3-classifier:
+Don't know where to start? don't worry! , 
 
-The SS3 Classification Model
-============================
+1. First, read :ref:`ss3-classifier` to have a general idea of how the classifier works (specially read the :ref:`ss3-hyperparameter` section), then...
+2. Do at least one of the :ref:`tutorials`.
 
-[under construction]
+Once you are done with these two steps, you will have a general knowledge of how to work with PySS3 :)
 
-
-
-PySS3's Features
-==================
-
-[under construction]
-
+Finally, for specific topics you can read any of the following items.
 
 Documentation Overview
 =======================
@@ -26,17 +20,29 @@ Documentation Overview
 User Guide
 -----------
 
+   user_guide/getting-started
+   user_guide/installation
+   user_guide/workflow
+   user_guide/ss3-classifier
+   user_guide/visualizations
+..   user_guide/customization
+..   user_guide/pyss3-command-line
+
 * :ref:`getting-started` - gives a brief introduction and overview.
 
 * :ref:`installation` - describes how to install *PySS3* through pip or source.
 
 * :ref:`workflow` - briefly describes the two main workflows.
 
-* :ref:`customization` - details on how to customize *PySS3*.
-
-* :ref:`pyss3-command-line` - explained list of commands.
+* :ref:`ss3-classifier` - briefly describes the classification model.
 
 * :ref:`visualizations` - details on the two main visualizations tools.
+
+
+.. * :ref:`customization` - details on how to customize *PySS3*.
+
+.. * :ref:`pyss3-command-line` - explained list of commands.
+
 
 .. _tutorials:
 
