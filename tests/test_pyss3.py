@@ -52,9 +52,7 @@ y_test = ["sports",
           "music",
           "science&technology"]
 
-
-stopwords = ['by', 'the', 'for', 'of', 'new', 'to', 'on', 'with', 'is', 'at',
-             'and', 'in', 'my', 'this', 'it', 'times', 'out', 'how']
+stopwords = ['by', 'the', 'for', 'of', 'new', 'to', 'with', 'is', 'at', 'and', 'in', 'this', 'out']
 
 
 def argmax(lst):
@@ -150,7 +148,7 @@ def test_pyss3_ss3():
 
     clf.fit(x_train, y_train)
 
-    perform_tests_with(clf, [.00032, .00056, 0, 0, 0, .00019, .0021, 7.03651])
+    perform_tests_with(clf, [.00114, .00295, 0, 0, 0, .00016, .01894, 8.47741])
 
     clf = SS3(
         s=.32, l=1.24, p=1.1, a=0, name="test-3grams",
@@ -158,18 +156,18 @@ def test_pyss3_ss3():
     )
     clf.fit(x_train, y_train, n_grams=3)
 
-    perform_tests_with(clf, [.00037, .0006, 0, 0, 0, .00028, .00082, 9.03427])
+    perform_tests_with(clf, [.00074, .00124, 0, 0, 0, .00028, .00202, 9.19105])
 
     pred = clf.classify("android mobile and video games", json=True)
     assert pred["pars"][0]["sents"][0]["words"][0]["lexeme"] == "android mobile"
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "video games"
     assert argmax(pred["cv"]) == clf.get_category_index("science&technology")
-    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 3.8183, 0, 0]
+    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 4.3789, 0, 0]
 
     pred = clf.classify("playing football soccer", json=True)
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "football soccer"
     assert argmax(pred["cv"]) == clf.get_category_index("sports")
-    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.70975, 0]
+    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.86708, 0]
 
 
 # if __name__ == "__main__":
