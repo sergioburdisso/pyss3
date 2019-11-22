@@ -65,8 +65,8 @@ Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
 were obtained following the :ref:`tutorials`.
 
 
-And last but not least, the ``PySS3 Command Line``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+And last but not least, the ``PySS3 Command Line`` tool
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is probably the most useful component of PySS3. When you install
 the package (for instance by using ``pip install pyss3``) a new command
