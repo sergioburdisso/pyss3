@@ -13,7 +13,7 @@ straightforward, interactive and visual way. In addition to the
 implementations of the classifier, PySS3 comes with a set of tools
 to help you to develop your machine learning models in a clearer and
 faster way. These tools let you analyze, monitor and understand your
-models by allowing you see what they have actually learned and why. To
+models by allowing you to see what they have actually learned and why. To
 achieve this, PySS3 provides you with 3 main components: the ``SS3``
 class, the ``Server`` class and the ``PySS3 Command Line`` tool, as
 pointed out below.
