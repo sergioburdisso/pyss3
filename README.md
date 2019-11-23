@@ -66,7 +66,7 @@ your@user:/your/project/path$ pyss3
 (pyss3) >>> load my_model
 (pyss3) >>> grid_search path/to/dataset 4-fold -s r(.2,.8,6) -l r(.1,2,6) -p r(.5,2,6)
 ```
-In this illustrative example, `s` will take 6 different values between .2 and .8, `l` between .1 and 2, and `p` between .5 and 2. After the grid search finishes, we can use the following command to open up an interactive 3D plot in the browser:
+In this illustrative example, `s` will take 6 different values between 0.2 and 0.8, `l` between 0.1 and 2, and `p` between 0.5 and 2. After the grid search finishes, we can use the following command to open up an interactive 3D plot in the browser:
 ```console
 (pyss3) >>> plot evaluations
 ```
