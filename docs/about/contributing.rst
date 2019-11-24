@@ -33,7 +33,7 @@ Pull Request
 ============
 
 If you want to contribute to our codebase, please send an email to
-sergio.burdisso@gmail.com to with subject "PYSS3 DEVELOPMENT" to discuss
+sergio.burdisso@gmail.com to with subject "PYSS3 CONTRIBUTION" to discuss
 your plan which should include the description of the contribution (bug
 fix, interface improvement, new feature, new test or documentation) and
 potential interface (for code contribution). Once we reach the agreement

@@ -69,11 +69,14 @@ Now, if you have Jupyter Notebook installed, lunch it and and run the "topic_cat
 
     jupyter notebook
 
+
 If you don't have Jupyter Notebook installed, you can either:
 
-* Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <topic_categorization-notebook>`. **Note:** *the "examples" folder includes a file called "topic_categorization.py" which already contains all the needed code.*
+* Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <topic_categorization-notebook>`.
+.. note:: the "examples" folder includes a file called "topic_categorization.py" which already contains all the needed code.
 
-* Try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/topic_categorization.ipynb>`__. **Note:** *keep in mind that by using this method you won't be able to manually (and visually) test your model through the interactive "live test"*.
+* Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/topic_categorization.ipynb>`__.
+.. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive "live test" tool.
 
 
 .. _topic_hyperparameter-optimization:
@@ -219,7 +222,7 @@ Not bad using the default hyperparameters values, let's now manually analyze wha
 
     (pyss3) >>> live_test datasets/topic/live_test
 
-**Note:** here we are not using the "file" argument because inside the "live_test" folder each file is a different document (not a different category).
+.. note:: here we are not using the "file" argument because inside the "live_test" folder each file is a different document (not a different category).
 
 
 Live test doesn't look bad, however, we will create a "more intelligent" version of this model, a version that can recognize variable-length word n-grams "on the fly". So, let's begin by creating a new model called "topic_categorization_3grams":
@@ -228,7 +231,7 @@ Live test doesn't look bad, however, we will create a "more intelligent" version
 
     (pyss3) >>> new topic_categorization_3grams
 
-**Note:** if you have previously done this tutorial following the :ref:`topic_classic-workflow` path, PySS3 Command Line will display **"This model already exists, do you really want to overwrite it? [Y/n]"** because you have already created a model called "topic_categorization_3grams" in the last part of the tutorial. Answer with 'Y' (note it is capitalized) and then press Enter to overwrite it.
+.. warning:: if you have previously done this tutorial following the :ref:`topic_classic-workflow` path, PySS3 Command Line will display **"This model already exists, do you really want to overwrite it? [Y/n]"** because you have already created a model called "topic_categorization_3grams" in the last part of the tutorial. Answer with 'Y' (**note it is capitalized**) and then press Enter to overwrite it.
 
 As we said above, we want this model to learn to recognize variable-length n-grams. Fortunately, as it was displayed with ``help train``, we know that the ``train`` command accepts an extra argument: *N*-grams (where *N* is any positive integer). This argument will allow us to do what we want, we will use ``3-grams`` to indicate we want SS3 to learn to recognize important words, bigrams, and 3-grams **(*)**
 
@@ -267,7 +270,7 @@ We will use better hyperparameters values to improve our classifier performance.
 
     (pyss3) >>> set s 0.32 l 1.24 p 1.1
 
-**Note:** if you want to know how we found out that these values were going to improve our model's accuracy, it is explained in the next subsection (:ref:`topic_hyperparameter-optimization-command-line`), so we really recommend reading it after completing this section.
+.. note:: if you want to know how we found out that these values were going to improve our model's accuracy, it is explained in the next subsection (:ref:`topic_hyperparameter-optimization-command-line`), so we really recommend reading it after completing this section.
 
 Let's see if the accuracy really improves using this values:
 
@@ -396,39 +399,38 @@ That is, we need to set ``s=0.32``, ``l=1.24`` and ``p=1.1``. To do this we coul
     (pyss3) >>> set s 0.32 l 1.24 p 1.1
     (pyss3) >>> save
 
------
+.. note::
+    if you want to use these hyperparameter values with python, there are at least three ways we can configure our SS3 classifier:
 
-**Note:** if you want to use these hyperparameter values with python, there are at least three ways we can configure our SS3 classifier:
-
-* Creating a new classifier using these hyperparameter values:
-
-.. code:: python
-
-    clf = SS3(s=0.32, l=1.24, p=1.1)
-
-
-* Changing the hyperparameter values of an already existing model using the ``set_hyperparameters`` method:
-
-.. code:: python
-
-    clf = SS3()
-    ...
-    clf.set_hyperparameters(s=0.32, l=1.24, p=1.1)
-
-
-* Or, using the ``PySS3 Command Line``:
-
-    1. Use the ``set`` and ``save`` commands to update and save the model
-
-    .. code:: console
-
-        (pyss3) >>> set s 0.32 l 1.24 p 1.1
-        (pyss3) >>> save
-
-    2. And then, use the ``load_model`` method to load the model with python:
+    * Creating a new classifier using these hyperparameter values:
 
     .. code:: python
 
-        clf = SS3(name="movie_review_3grams")
+        clf = SS3(s=0.32, l=1.24, p=1.1)
+
+
+    * Changing the hyperparameter values of an already existing model using the ``set_hyperparameters`` method:
+
+    .. code:: python
+
+        clf = SS3()
         ...
-        clf.load_model()
+        clf.set_hyperparameters(s=0.32, l=1.24, p=1.1)
+
+
+    * Or, using the ``PySS3 Command Line``:
+
+        1. Use the ``set`` and ``save`` commands to update and save the model
+
+        .. code:: console
+
+            (pyss3) >>> set s 0.32 l 1.24 p 1.1
+            (pyss3) >>> save
+
+        2. And then, use the ``load_model`` method to load the model with python:
+
+        .. code:: python
+
+            clf = SS3(name="movie_review_3grams")
+            ...
+            clf.load_model()

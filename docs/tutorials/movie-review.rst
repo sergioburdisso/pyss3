@@ -36,9 +36,11 @@ Now, if you have Jupyter Notebook installed, lunch it and and run the "movie_rev
 
 If you don't have Jupyter Notebook installed, you can either:
 
-* Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <movie-reviews-notebook>`. **Note:** *the "examples" folder includes a file called "movie_review.py" which already contains all the needed code.*
+* Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <movie-reviews-notebook>`. 
+.. note:: the "examples" folder includes a file called "movie_review.py" which already contains all the needed code.
 
-* Try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__. **Note:** *keep in mind that by using this method you won't be able to manually (and visually) test your model through the interactive "live test"*.
+* Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__.
+.. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive "live test" tool.
 
 
 
@@ -161,7 +163,7 @@ Live test doesn't look bad, however, we will create a "more intelligent" version
 
     (pyss3) >>> new movie_review_3grams
 
-**Note:** if you have previously done this tutorial following the :ref:`movie-review_classic-workflow` path, PySS3 Command Line will display **"This model already exists, do you really want to overwrite it? [Y/n]"** because you have already created a model called "movie_review_3grams" in the last part of the tutorial. Answer with 'Y' (note it is capitalized) and then press Enter to overwrite it.
+.. warning:: if you have previously done this tutorial following the :ref:`movie-review_classic-workflow` path, PySS3 Command Line will display **"This model already exists, do you really want to overwrite it? [Y/n]"** because you have already created a model called "movie_review_3grams" in the last part of the tutorial. Answer with 'Y' (**note it is capitalized**) and then press Enter to overwrite it.
 
 As we said above, we want this model to learn to recognize variable-length n-grams, let's use the ``help`` command to see more details about the ``train`` command:
 
@@ -231,7 +233,7 @@ Finally, we will use better hyperparameters values. Namely, we will set ``s=0.44
 
     (pyss3) >>> set s 0.44 l 0.48 p 1.1
 
-**Note:** if you want to know how we found out that these values were going to improve our model's accuracy, it is explained in the next subsection (:ref:`hyperparameter-optimization-command-line`), so we really recommend reading it after completing this section.
+.. note:: if you want to know how we found out that these values were going to improve our model's accuracy, it is explained in the next subsection (:ref:`hyperparameter-optimization-command-line`), so we really recommend reading it after completing this section.
 
 Let's see if the accuracy really improves using this values:
 
@@ -358,48 +360,44 @@ That is, we need to set ``s=0.44``, ``l=0.48`` and ``p=1.1``. To do this we coul
     (pyss3) >>> set s 0.44 l 0.48 p 1.1
     (pyss3) >>> save
 
------
 
-**Note:** if you want to use these hyperparameter values with python, there are at least three ways we can configure our SS3 classifier:
+.. note::
+  if you want to use these hyperparameter values with python, there are at least three ways we can configure our SS3 classifier:
 
-* Creating a new classifier using these hyperparameter values:
+  * Creating a new classifier using these hyperparameter values:
 
-.. code:: python
+  .. code:: python
 
-    clf = SS3(s=0.44, l=0.48, p=1.1)
-
-
-* Changing the hyperparameter values of an already existing model using the ``set_hyperparameters`` method:
-
-.. code:: python
-
-    clf = SS3()
-    ...
-    clf.set_hyperparameters(s=0.44, l=0.48, p=1.1)
+      clf = SS3(s=0.44, l=0.48, p=1.1)
 
 
-* Or, using the ``PySS3 Command Line``:
+  * Changing the hyperparameter values of an already existing model using the ``set_hyperparameters`` method:
 
-    1. Use the ``set`` and ``save`` commands to update and save the model
+  .. code:: python
 
-    .. code:: console
-
-        (pyss3) >>> set s 0.44 l 0.48 p 1.1
-        (pyss3) >>> save
-
-    2. And then, use the ``load_model`` method to load the model with python:
-
-    .. code:: python
-
-        clf = SS3(name="movie_review_3grams")
-        ...
-        clf.load_model()
+      clf = SS3()
+      ...
+      clf.set_hyperparameters(s=0.44, l=0.48, p=1.1)
 
 
------
+  * Or, using the ``PySS3 Command Line``:
 
-Before we finish the hyperparameter optimization task, there is an optional (but recommended) step. To make sure the selected hyperparameters generalize well (i.e. are not overfitted to the test set), we will perform an extra grid search but this time using a (stratified) 10-fold cross-validation. In addition, 
-from what we saw from the previous grid search, the "santion"(p) hyperparameter doesn't seem to have a real impact on performance, so this time we will set ``p = 1.1`` when performing the grid search, that is:
+      1. Use the ``set`` and ``save`` commands to update and save the model
+
+      .. code:: console
+
+          (pyss3) >>> set s 0.44 l 0.48 p 1.1
+          (pyss3) >>> save
+
+      2. And then, use the ``load_model`` method to load the model with python:
+
+      .. code:: python
+
+          clf = SS3(name="movie_review_3grams")
+          ...
+          clf.load_model()
+
+Before we finish the hyperparameter optimization task, there is an optional (but recommended) step. To make sure the selected hyperparameters generalize well (i.e. are not overfitted to the test set), we will perform an extra grid search but this time using a (stratified) 10-fold cross-validation. From what we saw from the previous grid search, the "santion"(p) hyperparameter doesn't seem to have a real impact on performance, so this time we will set ``p = 1.1`` when performing the grid search, that is:
 
 .. code:: console
 

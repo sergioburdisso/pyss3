@@ -29,7 +29,7 @@ As shown in the figure below, in this plot, each data point represents an evalua
 
 .. image:: ../_static/evaluation-plot.png
 
-**Note:** two live examples of these evaluation plots are `"Movie Review (Sentiment Analysis)" <../_static/ss3_model_evaluation[movie_review_3grams].html>`__ and `"Topic Categorization" <../_static/ss3_model_evaluation[topic_categorization_3grams].html>`__, both were obtained following the :ref:`tutorials`.
+.. note:: two live examples of these evaluation plots are `"Movie Review (Sentiment Analysis)" <../_static/ss3_model_evaluation[movie_review_3grams].html>`__ and `"Topic Categorization" <../_static/ss3_model_evaluation[topic_categorization_3grams].html>`__, both were obtained following the :ref:`tutorials`.
 
 The performance measure can be interactively changed using the options panel in the upper-left corner, as shown below.
 

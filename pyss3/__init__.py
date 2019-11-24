@@ -717,23 +717,22 @@ class SS3:
 
         By default it returns the addition of all confidence
         vectors. However, in case you want to use a custom
-        wants to use a custom summary operator, this function
-        must be replaced as shown in the following example:
+        summary operator, this function must be replaced
+        as shown in the following example:
 
-            >>> def dummy_summary_op(cvs):
+            >>> def my_summary_op(cvs):
             >>>     return cvs[0]
             >>> ...
             >>> clf = SS3()
             >>> ...
-            >>> clf.summary_op_ngrams = dummy_summary_op
+            >>> clf.summary_op_ngrams = my_summary_op
 
-        Note that any function receiving a list of (confidence)
-        vectors and returning a single (confidence) vector
-        could be used. In the example above the summary operator
-        is replaced by the user-defined ``dummy_summary_op`` which
-        ignores all confidence vectors returning only the confidence
-        vector of the first n-gram (which besides being an
-        illustrative example, makes no real sense).
+        Note that any function receiving a list of vectors and
+        returning a single vector could be used. In the above example
+        the summary operator is replaced by the user-defined
+        ``my_summary_op`` which ignores all confidence vectors
+        returning only the confidence vector of the first n-gram
+        (which besides being an illustrative example, makes no real sense).
 
         :param cvs: a list n-grams confidence vectors
         :type cvs: list (of list of float)
@@ -748,8 +747,8 @@ class SS3:
 
         By default it returns the addition of all confidence
         vectors. However, in case you want to use a custom
-        wants to use a custom summary operator, this function
-        must be replaced as shown in the following example:
+        summary operator, this function must be replaced
+        as shown in the following example:
 
             >>> def dummy_summary_op(cvs):
             >>>     return cvs[0]
@@ -758,13 +757,12 @@ class SS3:
             >>> ...
             >>> clf.summary_op_sentences = dummy_summary_op
 
-        Note that any function receiving a list of (confidence)
-        vectors and returning a single (confidence) vector
-        could be used. In the example above the summary operator
-        is replaced by the user-defined ``dummy_summary_op`` which
-        ignores all confidence vectors returning only the confidence
-        vector of the first sentence (which besides being an
-        illustrative example, makes no real sense).
+        Note that any function receiving a list of vectors and
+        returning a single vector could be used. In the above example
+        the summary operator is replaced by the user-defined
+        ``dummy_summary_op`` which ignores all confidence vectors
+        returning only the confidence vector of the first sentence
+        (which besides being an illustrative example, makes no real sense).
 
         :param cvs: a list sentence confidence vectors
         :type cvs: list (of list of float)
@@ -779,8 +777,8 @@ class SS3:
 
         By default it returns the addition of all confidence
         vectors. However, in case you want to use a custom
-        wants to use a custom summary operator, this function
-        must be replaced as shown in the following example:
+        summary operator, this function must be replaced
+        as shown in the following example:
 
             >>> def dummy_summary_op(cvs):
             >>>     return cvs[0]
@@ -789,13 +787,12 @@ class SS3:
             >>> ...
             >>> clf.summary_op_paragraphs = dummy_summary_op
 
-        Note that any function receiving a list of (confidence)
-        vectors and returning a single (confidence) vector
-        could be used. In the example above the summary operator
-        is replaced by the user-defined ``dummy_summary_op`` which
-        ignores all confidence vectors returning only the confidence
-        vector of the first paragraph (which besides being an
-        illustrative example, makes no real sense).
+        Note that any function receiving a list of vectors and
+        returning a single vector could be used. In the above example
+        the summary operator is replaced by the user-defined
+        ``dummy_summary_op`` which ignores all confidence vectors
+        returning only the confidence vector of the first paragraph
+        (which besides being an illustrative example, makes no real sense).
 
         :param cvs: a list paragraph confidence vectors
         :type cvs: list (of list of float)
