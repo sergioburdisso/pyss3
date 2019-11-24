@@ -58,7 +58,6 @@ Finally, the actual classification is performed based on the values of this sing
 .. figure:: ../_static/mapreduce-ss3.jpg
     :target: ../_static/mapreduce-ss3-full.jpg
     :alt: map to buried treasure
-    :align: center
 
     **Figure:** Classification process for an example document.
     In the first stage, this document is split into two sentences (for instance, by using the dot as a delimiter) and then each sentence is also split into single words.
@@ -69,7 +68,7 @@ Finally, the actual classification is performed based on the values of this sing
 
 Note that using the *confidence vectors* in this hierarchy of blocks, it is quite straightforward for SS3 to visually justify the classification if different blocks of the input are colored in relation to their values.
 
-.. note::  This characteristic is exploited by the PySS3's "live test" tool to create the interactive visualizations. This tool can be used to monitor and analyze what the model is actually learning. You can check out the online live test demos available `here <http://tworld.io/ss3>`__ (both were created following the :ref:`tutorials <tutorials>`).
+.. note::  This characteristic is exploited by the PySS3's :ref:`live-test` tool to create the interactive visualizations. This tool can be used to monitor and analyze what the model is actually learning. You can check out the online live test demos available `here <http://tworld.io/ss3>`__ (both were created following the :ref:`tutorials <tutorials>`).
 
 
 Additionally, the classification is also incremental as long as the **summary operator** for the highest level block (:math:`\oplus_1`, for this example) can be computed incrementally ---which is the case for most common aggregation operations such as addition, multiplication, maximum, etc.
@@ -80,8 +79,8 @@ Note that this incremental classification, in which only the new sentence needs 
 
 .. _ss3-hyperparameter:
 
-The Hyperparameters
-===================
+Hyperparameters
+===============
 
 As it is described in the previous section, the global value (:math:`gv`) of a word is used to create the first confidence vectors, upon which higher level confidence vectors are then created until a single confidence vector for the whole input is obtained. Therefore, the global value (gv) of a word is the basic building block for the entire classification process.
 

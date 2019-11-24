@@ -14,13 +14,15 @@ To get started with the tutorials, we need to download the content of the `examp
 - or `downloading a zipped version <https://github.com/sergioburdisso/pyss3/archive/master.zip>`__.
 
 
-Additionally, we strongly recommend creating a new `conda enviroment <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`__ to install everything we need for the tutorials, including PySS3 *(don't have* `conda <https://docs.conda.io/projects/conda/en/latest/>`__ *in your system? don't worry, read its* `installation guide <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ *!)*. We will call this new environemnt "pyss3tutos":
+Additionally, we strongly recommend creating a new `conda enviroment <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`__ to install everything we need for the tutorials, including PySS3. We will call this new environemnt "pyss3tutos":
 
 .. code:: console
 
     conda create --name pyss3tutos python=3
 
-Activate the environemnt:
+.. note:: don't have `conda <https://docs.conda.io/projects/conda/en/latest/>`__ in your system? don't worry, read its `installation guide <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__! :)
+
+Now, activate our new conda environemnt:
 
 .. code:: console
 
@@ -37,3 +39,5 @@ Finally! install PySS3:
 .. code:: console
 
     pip install pyss3
+
+.. seealso:: If you want to install pyss3 using another method, you should check out the :ref:`installation` page.

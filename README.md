@@ -91,6 +91,13 @@ The whole process is done using only the `PySS3 Command Line` tool. This workflo
 Note: [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html#tutorials) are presented in two versions, one for each workflow type, so that the reader can choose the workflow that best suit her/his needs.
 
 
+
+## Want to give PySS3 a try?
+
+Just go to the [Getting Started](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html) page :D
+
+
+
 ## Installation
 
 

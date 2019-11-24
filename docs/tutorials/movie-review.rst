@@ -4,7 +4,7 @@
 Movie Reviews (Sentiment Analysis)
 **********************************
 
-In this tutorial we will develop an SS3 classifier for sentiment analysis on movie reviews. We will work with a dataset called `"Large Movie Review Dataset v1.0" <https://ai.stanford.edu/~amaas/data/sentiment/>`__ (introduced in `"Learning Word Vectors for Sentiment Analysis" <https://ai.stanford.edu/~ang/papers/acl11-WordVectorsSentimentAnalysis.pdf>`__) to train our model. This dataset contains 50,000 reviews split evenly into 25k train and 25k test sets. However, since this is just a tutorial, and to speed up the whole process, we will use only a subset of it with 10K documents for training (5k pos and 5k neg) and 1k for testing (500 pos and 500 neg), and yet, as readers will experience, the final model will work remarkable well.
+In this tutorial we will develop an :ref:`SS3 classifier <ss3-classifier>` for sentiment analysis on movie reviews. We will work with a dataset called `"Large Movie Review Dataset v1.0" <https://ai.stanford.edu/~amaas/data/sentiment/>`__ (introduced in `"Learning Word Vectors for Sentiment Analysis" <https://ai.stanford.edu/~ang/papers/acl11-WordVectorsSentimentAnalysis.pdf>`__) to train our model. This dataset contains 50,000 reviews split evenly into 25k train and 25k test sets. However, since this is just a tutorial, and to speed up the whole process, we will use only a subset of it with 10K documents for training (5k pos and 5k neg) and 1k for testing (500 pos and 500 neg), and yet, as readers will experience, the final model will work remarkable well.
 
 Before we begin, go to :ref:`tutorial-setup` and make sure you have everything we need.
 
@@ -37,9 +37,11 @@ Now, if you have Jupyter Notebook installed, lunch it and and run the "movie_rev
 If you don't have Jupyter Notebook installed, you can either:
 
 * Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <movie-reviews-notebook>`. 
+
 .. note:: the "examples" folder includes a file called "movie_review.py" which already contains all the needed code.
 
 * Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__.
+
 .. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive "live test" tool.
 
 

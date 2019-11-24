@@ -4,7 +4,7 @@
 Topic Categorization
 ********************
 
-In this tutorial we will develop an SS3 classifier for topic categorization. We will work with a special dataset that we have created for this tutorial to train our model. This dataset was created collecting tweets with hashtags related to these 8 different categories: *"art&photography", "beauty&fashion", "business&finance", "food", "health", "music", "science&technology" and "sports"*. The dataset contains around 29k tweets for training on each category and only 100 tweets for testing on each one. Additionally, instead of having a folder for each category, training and test folder have a single .txt file for each category containing a tweet on each line.
+In this tutorial we will develop an :ref:`SS3 classifier <ss3-classifier>` for topic categorization. We will work with a special dataset that we have created for this tutorial to train our model. This dataset was created collecting tweets with hashtags related to these 8 different categories: *"art&photography", "beauty&fashion", "business&finance", "food", "health", "music", "science&technology" and "sports"*. The dataset contains around 29k tweets for training on each category and only 100 tweets for testing on each one. Additionally, instead of having a folder for each category, training and test folder have a single .txt file for each category containing a tweet on each line.
 Finally, there's an extra folder, called "live_test", with 9 test documents that we will use to visually check that our model has learned properly. So, basically the dataset is structured like this:
 
 .. code:: console
@@ -73,9 +73,11 @@ Now, if you have Jupyter Notebook installed, lunch it and and run the "topic_cat
 If you don't have Jupyter Notebook installed, you can either:
 
 * Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <topic_categorization-notebook>`.
+
 .. note:: the "examples" folder includes a file called "topic_categorization.py" which already contains all the needed code.
 
 * Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/topic_categorization.ipynb>`__.
+
 .. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive "live test" tool.
 
 

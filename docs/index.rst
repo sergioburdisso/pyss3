@@ -123,6 +123,12 @@ Categorization" <_static/ss3_model_evaluation[topic_categorization_3grams].html>
 both evaluation plots were obtained following the :ref:`tutorials`.
 
 
+Want to give PySS3 a try?
+=========================
+
+Just go to the :ref:`getting-started` page :D
+
+----
 
 Further Readings
 ================
