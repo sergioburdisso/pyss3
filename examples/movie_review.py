@@ -2,8 +2,6 @@
 """
 Movie Review (Sentiment Analysis) Tutorial Source Code (Classic Workflow).
 
-This is the notebook for the tutorial "Movie Review - Classic Workflow"
-
 (https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#movie-review_classic-workflow)
 ---
 """

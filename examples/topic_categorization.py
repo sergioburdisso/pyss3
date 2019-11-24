@@ -2,8 +2,6 @@
 """
 Topic Categorization Tutorial Source Code (Classic Workflow).
 
-This is the notebook for the tutorial "Topic Categorization - Classic Workflow"
-
 (https://pyss3.readthedocs.io/en/latest/tutorials/topic-categorization.html#topic_classic-workflow)
 ---
 """
