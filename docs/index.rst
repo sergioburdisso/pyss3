@@ -10,8 +10,8 @@ Welcome to PySS3's documentation!
 
 `PySS3`_ is a Python package that allows you to work with :ref:`ss3-classifier` in a very
 straightforward, interactive and visual way. In addition to the
-implementations of the classifier, PySS3 comes with a set of tools
-to help you to develop your machine learning models in a clearer and
+implementation of the classifier, PySS3 comes with a set of tools
+to help you developing your machine learning models in a clearer and
 faster way. These tools let you analyze, monitor and understand your
 models by allowing you to see what they have actually learned and why. To
 achieve this, PySS3 provides you with 3 main components: the ``SS3``

@@ -18,6 +18,9 @@ Some virtues of SS3:
 PySS3 implements the original SS3 definition as well as different variations of it, such as the one introduced in *"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams
 "* (recently submitted to Patter Recognition Letters, preprint available `here <https://arxiv.org/abs/1911.06147>`__ which allows SS3 to recognize important word n-grams "on the fly".
 
+
+.. _ss3-introduction:
+
 Introduction
 ============
 
@@ -72,7 +75,7 @@ Note that using the *confidence vectors* in this hierarchy of blocks, it is quit
 Additionally, the classification is also incremental as long as the **summary operator** for the highest level block (:math:`\oplus_1`, for this example) can be computed incrementally ---which is the case for most common aggregation operations such as addition, multiplication, maximum, etc.
 For instance, suppose that later on, a new sentence is appended to the example shown above.
 Since :math:`\oplus_1` is the addition of all vectors, instead of processing the whole document again, we could update the already computed vector, :math:`(0.15, 3.65, 2.0, 0.15)`, by adding the new sentence **confidence vector** to it ---
-Note that this incremental classification, in which only the new sentence needs to be processed, would produce exactly the same result as if the process were applied to the whole document again each time.
+Note that this incremental classification, in which only the new sentence needs to be processed, would produce exactly the same result as if the process were applied to the whole document again, each time.
 
 
 .. _ss3-hyperparameter:
@@ -80,9 +83,9 @@ Note that this incremental classification, in which only the new sentence needs 
 The Hyperparameters
 ===================
 
-.. The entire classification process depends on the global value, to compue confidence vectos of each word bla bla ? (para que no quede tan lejos de la introduccion, en el que se introduce la definición de gv)
+As it is described in the previous section, the global value (:math:`gv`) of a word is used to create the first confidence vectors, upon which higher level confidence vectors are then created until a single confidence vector for the whole input is obtained. Therefore, the global value (gv) of a word is the basic building block for the entire classification process.
 
-In simple terms, the calculation of the **global value** (:math:`gv`) of a word in a category is obtained by multiplying three values. Namely, its **local value**, its **significance** factor, and its **sanction** factor, like this:
+In simple terms, the calculation of the **global value** (:math:`gv`) of a word in a category is obtained by multiplying three values. Namely, its **local value**, its **significance** factor, and its **sanction** factor. Additionally, in practice, the calculation of each one of these three values is controlled by a special hyperparameter. In more detail, we have:
 
 .. math::
     global\ value = local\ value\cdot significance\cdot sanction
@@ -91,27 +94,32 @@ where:
 
 * The **local value** values the word based on its local frequency in the category.
 
+    * The :math:`\sigma` **or "smoothness" hyperparameter** allows you to "smooth" the relationship between the raw frequency and the final value assigned to the word. For instance, :math:`\sigma=1` indicates the **local value** is calculated directly proportional to the raw frequency, whereas smaller :math:`\sigma` values decrease the influence of this frequency (i.e the gap between the most and less frequent words becomes smaller). Think of this hyperparameter as if it were a "frequency tuner" that you can use to remove the "overshadowing" effect that extremely frequent words (but not important such as "the", "on", "with", etc.) produce on less frequent but really useful words.
+
 * The **significance** factor captures the global significance of the word by decreasing the **global value** in relation to its **local value** in the other categories.
+
+    * The :math:`\lambda` **or "significance" hyperparameter** allows you to controls how far the **local value** in a category must deviate from the **local value** in the other categories for the word to be considered important to that category.
 
 * The **sanction** factor decreases the **global value** in relation to the number of categories the word is significant to (given by the **significance** value). 
 
+    * The :math:`\rho` **or "sanction" hyperparameter** allows you to control how sensitive/severe this sanction is.
 
-In practice, each one of these values are parameterized, respectively, by the following three hyperparameters:
-
-* :math:`\sigma` **or "smoothness"** -- Controls the smoothness factor of the word distribution curve.
-* :math:`\lambda` **or "significance"** --  Controls how far the local value must deviate from the  median to be considered significant.
-* :math:`\rho` **or "sanction"** -- Controls how sensitive the sanction is.
+The name "SS3" is based on these three hyperparameters: Sequential Smoothness-Significance-and-Sanction (SS3).
 
 .. note::
-    In PySS3, these hyperparameters are referenced using the "s", "l", and "p" letters for :math:`\sigma`, :math:`\lambda`, and the :math:`\rho`, respectively. For instance, let's say we want to create a new SS3 model with :math:`\sigma=0.32`, :math:`\lambda=1.24`, and :math:`\rho=1.1`, then we can create a new ``SS3`` object as follows: 
+    In PySS3, these hyperparameters are referenced using the "s", "l", and "p" letters for :math:`\sigma`, :math:`\lambda`, and :math:`\rho`, respectively. For instance, let's say we want to create a new SS3 model with :math:`\sigma=0.32`, :math:`\lambda=1.24`, and :math:`\rho=1.1`, then we can create a new ``SS3`` object as follows: 
 
     .. code:: python
 
         clf = SS3(s=0.32, l=1.24, p=1.1)
 
+    Additionally, PySS3 provides a **"forth hyperparameter"**, called :math:`\alpha` (and referenced using the "a" letter), which allows you to set the minimum global value that a word must have in order not to be ignored.. That is, only words with :math:`gv > \alpha` will be taken into account during classification. By default :math:`\alpha = 0`, so no word is ignored. However, let's say we want to create the same previous SS3 model but this time using :math:`\alpha = 0.1`, then we could use:
 
-.. topic:: a forth hyperparameter?
+    .. code:: python
 
-    The :math:`\alpha` hyperparameter...
+        clf = SS3(s=0.32, l=1.24, p=1.1, a=0.1)
 
-.. note:: If you want to know how exactly these values are calculated in practice, as well as the formal definition of the algorithms, read Section 3 of the `original paper <https://arxiv.org/abs/1905.08772>`__ that, along with the corresponding equations, presents the main ideas that lead to them.
+    **Tip:** when working on early classification tasks, using :math:`\alpha` values greater than 0 can yield better classification results.
+
+
+.. seealso:: If you want to know how exactly these values are calculated in practice, as well as the formal definition of the algorithms, read Section 3 of the `original paper <https://arxiv.org/abs/1905.08772>`__ that, along with the corresponding equations, presents the main ideas that lead to them.

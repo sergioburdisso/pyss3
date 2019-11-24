@@ -25,7 +25,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 
 ## What is PySS3?
 
-[PySS3](https://github.com/sergioburdisso/pyss3) is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementations of the SS3 classifier, PySS3 comes with a set of tools to help you to develop your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you to see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Server`` class and the ``PySS3 Command Line`` tool, as pointed out below.
+[PySS3](https://github.com/sergioburdisso/pyss3) is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementation of the SS3 classifier, PySS3 comes with a set of tools to help you developing your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you to see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Server`` class and the ``PySS3 Command Line`` tool, as pointed out below.
 
 
 ### The `SS3` class
