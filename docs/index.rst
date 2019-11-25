@@ -82,7 +82,7 @@ etc.) that you've performed. This will allow you (with a single command)
 to interactively visualize and analyze your classifier performance in
 terms of its different hyperparameters values (and select the best
 model according to your needs). For instance, let's perform a grid
-search with a 4-fold cross-validation on the three hyperparameters,
+search with a 4-fold cross-validation on the three :ref:`hyperparameters <ss3-hyperparameter>`,
 smoothness(\ ``s``), significance(\ ``l``), and sanction(\ ``p``) as
 follows:
 
