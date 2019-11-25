@@ -127,7 +127,10 @@ class Server:
         if not data:
             return
 
-        data = data.decode()
+        try:
+            data = data.decode()
+        except UnicodeDecodeError:
+            Print.error("UnicodeDecodeError: __handle_request__")
 
         rsc_path = get_http_path(data)
 
@@ -146,6 +149,9 @@ class Server:
                 Server.__do_get_info__(sock)
             elif method == "get_doc":
                 Server.__do_get_doc__(sock, body)
+            else:
+                sock.send(HTTP_404)
+                Print.info("404 Not Found")
 
         else:  # if GET
             Print.show("\tGET %s " % rsc_path, False)
@@ -478,7 +484,10 @@ class Server:
                             % (addr[0], datetime.now())
                         )
                     else:
-                        Server.__handle_request__(sock)
+                        try:
+                            Server.__handle_request__(sock)
+                        except BaseException:
+                            Print.error("Exception: Server.__handle_request__(sock)")
                         clients.remove(sock)
                         del sock_to_addr[sock.fileno()]
                         sock.close()

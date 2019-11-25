@@ -35,7 +35,7 @@ Ok, now we are ready to begin. Let's create a new SS3 instance
 
     clf = SS3()
 
-What are the default hyperparameter values? let's see
+What are the default :ref:`hyperparameter <ss3-hyperparameter>` values? let's see
 
 .. code:: python
 
@@ -105,7 +105,7 @@ Let's see how good our model performed
     Accuracy: 0.70375
 
 
-Not bad using the default hyperparameters values... let's
+Not bad using the default :ref:`hyperparameter <ss3-hyperparameter>` values... let's
 manually analyze what this model has actually learned by using the
 interactive "live test". Note that since we are not going to use the
 ``x_test`` for this live test\ **(\*)** but instead the documents in
@@ -132,7 +132,7 @@ extra argument ``n_grams=3`` to indicate we want SS3 to learn to
 recognize important words, bigrams, and 3-grams **(\*)**. Additionally,
 we will name our model "topic\_categorization\_3grams" so that we can
 save it and load it later from the ``PySS3 Command Line`` to perform the
-hyperparameter optimization to find better hyperparameters values.
+hyperparameter optimization to find better :ref:`hyperparameter <ss3-hyperparameter>` values.
 
 **(\*)** *If you're curious and want to know how this is actually done
 by SS3, read the paper "t-SS3: a text classifier with dynamic n-grams
@@ -203,7 +203,7 @@ using the ``PySS3 Command Line`` tool.
 **At this point you should read the** :ref:`topic_hyperparameter-optimization` **section of this tutorial.**
 
 As described in the "Hyperparameter Optimization" section, we found out
-that the following hyperparameter values will improve our classification
+that the following :ref:`hyperparameter <ss3-hyperparameter>` values will improve our classification
 performance
 
 .. code:: python

@@ -2,6 +2,14 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.3.8] 2019-11-25
+
+### Fixed
+- Server: fixed bug that stopped the server when receiving arbitrary bytes (not utf-8 strings)
+- PySS3 Command Line: fixed bug when loading live_test with a non existing path
+- Live Test: now the user can select single letter words (and are also included in the "advanced" live chart)
+
+
 ## [0.3.7] 2019-11-22
 
 ### Added
@@ -11,11 +19,13 @@ All notable changes to PySS3 will be documented here.
 ### Fixed
 - Evaluation plot: confusion matrices size when working with k-folds
 
+
 ## [0.3.6] 2019-11-14
 
 ### Added
 - `Dataset` class added to `pyss3.util` as an interface to help the user to load/read datasets. Method `Dataset.load_from_files` added
 - Documentations updated
+
 
 ## [0.3.5] 2019-11-12
 

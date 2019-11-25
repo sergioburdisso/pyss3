@@ -34,7 +34,7 @@ Ok, now we are ready to begin. Let's create a new SS3 instance
 
     clf = SS3()
 
-What are the default hyperparameter values? let's see
+What are the default :ref:`hyperparameter <ss3-hyperparameter>` values? let's see
 
 .. code:: python
 
@@ -101,7 +101,7 @@ Let's see how good our model performed
     Accuracy: 0.852
 
 
-Not bad using the default hyperparameters values, let's now manually
+Not bad using the default :ref:`hyperparameter <ss3-hyperparameter>` values, let's now manually
 analyze what our model has actually learned by using the interactive
 "live test".
 
@@ -118,7 +118,7 @@ version of this model, a version that can recognize variable-length word
 n-grams "on the fly". Thus, when calling the ``fit`` we will pass an
 extra argument ``n_grams=3`` to indicate we want SS3 to learn to
 recognize important words, bigrams, and 3-grams **[*]**. Additionally, we will name our model "movie\_review\_3grams" so that we can save it and load it later from the ``PySS3 Command Line`` to perform
-the hyperparameter optimization to find better hyperparameters values.
+the hyperparameter optimization to find better :ref:`hyperparameter <ss3-hyperparameter>` values.
 
 **[*]** *If you're curious and want to know how this is actually
 done by SS3, read the paper "t-SS3: a text classifier with dynamic
@@ -188,9 +188,9 @@ what our model has learned (like "was supposed to", "has nothing to",
 
 **Before moving forward, at this point you should read the** :ref:`hyperparameter-optimization` **section of this tutorial.**
 
-As described in the "Hyperparameter Optimization" section, after performing hyperparameters
+As described in the "Hyperparameter Optimization" section, after performing hyperparameter
 optimization using the ``PySS3 Command Line``, we found out that, for
-example, the following hyperparameter values will slightly improve our
+example, the following :ref:`hyperparameter <ss3-hyperparameter>` values will slightly improve our
 classification performance
 
 .. code:: python

@@ -112,7 +112,7 @@ The name "SS3" is based on these three hyperparameters: Sequential Smoothness-Si
 
         clf = SS3(s=0.32, l=1.24, p=1.1)
 
-    Additionally, PySS3 provides a **"forth hyperparameter"**, called :math:`\alpha` (and referenced using the "a" letter), which allows you to set the minimum global value that a word must have in order not to be ignored.. That is, only words with :math:`gv > \alpha` will be taken into account during classification. By default :math:`\alpha = 0`, so no word is ignored. However, let's say we want to create the same previous SS3 model but this time using :math:`\alpha = 0.1`, then we could use:
+    Additionally, PySS3 provides a **"forth hyperparameter"**, called :math:`\alpha` (and referenced using the "a" letter), which allows you to set the minimum global value that a word must have in order not to be ignored. That is, only words with :math:`gv > \alpha` will be taken into account during classification. By default :math:`\alpha = 0`, so no word is ignored. However, let's say we want to create the same previous SS3 model but this time using :math:`\alpha = 0.1`, then we could use:
 
     .. code:: python
 

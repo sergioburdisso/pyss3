@@ -86,7 +86,7 @@ If you don't have Jupyter Notebook installed, you can either:
 Hyperparameter Optimization
 ----------------------------
 
-Close to the end of notebook for this tutorial, we created a model called "topic_categorization_3grams" and save it so that we could load it later from the ``PySS3 Command Line`` to perform hyperparameter optimization. Hyperparameter optimization will allow us to find better hyperparameters values for our model. Well, here we'll learn how to do it.
+Close to the end of notebook for this tutorial, we created a model called "topic_categorization_3grams" and save it so that we could load it later from the ``PySS3 Command Line`` to perform hyperparameter optimization. Hyperparameter optimization will allow us to find better :ref:`hyperparameter <ss3-hyperparameter>` values for our model. Well, here we'll learn how to do it.
 
 Make sure you're in the PySS3's "examples" folder and that our conda environment is activated:
 
@@ -143,7 +143,7 @@ We will create a new model using the ``new`` command, we will call this model "t
 
     (pyss3) >>> new topic_categorization
 
-What are the default hyperparameter values? let's see
+What are the default :ref:`hyperparameter <ss3-hyperparameter>` values? let's see
 
 .. code:: console
 
@@ -218,7 +218,7 @@ which, among other things it displays:
 
  accuracy: 0.704
 
-Not bad using the default hyperparameters values, let's now manually analyze what our model has actually learned by using the interactive "live test".
+Not bad using the default :ref:`hyperparameter <ss3-hyperparameter>` values, let's now manually analyze what our model has actually learned by using the interactive "live test".
 
 .. code:: console
 
@@ -265,7 +265,7 @@ Yeah, the accuracy slightly improved but more importantly, we should now see tha
 
 Fortunately, our model has learned to recognize these important sequences (such as “artificial intelligence” and “machine learning” in doc_2.txt, “self-driving cars” in doc_6.txt, etc.). However, some documents aren't perfectly classified, for instance, *doc_3.txt* was classified as "science&technology" (as a third topic) which is clearly wrong...
 
-We will use better hyperparameters values to improve our classifier performance. Namely, we will set ``s=0.32``, ``l=1.24`` and ``p=1.1`` which will improve the accuracy of our model:
+We will use better :ref:`hyperparameter <ss3-hyperparameter>` values to improve our classifier performance. Namely, we will set ``s=0.32``, ``l=1.24`` and ``p=1.1`` which will improve the accuracy of our model:
 
 
 .. code:: console
@@ -315,7 +315,7 @@ Congratulations! you have created an SS3 model for topic categorization without 
 Hyperparameter Optimization
 ----------------------------
 
-As mentioned earlier, hyperparameter optimization will allow us to find better hyperparameters values for our model.  To begin with, we will perform a grid search over the test set. To carry out this task, we will use the ``grid_search`` command. Let's see what this command does and how to use it, using the ``help`` command:
+As mentioned earlier, hyperparameter optimization will allow us to find better :ref:`hyperparameter <ss3-hyperparameter>` values for our model.  To begin with, we will perform a grid search over the test set. To carry out this task, we will use the ``grid_search`` command. Let's see what this command does and how to use it, using the ``help`` command:
 
 .. code:: console
 
@@ -365,7 +365,7 @@ which displays the following help:
      grid_search a/testset/path s r(.2,.8,6) l r(.1,2,6) -p r(.5,2,6) a [0,.01]
      grid_search a/dataset/path 4-fold -s [.2,.3,.4,.5] -l [.5,1,1.5] -p r(.5,2,6)
 
-From this help, we can see that this command expects at least a path and a list of hyperparameter names and, after each hyperparameter name, any python expression that returns either a number or a list of numbers, for instance, ``-s [.2,.35,.4,.55]``. In our case, we will use the built-in function ``r(x0,x1,n)`` which returns a list of ``n`` numbers between ``x0`` and ``x1`` (including both), as follows:
+From this help, we can see that this command expects at least a path and a list of :ref:`hyperparameter <ss3-hyperparameter>` names and, after each :ref:`hyperparameter <ss3-hyperparameter>` name, any python expression that returns either a number or a list of numbers, for instance, ``-s [.2,.35,.4,.55]``. In our case, we will use the built-in function ``r(x0,x1,n)`` which returns a list of ``n`` numbers between ``x0`` and ``x1`` (including both), as follows:
 
 .. code:: console
 
@@ -388,7 +388,7 @@ Rotate the plot and move the cursor over the point with the best performance (pi
 
 .. image:: ../_static/topic_evaluations.png
 
-Here we can see that using these hyperparameters values, our classifier will obtain a better accuracy (0.7712):
+Here we can see that using these :ref:`hyperparameter <ss3-hyperparameter>` values, our classifier will obtain a better accuracy (0.7712):
 
 * smoothness (:math:`\sigma`): 0.32
 * significance (:math:`\lambda`): 1.24

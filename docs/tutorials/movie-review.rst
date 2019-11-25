@@ -51,7 +51,7 @@ If you don't have Jupyter Notebook installed, you can either:
 Hyperparameter Optimization
 ----------------------------
 
-Close to the end of notebook for this tutorial, we created a model called "movie_review_3grams" and save it so that we could load it later from the ``PySS3 Command Line`` to perform hyperparameter optimization. Hyperparameter optimization will allow us to find better hyperparameters values for our model. Well, here we'll learn how to do it.
+Close to the end of notebook for this tutorial, we created a model called "movie_review_3grams" and save it so that we could load it later from the ``PySS3 Command Line`` to perform hyperparameter optimization. Hyperparameter optimization will allow us to find better :ref:`hyperparameter <ss3-hyperparameter>` values for our model. Well, here we'll learn how to do it.
 
 Make sure you're in the PySS3's "examples" folder and that our conda environment is activated:
 
@@ -108,7 +108,7 @@ We will create a new model using the ``new`` command, we will call this model "m
 
     (pyss3) >>> new movie_review
 
-What are the default hyperparameter values? let's see
+What are the default :ref:`hyperparameter <ss3-hyperparameter>` values? let's see
 
 .. code:: console
 
@@ -149,7 +149,7 @@ which, among other things it displays:
 
  accuracy: 0.852
 
-Not bad using the default hyperparameters values, let's now manually analyze what our model has actually learned by using the interactive "live test".
+Not bad using the default :ref:`hyperparameter <ss3-hyperparameter>` values, let's now manually analyze what our model has actually learned by using the interactive "live test".
 
 .. code:: console
 
@@ -228,7 +228,7 @@ what our model has learned (like "was supposed to", "has nothing to", "low budge
 
     (pyss3) >>> live_test datasets/movie_review/test
 
-Finally, we will use better hyperparameters values. Namely, we will set ``s=0.44``, ``l=0.48`` and ``p=1.1`` which will improve the accuracy of our model:
+Finally, we will use better :ref:`hyperparameter <ss3-hyperparameter>` values. Namely, we will set ``s=0.44``, ``l=0.48`` and ``p=1.1`` which will improve the accuracy of our model:
 
 
 .. code:: console
@@ -276,7 +276,7 @@ Congratulations! you have created an SS3 model for sentiment analysis without a 
 Hyperparameter Optimization
 ----------------------------
 
-As mentioned earlier, hyperparameter optimization will allow us to find better hyperparameters values for our model.  To begin with, we will perform a grid search over the test set. To carry out this task, we will use the ``grid_search`` command. Let's see what this command does and how to use it, using the ``help`` command:
+As mentioned earlier, hyperparameter optimization will allow us to find better :ref:`hyperparameter <ss3-hyperparameter>` values for our model.  To begin with, we will perform a grid search over the test set. To carry out this task, we will use the ``grid_search`` command. Let's see what this command does and how to use it, using the ``help`` command:
 
 .. code:: console
 
@@ -326,7 +326,7 @@ which displays the following help:
      grid_search a/testset/path s r(.2,.8,6) l r(.1,2,6) -p r(.5,2,6) a [0,.01]
      grid_search a/dataset/path 4-fold -s [.2,.3,.4,.5] -l [.5,1,1.5] -p r(.5,2,6)
 
-From this help, we can see that this command expects at least a path and a list of hyperparameter names and, after each hyperparameter name, any python expression that returns either a number or a list of numbers, for instance, ``-s [.2,.35,.4,.55]``. In our case, we will use the built-in function ``r(x0,x1,n)`` which returns a list of ``n`` numbers between ``x0`` and ``x1`` (including both), as follows:
+From this help, we can see that this command expects at least a path and a list of :ref:`hyperparameter <ss3-hyperparameter>` names and, after each :ref:`hyperparameter <ss3-hyperparameter>` name, any python expression that returns either a number or a list of numbers, for instance, ``-s [.2,.35,.4,.55]``. In our case, we will use the built-in function ``r(x0,x1,n)`` which returns a list of ``n`` numbers between ``x0`` and ``x1`` (including both), as follows:
 
 .. code:: console
 
@@ -345,11 +345,11 @@ Once the grid search is over, we will use the following command to open up an in
 
 PySS3 should have created `this plot <../_static/ss3_model_evaluation[movie_review_3grams].html>`__ on your machine. **Note:** We recommend reading the :ref:`evaluation-plot` page in which the plots and the user interface are explained in detail.
 
-You probably noted that there are multiple points with the global best performance, this is probably due to this problem (sentiment analysis) being a binary classification problem (thus, the "sanction" hyperparameter doesn't have much impact with only two categories).  We could choose any of the best values, for instance, we will select the one with the lowest "sanction" (p) value. To do this, rotate the plot and move the cursor over this point and see the information that is displayed, as shown in the following figure:
+You probably noted that there are multiple points with the global best performance, this is probably due to this problem (sentiment analysis) being a binary classification problem (thus, the "sanction" :ref:`hyperparameter <ss3-hyperparameter>` doesn't have much impact with only two categories).  We could choose any of the best values, for instance, we will select the one with the lowest "sanction" (p) value. To do this, rotate the plot and move the cursor over this point and see the information that is displayed, as shown in the following figure:
 
 .. image:: ../_static/movie_review_evaluations.png
 
-Here we can see that using these hyperparameters values, our classifier will obtain a better accuracy (0.861):
+Here we can see that using these :ref:`hyperparameter <ss3-hyperparameter>` values, our classifier will obtain a better accuracy (0.861):
 
 * smoothness (:math:`\sigma`): 0.44
 * significance (:math:`\lambda`): 0.48
@@ -399,7 +399,7 @@ That is, we need to set ``s=0.44``, ``l=0.48`` and ``p=1.1``. To do this we coul
           ...
           clf.load_model()
 
-Before we finish the hyperparameter optimization task, there is an optional (but recommended) step. To make sure the selected hyperparameters generalize well (i.e. are not overfitted to the test set), we will perform an extra grid search but this time using a (stratified) 10-fold cross-validation. From what we saw from the previous grid search, the "santion"(p) hyperparameter doesn't seem to have a real impact on performance, so this time we will set ``p = 1.1`` when performing the grid search, that is:
+Before we finish the hyperparameter optimization task, there is an optional (but recommended) step. To make sure the selected :ref:`hyperparameters <ss3-hyperparameter>` generalize well (i.e. are not overfitted to the test set), we will perform an extra grid search but this time using a (stratified) 10-fold cross-validation. From what we saw from the previous grid search, the "santion"(p) hyperparameter doesn't seem to have a real impact on performance, so this time we will set ``p = 1.1`` when performing the grid search, that is:
 
 .. code:: console
 
@@ -421,4 +421,4 @@ Fortunately, the same point we have previously selected has also the best perfor
 
 .. image:: ../_static/movie_review_evaluations_kfold.png
 
-Note that all the 10 confusion matrices looks really well and consistent, that means that this configuration performed consistently well across the 10 different folds! this means we can use the selected hyperparameters values (``s=0.44``, ``l=0.48`` and ``p=1.1``) safely.
+Note that all the 10 confusion matrices looks really well and consistent, that means that this configuration performed consistently well across the 10 different folds! this means we can use the selected :ref:`hyperparameter <ss3-hyperparameter>` values (``s=0.44``, ``l=0.48`` and ``p=1.1``) safely.

@@ -1562,7 +1562,6 @@ class SS3Prompt(Cmd):
         except ArgsParseError:
             return
 
-        Server.set_model(CLF)
         if test_path:
             try:
                 success = Server.set_testset_from_files(test_path, folder_label)
@@ -1575,18 +1574,10 @@ class SS3Prompt(Cmd):
                     )
                     return
             except OSError:
-                Print.error(ERROR_NSD % test_path, raises=GetTestDataError)
+                Print.error(ERROR_NSD % test_path)
                 return
 
-        Server.start_listening()
-
-        if not verbose:
-            Print.set_quiet(True)
-
-        Server.serve()
-
-        if not verbose:
-            Print.set_quiet(False)
+        Server.serve(CLF, quiet=not verbose)
 
     @requires_model
     @requires_args

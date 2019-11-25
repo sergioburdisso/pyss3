@@ -177,7 +177,7 @@ app.controller("mainCtrl", function($scope) {
     return style;
   }
 
-  $scope.show_info = function(word){ if (word.lexeme[1].length == 1) return;
+  $scope.show_info = function(word){
     $scope.word_info = true;
     $scope.chart.srow = word;
     $scope.chart.srow.scat = $scope.scat != -1? $scope.scat : word.cv.indexOf(Math.max(...word.cv));
@@ -303,7 +303,7 @@ app.controller("mainCtrl", function($scope) {
         var sent = par.sents[is];
         sent.index = senti++;
 
-        if (!(sent.words.length == 1 && !sent.words[0].token)){
+        if (sent.words[0].token){
           if (crow_sents)
             crow_sents.add(sent.cv);
           else
@@ -333,7 +333,7 @@ app.controller("mainCtrl", function($scope) {
               word.token = word.token.replace("nnbrr", "<number>");
           }
 
-          if (word.token && word.lexeme.length > 1){
+          if (word.token && word.token != "<unkown>"){
             if (crow_words)
               crow_words.add(word.cv);
             else

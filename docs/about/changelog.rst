@@ -6,6 +6,16 @@ Change Log
 
 All notable changes to PySS3 will be documented here.
 
+[0.3.8] 2019-11-25
+==================
+
+Fixed
+-----
+- Server: fixed bug that stopped the server when receiving arbitrary bytes (not utf-8 strings)
+- PySS3 Command Line: fixed bug when loading live_test with a non existing path
+- Live Test: now the user can select single letter words (and are also included in the "advanced" live chart)
+
+
 [0.3.7] 2019-11-22
 ==================
 
