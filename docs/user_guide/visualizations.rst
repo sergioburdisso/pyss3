@@ -12,7 +12,7 @@ PySS3 provides two main interactive visualization tools that users can use to an
 Live Test
 =========
 
-The Live Test tool is is an interactive visualization tool that allows you to actively test you models. This tool can be lunched with a single line of python code (or a single ``PySS3`` command), and it will provide an user interface (see :ref:`Figure 1 <live_test_screenshot>`) by which you can manually test the model using either a preloaded set of documents (for example, giving the ``x_test`` list or the path to a test set) or just letting you to type in your own documents. This tool will allow you to visually analyze and understand what your models are actually learning, at different levels (word n-grams, sentences, and paragraphs).
+The Live Test tool is is an interactive visualization tool that allows you to actively test you models. This tool can be lunched with a single line of python code (or a single ``PySS3`` command), and it will provide a user interface (see :ref:`Figure 1 <live_test_screenshot>`) with which you can manually test the model using either a preloaded set of documents (for example, giving the ``x_test`` list or the path to a test set) or just letting you to type in your own documents. This tool will allow you to visually analyze and understand what your models are actually learning, at different levels (word n-grams, sentences, and paragraphs).
 
 .. _live_test_screenshot:
 .. figure:: ../_static/live_test.png

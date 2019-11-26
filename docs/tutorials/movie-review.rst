@@ -42,7 +42,7 @@ If you don't have Jupyter Notebook installed, you can either:
 
 * Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__.
 
-.. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive "live test" tool.
+.. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive :ref:`live-test` tool.
 
 
 
