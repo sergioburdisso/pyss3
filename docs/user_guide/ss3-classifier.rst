@@ -25,7 +25,7 @@ Introduction
 ============
 
 SS3 was originally introduced in Section 3 of the paper `"A text classification framework for simple and effective early depression detection over social media streams" <https://dx.doi.org/10.1016/j.eswa.2019.05.023>`__ (preprint available `here <https://arxiv.org/abs/1905.08772>`__).  As it is described in more detail in this paper, SS3 first builds a dictionary of words for each category during the training phase, in which the frequency of each word is stored.
-Then, using these word frequencies, and during the classification stage, it calculates a value for each word using a function :math:`gv(w,c)` to value words in relation each category (:math:`gv` stands for "global value" of a word). :math:`gv` takes a word :math:`w` and a category :math:`c` and outputs a number in the interval [0,1] representing the degree of confidence with which :math:`w` is believed to **exclusively** belong to :math:`c`. For instance, suppose the categories are :math:`travel, technology, business`, and :math:`food`, we could have:
+Then, using these word frequencies, and during the classification stage, it calculates a value for each word using a function :math:`gv(w,c)` to value words in relation to each category (:math:`gv` stands for "global value" of a word). :math:`gv` takes a word :math:`w` and a category :math:`c` and outputs a number in the interval [0,1] representing the degree of confidence with which :math:`w` is believed to **exclusively** belong to :math:`c`. For instance, suppose the categories are :math:`travel, technology, business`, and :math:`food`, we could have:
 
 .. math::
     gv(apple, travel) = 0;\ \ \ &gv(the, travel) = 0;\\
@@ -82,7 +82,7 @@ Note that this incremental classification, in which only the new sentence needs 
 Hyperparameters
 ===============
 
-As it is described in the previous section, the global value (:math:`gv`) of a word is used to create the first confidence vectors, upon which higher level confidence vectors are then created until a single confidence vector for the whole input is obtained. Therefore, the global value (gv) of a word is the basic building block for the entire classification process.
+As it was described in the previous section, the global value (:math:`gv`) of a word is used to create the first confidence vectors, upon which higher level confidence vectors are then created until a single confidence vector for the whole input is obtained. Therefore, the global value (gv) of a word is the basic building block for the entire classification process.
 
 In simple terms, the calculation of the **global value** (:math:`gv`) of a word in a category is obtained by multiplying three values. Namely, its **local value**, its **significance** factor, and its **sanction** factor. Additionally, in practice, the calculation of each one of these three values is controlled by a special hyperparameter. In more detail, we have:
 
