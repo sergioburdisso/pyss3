@@ -185,7 +185,7 @@ see that the model has learned "more intelligent patterns" involving
 sequences of words when using the interactive "live test"
 (like "machine learning", "artificial
 intelligence", "self-driving cars", etc. for the "science&technology"
-category. Let's see...
+category). Let's see...
 
 .. code:: python
 
@@ -197,7 +197,7 @@ doc\_2.txt, "self-driving cars" in doc\_6.txt, etc.). However, some documents ar
 
 So, one last thing we are going to do is to try yo find better
 hyperparameter values to improve our model's performance. To achieve
-this, we will perform what its known as "Hyperparameter Optimization"
+this, we will perform what it is known as "Hyperparameter Optimization"
 using the ``PySS3 Command Line`` tool.
 
 **At this point you should read the** :ref:`topic_hyperparameter-optimization` **section of this tutorial.**
