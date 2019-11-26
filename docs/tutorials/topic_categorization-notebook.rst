@@ -182,8 +182,8 @@ Now let's see if the performance has improved...
 
 Yeah, the accuracy slightly improved but more importantly, we should now
 see that the model has learned "more intelligent patterns" involving
-sequences of words when using the interactive "live test" to observe
-what our model has learned (like "machine learning", "artificial
+sequences of words when using the interactive "live test"
+(like "machine learning", "artificial
 intelligence", "self-driving cars", etc. for the "science&technology"
 category. Let's see...
 

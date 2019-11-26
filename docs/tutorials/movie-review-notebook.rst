@@ -175,8 +175,8 @@ Now let's see if the performance has improved...
 
 Yeah, the accuracy slightly improved but more importantly, we should now
 see that the model has learned "more intelligent patterns" involving
-sequences of words when using the interactive "live test" to observe
-what our model has learned (like "was supposed to", "has nothing to",
+sequences of words when using the interactive "live test"
+(like "was supposed to", "has nothing to",
 "low budget", "your money", etc. for the "negative" class). Let's see...
 
 .. code:: python
