@@ -109,7 +109,9 @@ MODELS = []
 RESULTS_HISTORY = None
 CLF = None
 F_PRECISION = 4
-r = linspace  # an alias for grid_search command
+
+frange = linspace  # an alias for grid_search command
+r = frange  # an alias for grid_search command
 
 
 try:
@@ -1576,6 +1578,8 @@ class SS3Prompt(Cmd):
             except OSError:
                 Print.error(ERROR_NSD % test_path)
                 return
+        else:
+            Server.set_testset([], [])
 
         Server.serve(CLF, quiet=not verbose)
 

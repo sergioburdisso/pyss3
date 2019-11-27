@@ -230,6 +230,8 @@ class Server:
     def __clear_testset__():
         """Clear server's test documents."""
         Server.__docs__ = RecursiveDefaultDict()
+        Server.__test_path__ = None
+        Server.__folder_label__ = None
         Server.__x_test__ = None
 
     @staticmethod

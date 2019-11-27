@@ -303,7 +303,7 @@ app.controller("mainCtrl", function($scope) {
         var sent = par.sents[is];
         sent.index = senti++;
 
-        if (sent.words[0].token){
+        if (sent.words.length > 1 || sent.words[0].token){
           if (crow_sents)
             crow_sents.add(sent.cv);
           else

@@ -39,7 +39,7 @@ Additionally, :math:`\overrightarrow{gv}` is the vectorial version of :math:`gv`
     \overrightarrow{gv}(apple) &= (0, 0.8, 0.4, 0.75)\\
     \overrightarrow{gv}(the) &= (0, 0, 0, 0)
 
-These vectors are called the **confidence vectors** (:math:`cv`). Thus, in this example :math:`(0, 0.8, 0.4, 0.75)` is the *confidence vector* of the word "apple", in which the first position corresponds to "travel", the second to "technology", and so on.
+These vectors are called **confidence vectors** (:math:`cv`). Thus, in this example :math:`(0, 0.8, 0.4, 0.75)` is the *confidence vector* of the word "apple", in which the first position corresponds to "travel", the second to "technology", and so on.
 
 
 
