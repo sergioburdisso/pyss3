@@ -460,7 +460,6 @@ class Server:
 
         server_socket = Server.__server_socket__
         clients = [server_socket]
-        sock_to_addr = {}
 
         if browser:
             webbrowser.open("http://localhost:%d" % Server.__port__)
@@ -473,26 +472,24 @@ class Server:
 
         try:
             while True:
-                read_socks, write_socks, error_socks = select(clients, [], [])
+                try:
+                    read_socks, write_socks, error_socks = select(clients, [], [])
 
-                for sock in read_socks:
-
-                    if sock is server_socket:
-                        sockfd, addr = server_socket.accept()
-                        clients.append(sockfd)
-                        sock_to_addr[sockfd.fileno()] = addr[0]
-                        Print.show(
-                            Print.style.green("[ %s : %s ]")
-                            % (addr[0], datetime.now())
-                        )
-                    else:
-                        try:
+                    for sock in read_socks:
+                        if sock is server_socket:
+                            sockfd, addr = server_socket.accept()
+                            clients.append(sockfd)
+                            Print.show(
+                                Print.style.green("[ %s : %s ]")
+                                % (addr[0], datetime.now())
+                            )
+                        else:
                             Server.__handle_request__(sock)
-                        except BaseException:
-                            Print.error("Exception: Server.__handle_request__(sock)")
-                        clients.remove(sock)
-                        del sock_to_addr[sock.fileno()]
-                        sock.close()
+                            clients.remove(sock)
+                            sock.close()
+
+                except Exception as e:
+                    Print.error("Exception: " + str(e))
         except KeyboardInterrupt:
             Print.info("closing server...")
             server_socket.close()
