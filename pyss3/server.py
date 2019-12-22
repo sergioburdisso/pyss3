@@ -537,6 +537,6 @@ if __name__ == "__main__":
         Server.set_testset_from_files(args.path, args.label == 'folder')
 
     try:
-        Server.serve(port=args.port, browser=False)
+        Server.serve(port=args.port, browser=False, quiet=args.quiet)
     except IOError:
         Print.error("Error: port number already in use")
