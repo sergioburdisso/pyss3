@@ -1100,7 +1100,7 @@ class SS3:
         :param path: the path to save the model to
         :type path: str
 
-        :raises: IOError
+        :raises: OSError
         """
         if path:
             self.set_model_path(path)
@@ -1164,7 +1164,7 @@ class SS3:
         :param path: the path to load the model from
         :type path: str
 
-        :raises: IOError
+        :raises: OSError
         """
         if path:
             self.set_model_path(path)

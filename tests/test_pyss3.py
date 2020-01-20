@@ -175,7 +175,7 @@ def test_pyss3_ss3():
 
     clf = SS3(name="test-3grams")
 
-    with pytest.raises(OSError):
+    with pytest.raises((OSError, IOError)):
         clf.set_model_path("dummy")
         clf.load_model()
 
