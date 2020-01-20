@@ -8,6 +8,7 @@ from __future__ import print_function
 import os
 import re
 import json
+import errno
 
 from io import open
 from time import time
@@ -19,7 +20,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.9"
+__version__ = "0.3.9.1"
 
 ENCODING = "utf-8"
 
@@ -31,6 +32,9 @@ STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[UNKNOWN]"
 STR_VANILLA, STR_XAI = "vanilla", "xai"
 STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
+
+STR_MODEL_FOLDER = "ss3_models"
+STR_MODEL_EXT = "ss3m"
 
 NAME = 0
 VOCAB = 1
@@ -79,8 +83,7 @@ class SS3:
     """
 
     __name__ = "model"
-    __models_folder__ = "ss3_models"
-    __models_ext__ = "ss3m"
+    __models_folder__ = STR_MODEL_FOLDER
 
     __s__ = .45
     __l__ = .5
@@ -843,6 +846,21 @@ class SS3:
         """
         return self.__s__, self.__l__, self.__p__, self.__a__
 
+    def set_model_path(self, path):
+        """
+        Set the path from which our model will be loaded (or saved to).
+
+        Note: be aware that the PySS3 Command Line tool looks for
+        a local folder called "ss3_models" to load models from.
+        Therefore, the "ss3_models" folder will be always automatically
+        append to given ``path`` (e.g. if ``path`` = "my/path/", it will
+        be converted to "my/path/ss3_models").
+
+        :param path: a path
+        :type path: str
+        """
+        self.__models_folder__ = os.path.join(path, STR_MODEL_FOLDER)
+
     def set_s(self, value):
         """
         Set the "smoothness" (sigma) hyperparameter value.
@@ -1075,7 +1093,7 @@ class SS3:
         Print.info(
             "saving model (%s/%s.%s)..."
             %
-            (self.__models_folder__, self.__name__, self.__models_ext__),
+            (self.__models_folder__, self.__name__, STR_MODEL_EXT),
             False
         )
         json_file_format = {
@@ -1094,16 +1112,21 @@ class SS3:
         }
 
         try:
-            os.mkdir(self.__models_folder__)
-        except OSError:
-            pass
+            os.makedirs(self.__models_folder__)
+        except OSError as ose:
+            if ose.errno == errno.EEXIST and os.path.isdir(self.__models_folder__):
+                pass
+            else:
+                raise
+
         json_file = open(
             "%s/%s.%s" % (
                 self.__models_folder__,
                 self.__name__,
-                self.__models_ext__
+                STR_MODEL_EXT
             ), "w", encoding=ENCODING
         )
+
         try:  # python 3
             json_file.write(json.dumps(json_file_format))
         except TypeError:  # python 2
@@ -1125,7 +1148,7 @@ class SS3:
             "%s/%s.%s" % (
                 self.__models_folder__,
                 self.__name__,
-                self.__models_ext__
+                STR_MODEL_EXT
             ), "r", encoding=ENCODING
         )
         json_file_format = json.loads(json_file.read(), object_hook=key_as_int)

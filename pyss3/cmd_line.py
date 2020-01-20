@@ -16,7 +16,7 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
-from . import SS3, InvalidCategoryError, __version__
+from . import SS3, InvalidCategoryError, STR_MODEL_EXT, __version__
 from .server import Server
 from .util import Print, Dataset, RecursiveDefaultDict
 
@@ -1291,7 +1291,7 @@ class SS3Prompt(Cmd):
 
                     model_file = path.join(
                         SS3.__models_folder__,
-                        "%s.%s" % (model_name, SS3.__models_ext__)
+                        "%s.%s" % (model_name, STR_MODEL_EXT)
                     )
                     if path.exists(model_file):
                         remove_file(model_file)
@@ -1366,7 +1366,7 @@ class SS3Prompt(Cmd):
             if rename:
                 rename_file(rh_file, rh_new_file)
 
-                m_ext = SS3.__models_ext__
+                m_ext = STR_MODEL_EXT
                 model_file = path.join(m_folder, "%s.%s" % (m_name, m_ext))
                 model_new_file = path.join(
                     m_folder, "%s.%s" % (args[0], m_ext)
@@ -2623,7 +2623,7 @@ def main():
         MODELS = [
             path.splitext(model_file)[0]
             for model_file in listdir(SS3.__models_folder__)
-            if path.splitext(model_file)[1][1:] == SS3.__models_ext__
+            if path.splitext(model_file)[1][1:] == STR_MODEL_EXT
         ]
         ARGS["load"] = MODELS
     except OSError:
