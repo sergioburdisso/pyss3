@@ -23,8 +23,8 @@ jobs:
       env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
 install:
-  - pip install -r requirements-dev.txt || pip3 install -r requirements-dev.txt
-  - pip install . || pip3 install .
+  - pip3 install -r requirements-dev.txt || pip install -r requirements-dev.txt
+  - pip3 install . || pip install .
 
 script:
   - flake8 pyss3
