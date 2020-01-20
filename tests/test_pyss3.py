@@ -1,9 +1,9 @@
 """Tests for pytest."""
 from os import path
+from shutil import rmtree
 from pyss3 import SS3, STR_NORM_GV_XAI, STR_XAI
 from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY
 from pyss3.util import Dataset
-
 import pyss3
 import pytest
 
@@ -169,18 +169,36 @@ def test_pyss3_ss3():
     assert argmax(pred["cv"]) == clf.get_category_index("sports")
     assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.86708, 0]
 
-    # clf.set_model_path("tests")
-    # clf.save_model()
-    # clf.load_model()
+    clf.set_model_path("tests/")
+    clf.save_model()
+    clf.load_model()
 
-    # clf = SS3(name="test-3grams")
-    # clf.set_model_path("tests")
-    # clf.load_model()
+    clf = SS3(name="test-3grams")
 
-    # clf.set_model_path("tests/tmp")
-    # clf.save_model()
-    # clf.save_model()
-    # clf.load_model()
+    with pytest.raises(OSError):
+        clf.set_model_path("dummy")
+        clf.load_model()
+
+    clf.set_model_path("./tests")
+    clf.load_model()
+
+    clf.set_model_path("tests/tmp")
+    clf.save_model()
+    clf.save_model()
+    clf.load_model()
+
+    clf.save_model("tests/")
+    clf.load_model()
+
+    clf = SS3(name="test-3grams")
+    clf.load_model("./tests/")
+
+    clf.save_model("./tests/tmp/")
+    clf.save_model()
+    clf.load_model()
+
+    rmtree("./tests/tmp", ignore_errors=True)
+    rmtree("./tests/ss3_models", ignore_errors=True)
 
 
 # if __name__ == "__main__":

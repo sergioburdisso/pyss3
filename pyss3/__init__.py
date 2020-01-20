@@ -20,7 +20,7 @@ from .util import Print, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.3.9.1"
+__version__ = "0.3.9.2"
 
 ENCODING = "utf-8"
 
@@ -848,15 +848,15 @@ class SS3:
 
     def set_model_path(self, path):
         """
-        Set the path from which our model will be loaded (or saved to).
+        Overwrite the default path from which the model will be loaded (or saved to).
 
         Note: be aware that the PySS3 Command Line tool looks for
-        a local folder called "ss3_models" to load models from.
+        a local folder called "ss3_models" to load models.
         Therefore, the "ss3_models" folder will be always automatically
-        append to given ``path`` (e.g. if ``path`` = "my/path/", it will
-        be converted to "my/path/ss3_models").
+        append to the given ``path`` (e.g. if ``path`` = "my/path/", it will
+        be converted into "my/path/ss3_models").
 
-        :param path: a path
+        :param path: the path
         :type path: str
         """
         self.__models_folder__ = os.path.join(path, STR_MODEL_FOLDER)
@@ -1087,8 +1087,24 @@ class SS3:
 
         return stopwords
 
-    def save_model(self):
-        """Save the model to disk."""
+    def save_model(self, path=None):
+        """
+        Save the model to disk.
+
+        if a ``path`` is not present, the default will be used ("./"),
+        However, if a ``path`` is given, it will not only used to save
+        the model but also will overwrite the default path calling the
+        ``SS3``'s ``set_model_path(path)`` method (see ``set_model_path``
+        method documentation for more detail).
+
+        :param path: the path to save the model to
+        :type path: str
+
+        :raises: IOError
+        """
+        if path:
+            self.set_model_path(path)
+
         stime = time()
         Print.info(
             "saving model (%s/%s.%s)..."
@@ -1135,12 +1151,24 @@ class SS3:
         json_file.close()
         Print.info("(%.1fs)" % (time() - stime))
 
-    def load_model(self):
+    def load_model(self, path=None):
         """
         Load model from disk.
 
+        if a ``path`` is not present, the default will be used ("./"),
+        However, if a ``path`` is given, it will not only used to load
+        the model but also will overwrite the default path calling the
+        ``SS3``'s ``set_model_path(path)`` method (see ``set_model_path``
+        method documentation for more detail).
+
+        :param path: the path to load the model from
+        :type path: str
+
         :raises: IOError
         """
+        if path:
+            self.set_model_path(path)
+
         stime = time()
         Print.info("loading '%s' model from disk..." % self.__name__)
 
