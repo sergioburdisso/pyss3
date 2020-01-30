@@ -130,6 +130,8 @@ pip install .
 
 [API documentation](https://pyss3.readthedocs.io/en/latest/api/)
 
+[Paper preprint](https://arxiv.org/abs/1912.09322)
+
 
 [license-badge]: https://img.shields.io/github/license/boyney123/performance-budgets.svg
 [license]: LICENSE.txt
