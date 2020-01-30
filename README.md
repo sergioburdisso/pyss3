@@ -101,8 +101,6 @@ Just go to the [Getting Started](https://pyss3.readthedocs.io/en/latest/user_gui
 ## Installation
 
 
-### Using pip
-
 Simply use:
 ```console
 pip install pyss3
@@ -113,15 +111,6 @@ pip install --upgrade pyss3
 ```
 
 
-### Installation from source
-
-To install latest version from github, clone the source from the project repository and install with setup.py:
-```console
-git clone https://github.com/sergioburdisso/pyss3
-cd pyss3
-pip install -r requirements.txt
-pip install .
- ```
 
 ## Further Readings
 
