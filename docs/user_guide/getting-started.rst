@@ -6,7 +6,7 @@ Getting Started
 
 Don't know where to start? don't worry!
 
-1. First, read :ref:`ss3-classifier` page to have a general idea of how the classifier works (we recommend reading, at least, the :ref:`ss3-introduction` and the :ref:`ss3-hyperparameter` section), and then...
+1. (Optional) Take a look at :ref:`ss3-classifier` page to have a general idea of how the classifier works. We recommend reading, at least, the :ref:`ss3-introduction` and the :ref:`ss3-hyperparameter` section but if you get bored just ignore this step.
 2. Do at least one of the :ref:`tutorials`.
 
 Once you are done with these two steps, you will have a general knowledge of how to work with PySS3 :)
