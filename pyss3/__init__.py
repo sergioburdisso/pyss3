@@ -341,20 +341,20 @@ class SS3:
                 sent = Pp.clean_and_ready(sent)
             sent_words = [
                 (w, w)
-                for w in sent.split(word_delimiter)
+                for w in re.split(word_delimiter, sent)
                 if w
             ]
         else:
             if prep:
                 sent_words = [
                     (w, Pp.clean_and_ready(w, dots=False))
-                    for w in sent.split(word_delimiter)
+                    for w in re.split(word_delimiter, sent)
                     if w
                 ]
             else:
                 sent_words = [
                     (w, w)
-                    for w in sent.split(word_delimiter)
+                    for w in re.split(word_delimiter, sent)
                     if w
                 ]
 
@@ -364,7 +364,7 @@ class SS3:
         flat_sent = []
         flat_raw_sent = []
         for raw_seq, seq in sent_words:
-            words = seq.split(word_delimiter)
+            words = re.split(word_delimiter, seq)
             for iw in xrange(len(words)):
                 word = words[iw]
                 wordi = word_index(word)
@@ -866,6 +866,19 @@ class SS3:
         :type path: str
         """
         self.__models_folder__ = os.path.join(path, STR_MODEL_FOLDER)
+
+    def set_block_delimeters(self, parag=None, sent=None, word=None):
+        """Overwrite the default delimiters used to split input documents into blocks.
+
+        :param parag: the path
+        :type parag: str
+        """
+        if parag:
+            self.__parag_delimiter__ = parag
+        if sent:
+            self.__sent_delimiter__ = sent
+        if word:
+            self.__word_delimiter__ = word
 
     def set_s(self, value):
         """
@@ -1659,7 +1672,7 @@ class SS3:
         if not json:
             paragraphs_cvs = [
                 self.__classify_paragraph__(parag, prep=prep)
-                for parag in doc.split(self.__parag_delimiter__)
+                for parag in re.split(self.__parag_delimiter__, doc)
                 if parag
             ]
             if paragraphs_cvs:
@@ -1678,7 +1691,7 @@ class SS3:
         else:
             info = [
                 self.__classify_paragraph__(parag, prep=prep, json=True)
-                for parag in doc.split(self.__parag_delimiter__)
+                for parag in re.split(self.__parag_delimiter__, doc)
                 if parag
             ]
 
