@@ -867,18 +867,79 @@ class SS3:
         """
         self.__models_folder__ = os.path.join(path, STR_MODEL_FOLDER)
 
-    def set_block_delimeters(self, parag=None, sent=None, word=None):
-        """Overwrite the default delimiters used to split input documents into blocks.
+    def set_block_delimiters(self, parag=None, sent=None, word=None):
+        r"""Overwrite the default delimiters used to split input documents into blocks.
 
-        :param parag: the path
+        delimiters are any regular expression from simple ones (e.g. " ") to
+        more complex ones (e.g. r"[^\s\w\d]").
+        Note: remember that there are certain reserved characters for regular expression,
+              for example, the dot (.), in which case use the backslash to indicate you're
+              referring the character itself and not its interpretation (e.g. \.)
+
+        e.g.
+
+        >>> ss3.set_block_delimiters(word="\s")
+        >>> ss3.set_block_delimiters(word="\s", parag="\n\n")
+        >>> ss3.set_block_delimiters(parag="\n---\n")
+        >>> ss3.set_block_delimiters(sent="\.")
+        >>> ss3.set_block_delimiters(word="\|")
+        >>> ss3.set_block_delimiters(word=" ")
+
+        :param parag: the paragraph new delimiter
         :type parag: str
+        :param sent: the sentence new delimiter
+        :type sent: str
+        :param word: the word new delimiter
+        :type word: str
         """
         if parag:
-            self.__parag_delimiter__ = parag
+            self.set_delimiter_paragraph(parag)
         if sent:
-            self.__sent_delimiter__ = sent
+            self.set_delimiter_sentence(sent)
         if word:
-            self.__word_delimiter__ = word
+            self.set_delimiter_word(word)
+
+    def set_delimiter_paragraph(self, regex):
+        r"""
+        Set the delimiter used to split documents into paragraphs.
+
+        Remember that there are certain reserved characters for regular expression,
+        for example, the dot (.), in which case use the backslash to indicate you're
+        referring the character itself and not its interpretation (e.g. \.)
+
+        :param regex: the regular expression of the new delimiter
+        :type regex: str
+        """
+        self.__parag_delimiter__ = regex
+
+    def set_delimiter_sentence(self, regex):
+        r"""
+        Set the delimiter used to split documents into sentences.
+
+        Remember that there are certain reserved characters for regular expression,
+        for example, the dot (.), in which case use the backslash to indicate you're
+        referring the character itself and not its interpretation (e.g. \.)
+
+        :param regex: the regular expression of the new delimiter
+        :type regex: str
+        """
+        if not re.match(r"\(.*\)", regex):
+            # force the inclusion of unmatched items by re.split
+            regex = "(%s)" % regex
+        self.__sent_delimiter__ = regex
+
+    def set_delimiter_word(self, regex):
+        r"""
+        Set the delimiter used to split documents into words.
+
+        Remember that there are certain reserved characters for regular expression,
+        for example, the dot (.), in which case use the backslash to indicate you're
+        referring the character itself and not its interpretation (e.g. \.)
+
+        :param regex: the regular expression of the new delimiter
+        :type regex: str
+        """
+        self.__word_delimiter__ = regex
 
     def set_s(self, value):
         """
