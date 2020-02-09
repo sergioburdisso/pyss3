@@ -25,7 +25,7 @@ __version__ = "0.3.9.2"
 ENCODING = "utf-8"
 
 PARA_DELTR = "\n"
-SENT_DELTR = r"([^\s\w\d'/\\-])"
+SENT_DELTR = r"(\.)"
 WORD_DELTR = " "
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
