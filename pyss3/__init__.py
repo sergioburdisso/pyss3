@@ -101,6 +101,10 @@ class SS3:
 
     __zero_cv__ = None
 
+    __parag_delimiter__ = PARA_DELTR
+    __sent_delimiter__ = SENT_DELTR
+    __word_delimiter__ = WORD_DELTR
+
     def __init__(
         self, s=None, l=None, p=None, a=None,
         name="", cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
@@ -331,25 +335,26 @@ class SS3:
         classify_trans = self.__classify_ngram__
         cats = xrange(len(self.__categories__))
         word_index = self.get_word_index
+        word_delimiter = self.__word_delimiter__
         if not json:
             if prep:
                 sent = Pp.clean_and_ready(sent)
             sent_words = [
                 (w, w)
-                for w in sent.split(WORD_DELTR)
+                for w in sent.split(word_delimiter)
                 if w
             ]
         else:
             if prep:
                 sent_words = [
                     (w, Pp.clean_and_ready(w, dots=False))
-                    for w in sent.split(WORD_DELTR)
+                    for w in sent.split(word_delimiter)
                     if w
                 ]
             else:
                 sent_words = [
                     (w, w)
-                    for w in sent.split(WORD_DELTR)
+                    for w in sent.split(word_delimiter)
                     if w
                 ]
 
@@ -359,7 +364,7 @@ class SS3:
         flat_sent = []
         flat_raw_sent = []
         for raw_seq, seq in sent_words:
-            words = seq.split(WORD_DELTR)
+            words = seq.split(word_delimiter)
             for iw in xrange(len(words)):
                 word = words[iw]
                 wordi = word_index(word)
@@ -455,12 +460,12 @@ class SS3:
                 "wmv": reduce(vmax, [v["cv"] for v in info])  # word max value
             }
 
-    def __classify_paragraph__(self, paragraph, prep, json=False):
+    def __classify_paragraph__(self, parag, prep, json=False):
         """Classify the given paragraph."""
         if not json:
             sents_cvs = [
                 self.__classify_sentence__(sent, prep=prep)
-                for sent in re.split(SENT_DELTR, paragraph)
+                for sent in re.split(self.__sent_delimiter__, parag)
                 if sent
             ]
             if sents_cvs:
@@ -469,7 +474,7 @@ class SS3:
         else:
             info = [
                 self.__classify_sentence__(sent, prep=prep, json=True)
-                for sent in re.split(SENT_DELTR, paragraph)
+                for sent in re.split(self.__sent_delimiter__, parag)
                 if sent
             ]
             if info:
@@ -1654,7 +1659,7 @@ class SS3:
         if not json:
             paragraphs_cvs = [
                 self.__classify_paragraph__(parag, prep=prep)
-                for parag in doc.split(PARA_DELTR)
+                for parag in doc.split(self.__parag_delimiter__)
                 if parag
             ]
             if paragraphs_cvs:
@@ -1673,7 +1678,7 @@ class SS3:
         else:
             info = [
                 self.__classify_paragraph__(parag, prep=prep, json=True)
-                for parag in doc.split(PARA_DELTR)
+                for parag in doc.split(self.__parag_delimiter__)
                 if parag
             ]
 
