@@ -29,7 +29,7 @@ SENT_DELTR = r"([^\s\w\d'/\\-])"
 WORD_DELTR = " "
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
-STR_UNKNOWN_CATEGORY = "[UNKNOWN]"
+STR_UNKNOWN_CATEGORY = "[unknown]"
 STR_VANILLA, STR_XAI = "vanilla", "xai"
 STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
 
@@ -972,6 +972,8 @@ class SS3:
                 name = name.lower()
             return self.__categories_index__[name]
         except KeyError:
+            if name == STR_UNKNOWN_CATEGORY:
+                return len(self.__categories_index__)
             raise InvalidCategoryError
 
     def get_category_name(self, index):
@@ -989,6 +991,8 @@ class SS3:
                 index = index[0]
             return self.__categories__[index][NAME]
         except IndexError:
+            if index == len(self.__categories__):
+                return STR_UNKNOWN_CATEGORY
             raise InvalidCategoryError
 
     def get_word_index(self, word):
@@ -1708,19 +1712,17 @@ class SS3:
         """
         r = self.classify(doc, sort=True, prep=prep)
 
-        categories = self.get_categories()
-
-        if not def_cat or def_cat == STR_UNKNOWN:
-            def_cat = len(self.__categories__)
-            categories.append(STR_UNKNOWN_CATEGORY)
-        elif def_cat == STR_MOST_PROBABLE:
-            def_cat = self.__get_most_probable_category__()
+        if not r[0][1]:
+            if not def_cat or def_cat == STR_UNKNOWN:
+                cat = STR_UNKNOWN_CATEGORY
+            elif def_cat == STR_MOST_PROBABLE:
+                cat = self.get_most_probable_category()
+            else:
+                cat = def_cat
         else:
-            def_cat = self.get_category_index(def_cat)
+            cat = self.get_category_name(r[0][0])
 
-        cat_i = r[0][0] if r[0][1] else def_cat
-
-        return categories[cat_i] if labels else cat_i
+        return cat if labels else self.get_category_index(cat)
 
     def classify_multilabel(self, doc, def_cat=STR_MOST_PROBABLE, labels=True, prep=True):
         """
@@ -1747,21 +1749,22 @@ class SS3:
         """
         r = self.classify(doc, sort=True, prep=prep)
 
-        categories = self.get_categories()
-
-        if not def_cat or def_cat == STR_UNKNOWN:
-            def_cat = len(self.__categories__)
-            categories.append(STR_UNKNOWN_CATEGORY)
-        elif def_cat == STR_MOST_PROBABLE:
-            def_cat = self.__get_most_probable_category__()
-        else:
-            def_cat = self.get_category_index(def_cat)
-
         if not r[0][1]:
-            return [categories[def_cat]] if labels else [def_cat]
-
-        result = [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
-        return [categories[cat_i] for cat_i in result] if labels else result
+            if not def_cat or def_cat == STR_UNKNOWN:
+                cat = STR_UNKNOWN_CATEGORY
+            elif def_cat == STR_MOST_PROBABLE:
+                cat = self.get_most_probable_category()
+            else:
+                cat = def_cat
+            return [cat] if labels else [self.get_category_index(cat)]
+        else:
+            if labels:
+                return [
+                    self.get_category_name(cat_i)
+                    for cat_i, _ in r[:kmean_multilabel_size(r)]
+                ]
+            else:
+                return [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
 
     def fit(self, x_train, y_train, n_grams=1, prep=True, leave_pbar=True):
         """

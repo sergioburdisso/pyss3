@@ -16,7 +16,7 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
-from . import SS3, InvalidCategoryError, STR_MODEL_EXT, __version__
+from . import SS3, InvalidCategoryError, STR_MODEL_EXT, STR_UNKNOWN_CATEGORY, __version__
 from .server import Server
 from .util import Print, Dataset, RecursiveDefaultDict
 
@@ -82,7 +82,6 @@ STR_FILE, STR_FOLDER, STR_VERBOSE = "file", "folder", "verbose"
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_FOLD, STR_TEST, STR_NGRAMS = "fold", "test", "grams"
 STR_S, STR_L, STR_P, STR_A = "s", "l", "p", "a"
-STR_UNKNOWN_CATEGORY = "[UNKNOWN]"
 STR_NO_CACHE = "no-cache"
 
 ARGS_HYP = [STR_S, STR_L, STR_P, STR_A]
