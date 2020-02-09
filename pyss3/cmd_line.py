@@ -16,9 +16,11 @@ from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
-from . import SS3, InvalidCategoryError, STR_MODEL_EXT, STR_UNKNOWN_CATEGORY, __version__
 from .server import Server
 from .util import Print, Dataset, RecursiveDefaultDict
+from . import \
+    SS3, InvalidCategoryError, STR_MODEL_EXT, \
+    STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, __version__
 
 import numpy as np
 import webbrowser
@@ -2391,9 +2393,7 @@ class SS3Prompt(Cmd):
         if len(def_cat_arg) == 1:
             def_cat = op_args[def_cat_arg[0]]
             if def_cat not in [STR_MOST_PROBABLE, STR_UNKNOWN]:
-                try:
-                    CLF.get_category_index(def_cat)
-                except InvalidCategoryError:
+                if CLF.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
                     Print.error(ERROR_ICN % def_cat, raises=ArgsParseError)
                     return
         elif len(def_cat_arg) > 1:

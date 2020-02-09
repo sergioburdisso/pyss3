@@ -30,6 +30,7 @@ WORD_DELTR = " "
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[unknown]"
+IDX_UNKNOWN_CATEGORY = -1
 STR_VANILLA, STR_XAI = "vanilla", "xai"
 STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
 
@@ -965,16 +966,13 @@ class SS3:
         :type name: str
         :returns: the category index
         :rtype: int
-        :raises: InvalidCategoryError
         """
         try:
             if type(name) is str:
                 name = name.lower()
             return self.__categories_index__[name]
         except KeyError:
-            if name == STR_UNKNOWN_CATEGORY:
-                return len(self.__categories_index__)
-            raise InvalidCategoryError
+            return IDX_UNKNOWN_CATEGORY
 
     def get_category_name(self, index):
         """
@@ -984,16 +982,13 @@ class SS3:
         :type index: int
         :returns: the category name
         :rtype: str
-        :raises: InvalidCategoryError
         """
         try:
             if type(index) == list:
                 index = index[0]
             return self.__categories__[index][NAME]
         except IndexError:
-            if index == len(self.__categories__):
-                return STR_UNKNOWN_CATEGORY
-            raise InvalidCategoryError
+            return STR_UNKNOWN_CATEGORY
 
     def get_word_index(self, word):
         """
@@ -1035,8 +1030,13 @@ class SS3:
         :type n: int
         :returns: a list of tuples (word, frequency, probability)
         :rtype: list (of tuple)
+        :raises: InvalidCategoryError
         """
         icat = self.get_category_index(cat)
+
+        if icat == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
         guessedwords = [
             (self.get_word(iword), fr, P)
             for iword, fr, P in self.__get_next_iwords__(sent, icat) if fr
@@ -1218,7 +1218,11 @@ class SS3:
                         2-grams, 3-grams, etc.). Default -1 stores all
                         learned n-grams (1-grams, 2-grams, 3-grams, etc.)
         :type n_grams: int
+        :raises: InvalidCategoryError
         """
+        if self.get_category_index(cat) == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
         self.__save_cat_vocab__(self.get_category_index(cat), path, n_grams)
 
     def save_vocab(self, path="./", n_grams=-1):
@@ -1469,7 +1473,11 @@ class SS3:
 
         :param cat: the category name
         :type cat: str
+        :raises: InvalidCategoryError
         """
+        if self.get_category_index(cat) == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
         import matplotlib.pyplot as plt
 
         icat = self.get_category_index(cat)
@@ -1709,6 +1717,7 @@ class SS3:
         :type prep: bool
         :returns: the category label or the category index.
         :rtype: str or int
+        :raises: InvalidCategoryError
         """
         r = self.classify(doc, sort=True, prep=prep)
 
@@ -1718,6 +1727,8 @@ class SS3:
             elif def_cat == STR_MOST_PROBABLE:
                 cat = self.get_most_probable_category()
             else:
+                if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
+                    raise InvalidCategoryError
                 cat = def_cat
         else:
             cat = self.get_category_name(r[0][0])
@@ -1746,6 +1757,7 @@ class SS3:
         :type prep: bool
         :returns: the list of category labels (or indexes).
         :rtype: list (of str or int)
+        :raises: InvalidCategoryError
         """
         r = self.classify(doc, sort=True, prep=prep)
 
@@ -1755,6 +1767,8 @@ class SS3:
             elif def_cat == STR_MOST_PROBABLE:
                 cat = self.get_most_probable_category()
             else:
+                if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
+                    raise InvalidCategoryError
                 cat = def_cat
             return [cat] if labels else [self.get_category_index(cat)]
         else:
@@ -1870,8 +1884,7 @@ class SS3:
 
         if not def_cat or def_cat == STR_UNKNOWN:
             Print.info(
-                "default category was set to 'unknown' (its index will be %d)"
-                % self.get_category_index(STR_UNKNOWN_CATEGORY),
+                "default category was set to 'unknown' (its index will be -1)",
                 offset=1
             )
         else:
@@ -1883,6 +1896,8 @@ class SS3:
                 )
             else:
                 Print.info("default category was set to '%s'" % def_cat, offset=1)
+                if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
+                    raise InvalidCategoryError
 
         stime = time()
         Print.info("about to start classifying test documents", offset=1)

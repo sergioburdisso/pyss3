@@ -2,7 +2,7 @@
 from os import path
 from shutil import rmtree
 from pyss3 import SS3, STR_NORM_GV_XAI, STR_XAI
-from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY
+from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY
 from pyss3.util import Dataset
 import pyss3
 import pytest
@@ -137,10 +137,10 @@ def test_pyss3_ss3():
         cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
     )
     assert clf.get_name() == "test"
-    with pytest.raises(pyss3.InvalidCategoryError):
-        clf.get_category_index("a_category")
-    with pytest.raises(pyss3.InvalidCategoryError):
-        clf.get_category_name(0)
+    assert clf.get_category_index("a_category") == IDX_UNKNOWN_CATEGORY
+    assert clf.get_category_name(0) == STR_UNKNOWN_CATEGORY
+    assert clf.get_category_name(-1) == STR_UNKNOWN_CATEGORY
+
     with pytest.raises(pyss3.EmptyModelError):
         y_pred = clf.predict(x_test)
     with pytest.raises(pyss3.EmptyModelError):
