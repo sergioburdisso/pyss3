@@ -857,10 +857,10 @@ class SS3:
         Overwrite the default path from which the model will be loaded (or saved to).
 
         Note: be aware that the PySS3 Command Line tool looks for
-        a local folder called "ss3_models" to load models.
-        Therefore, the "ss3_models" folder will be always automatically
-        append to the given ``path`` (e.g. if ``path`` = "my/path/", it will
-        be converted into "my/path/ss3_models").
+        a local folder called ``ss3_models`` to load models.
+        Therefore, the ``ss3_models`` folder will be always automatically
+        append to the given ``path`` (e.g. if ``path="my/path/"``, it will
+        be converted into ``my/path/ss3_models``).
 
         :param path: the path
         :type path: str
@@ -870,11 +870,11 @@ class SS3:
     def set_block_delimiters(self, parag=None, sent=None, word=None):
         r"""Overwrite the default delimiters used to split input documents into blocks.
 
-        delimiters are any regular expression from simple ones (e.g. " ") to
-        more complex ones (e.g. r"[^\s\w\d]").
+        delimiters are any regular expression from simple ones (e.g. ``" "``) to
+        more complex ones (e.g. ``r"[^\s\w\d]"``).
         Note: remember that there are certain reserved characters for regular expression,
               for example, the dot (.), in which case use the backslash to indicate you're
-              referring the character itself and not its interpretation (e.g. \.)
+              referring the character itself and not its interpretation (e.g. ``\.``)
 
         e.g.
 
@@ -905,7 +905,7 @@ class SS3:
 
         Remember that there are certain reserved characters for regular expression,
         for example, the dot (.), in which case use the backslash to indicate you're
-        referring the character itself and not its interpretation (e.g. \.)
+        referring the character itself and not its interpretation (e.g. ``\.``)
 
         :param regex: the regular expression of the new delimiter
         :type regex: str
@@ -918,7 +918,7 @@ class SS3:
 
         Remember that there are certain reserved characters for regular expression,
         for example, the dot (.), in which case use the backslash to indicate you're
-        referring the character itself and not its interpretation (e.g. \.)
+        referring the character itself and not its interpretation (e.g. ``\.``)
 
         :param regex: the regular expression of the new delimiter
         :type regex: str
@@ -934,7 +934,7 @@ class SS3:
 
         Remember that there are certain reserved characters for regular expression,
         for example, the dot (.), in which case use the backslash to indicate you're
-        referring the character itself and not its interpretation (e.g. \.)
+        referring the character itself and not its interpretation (e.g. ``\.``)
 
         :param regex: the regular expression of the new delimiter
         :type regex: str
