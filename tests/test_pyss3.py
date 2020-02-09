@@ -1,9 +1,12 @@
 """Tests for pytest."""
 from os import path
 from shutil import rmtree
-from pyss3 import SS3, STR_NORM_GV_XAI, STR_XAI
-from pyss3 import STR_UNKNOWN, STR_MOST_PROBABLE, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY
 from pyss3.util import Dataset
+from pyss3 import \
+    SS3, STR_NORM_GV_XAI, STR_XAI, STR_MOST_PROBABLE, \
+    STR_UNKNOWN, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, \
+    PARA_DELTR, SENT_DELTR, WORD_DELTR
+
 import pyss3
 import pytest
 
@@ -63,6 +66,8 @@ def argmax(lst):
 def perform_tests_with(clf, cv_test):
     """Perform some tests with the given classifier."""
     unknown_doc = "bla bla bla."
+    blocks_doc0 = "is this a sentence? a paragraph?!who knows"
+    blocks_doc1 = "these-are-words"
     multilabel_doc = x_test[0] + x_test[1]
     multilabel_labels = [y_test[0], y_test[1]]
     multilabel_idxs = [clf.get_category_index(y_test[0]),
@@ -150,6 +155,23 @@ def perform_tests_with(clf, cv_test):
     # get_stopwords
     learned_stopwords = clf.get_stopwords(.01)
     assert [sw for sw in stopwords if sw in learned_stopwords] == stopwords
+
+    # set_block_delimiters
+    pred = clf.classify(blocks_doc0, json=True)
+    assert len(pred["pars"]) == 1 and len(pred["pars"][0]["sents"]) == 1
+    assert len(pred["pars"][0]["sents"][0]["words"]) == 8
+
+    clf.set_block_delimiters(parag="!", sent=r"\?")
+    pred = clf.classify(blocks_doc0, json=True)
+    assert len(pred["pars"]) == 2 and len(pred["pars"][0]["sents"]) == 4
+    clf.set_block_delimiters(sent=r"(\?)")
+    assert len(pred["pars"][0]["sents"]) == 4
+
+    clf.set_block_delimiters(word="-")
+    pred = clf.classify(blocks_doc1, json=True)
+    assert len(pred["pars"][0]["sents"][0]["words"]) == 3
+
+    clf.set_block_delimiters(parag=PARA_DELTR, sent=SENT_DELTR, word=WORD_DELTR)
 
 
 def test_pyss3_functions():
