@@ -189,12 +189,6 @@ app.controller("mainCtrl", function($scope) {
     return active_cats.indexOf(cat_info[0]) != -1;
   }
 
-  $scope.need_space = function(words, i, sents, j){
-    // space if it is a word (and previos not (,[, etc. ) or if it is (,[, etc.
-    return (!words[i].lexeme[0] || __start_space__.indexOf(words[i].lexeme[0]) != -1) &&
-          !(i == 0 && (!sents[j-1] || __no_start_space__.indexOf(sents[j-1].words[0].lexeme[0]) != -1));
-  }
-
   $scope.on_chart_change = function(){
     var $chart = $scope.chart;
     if ($scope.show_chart){

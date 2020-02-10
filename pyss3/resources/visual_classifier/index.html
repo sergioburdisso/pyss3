@@ -304,9 +304,7 @@
                   <span>Words</span>
                 </label>
                 <div class="card-panel animate" id="desc-doc">
-                  <p ng-repeat="par in ss3.pars" id="{{'p-' + par.index}}" ng-style="get_cv_style(par, 0)">
-                    <span ng-repeat="sent in par.sents" id="{{'s-' + sent.index}}" ng-style="get_cv_style(sent, 1)"><span ng-repeat="word in sent.words"><span ng-if="need_space(sent.words, $index, par.sents, sent.index - 1)"> </span><span ng-style="get_cv_style(null, 2)">{{word.lexeme[0]}}</span><span id="{{'w-' + word.index}}" style="cursor:pointer" ng-style="get_cv_style(word, 2)" ng-click="show_info(word)">{{word.lexeme[1]}}{{word.lexeme[2]}}</span></span><span ng-if="sent.dot" ng-style="get_cv_style(null, 2)"></span></span>
-                  </p>
+                  <span ng-repeat="par in ss3.pars" id="{{'p-' + par.index}}" ng-style="get_cv_style(par, 0)"><span ng-repeat="sent in par.sents" id="{{'s-' + sent.index}}" ng-style="get_cv_style(sent, 1)"><span ng-repeat="word in sent.words"><span ng-style="get_cv_style(null, 2)">{{word.lexeme[0]}}</span><br ng-if="word.lexeme[0] == '\n'"><span id="{{'w-' + word.index}}" style="cursor:pointer" ng-style="get_cv_style(word, 2)" ng-click="show_info(word)">{{word.lexeme[1]}}{{word.lexeme[2]}}</span></span><span ng-if="sent.dot" ng-style="get_cv_style(null, 2)"></span></span></span>
                   <div class="math row no-animate" ng-show="word_info || show_chart" ng-class="{'animate-show-3d-top':!show_chart}">
                     <hr>
                     <div ng-show="word_info">
