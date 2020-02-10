@@ -1675,6 +1675,7 @@ class SS3:
                 if s["cv"][c_i] > min_cv
             ]
         elif level == 'word':
+            ww_size = window_size
             insights = []
             for p in r["pars"]:
                 for s in p["sents"]:
@@ -1685,14 +1686,21 @@ class SS3:
                         if w["cv"][c_i] > min_cv:
                             ww = []
                             ww_cv = 0
-                            w_i = max(w_i - window_size, 0)
-                            ww_i_end = min(w_i + window_size, len(words) - 1)
-                            while w_i <= ww_i_end:
+                            ww_left = min(w_i, ww_size) + 1
+                            w_i -= ww_left - 1
+                            while ww_left > 0 and w_i < len(words):
+
                                 ww.append(words[w_i]["lexeme"])
                                 ww_cv += words[w_i]["cv"][c_i]
+
                                 if words[w_i]["cv"][c_i] > min_cv:
-                                    ww_i_end = min(w_i + window_size, len(words) - 1)
+                                    ww_left += min(ww_size, (len(words) - 1) - w_i)
+
+                                if re.search(r"[\w\d]+", words[w_i]["lexeme"]):
+                                    ww_left -= 1
+
                                 w_i += 1
+
                             insights.append(("".join(ww), ww_cv))
                         else:
                             w_i += 1
