@@ -1678,32 +1678,31 @@ class SS3:
             ww_size = window_size
             insights = []
             for p in r["pars"]:
-                for s in p["sents"]:
-                    words = s["words"]
-                    w_i = 0
-                    while w_i < len(words):
-                        w = words[w_i]
-                        if w["cv"][c_i] > min_cv:
-                            ww = []
-                            ww_cv = 0
-                            ww_left = min(w_i, ww_size) + 1
-                            w_i -= ww_left - 1
-                            while ww_left > 0 and w_i < len(words):
+                words = [w for s in p["sents"] for w in s["words"]]
+                w_i = 0
+                while w_i < len(words):
+                    w = words[w_i]
+                    if w["cv"][c_i] > min_cv:
+                        ww = []
+                        ww_cv = 0
+                        ww_left = min(w_i, ww_size) + 1
+                        w_i -= ww_left - 1
+                        while ww_left > 0 and w_i < len(words):
 
-                                ww.append(words[w_i]["lexeme"])
-                                ww_cv += words[w_i]["cv"][c_i]
+                            ww.append(words[w_i]["lexeme"])
+                            ww_cv += words[w_i]["cv"][c_i]
 
-                                if words[w_i]["cv"][c_i] > min_cv:
-                                    ww_left += min(ww_size, (len(words) - 1) - w_i)
+                            if words[w_i]["cv"][c_i] > min_cv:
+                                ww_left += min(ww_size, (len(words) - 1) - w_i)
 
-                                if re.search(r"[\w\d]+", words[w_i]["lexeme"]):
-                                    ww_left -= 1
+                            if re.search(r"[\w\d]+", words[w_i]["lexeme"]):
+                                ww_left -= 1
 
-                                w_i += 1
-
-                            insights.append(("".join(ww), ww_cv))
-                        else:
                             w_i += 1
+
+                        insights.append(("".join(ww), ww_cv))
+                    else:
+                        w_i += 1
         else:
             raise ValueError(
                 "expected values for the `level` argument are "

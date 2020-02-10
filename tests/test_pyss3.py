@@ -57,6 +57,11 @@ y_test = ["sports",
 
 stopwords = ['by', 'the', 'for', 'of', 'new', 'to', 'with', 'is', 'at', 'and', 'in', 'this', 'out']
 
+doc_insight = "Dude, this text is about sports. Football soccer, you know!\nSecond paragraph."
+doc_unknown = "bla bla bla."
+doc_blocks0 = "is this a sentence? a paragraph?!who knows"
+doc_blocks1 = "these-are-words"
+
 
 def argmax(lst):
     """Given a list of numbers, return the index of the biggest one."""
@@ -65,9 +70,6 @@ def argmax(lst):
 
 def perform_tests_with(clf, cv_test):
     """Perform some tests with the given classifier."""
-    unknown_doc = "bla bla bla."
-    blocks_doc0 = "is this a sentence? a paragraph?!who knows"
-    blocks_doc1 = "these-are-words"
     multilabel_doc = x_test[0] + x_test[1]
     multilabel_labels = [y_test[0], y_test[1]]
     multilabel_idxs = [clf.get_category_index(y_test[0]),
@@ -89,25 +91,25 @@ def perform_tests_with(clf, cv_test):
     y_pred = [clf.get_category_name(ic) for ic in y_pred]
     assert y_pred == y_test
 
-    y_pred = clf.predict([unknown_doc], def_cat=STR_UNKNOWN)
+    y_pred = clf.predict([doc_unknown], def_cat=STR_UNKNOWN)
     assert y_pred[0] == STR_UNKNOWN_CATEGORY
 
-    y_pred = clf.predict([unknown_doc], def_cat=STR_MOST_PROBABLE)
+    y_pred = clf.predict([doc_unknown], def_cat=STR_MOST_PROBABLE)
     assert y_pred[0] == most_prob_cat
     assert y_pred[0] == "science&technology"
 
-    assert clf.predict([unknown_doc], def_cat=def_cat)[0] == def_cat
+    assert clf.predict([doc_unknown], def_cat=def_cat)[0] == def_cat
 
     # predict_proba
     y_pred = clf.predict_proba(x_test)
     assert y_test == [clf.get_category_name(argmax(cv)) for cv in y_pred]
     assert [round(p, 5) for p in y_pred[0]] == cv_test
 
-    y_pred = clf.predict_proba([unknown_doc])
+    y_pred = clf.predict_proba([doc_unknown])
     assert y_pred[0] == [0] * len(clf.get_categories())
 
     # classify
-    pred = clf.classify(unknown_doc, sort=False)
+    pred = clf.classify(doc_unknown, sort=False)
     assert pred == [0] * len(clf.get_categories())
 
     pred0 = clf.classify(x_test[0], sort=False)
@@ -121,13 +123,13 @@ def perform_tests_with(clf, cv_test):
     assert clf.classify_label(x_test[0]) == y_test[0]
     assert clf.classify_label(x_test[0], labels=False) == clf.get_category_index(y_test[0])
 
-    assert clf.classify_label(unknown_doc) == most_prob_cat
-    assert clf.classify_label(unknown_doc, def_cat=STR_UNKNOWN) == STR_UNKNOWN_CATEGORY
-    assert clf.classify_label(unknown_doc, def_cat=def_cat) == def_cat
+    assert clf.classify_label(doc_unknown) == most_prob_cat
+    assert clf.classify_label(doc_unknown, def_cat=STR_UNKNOWN) == STR_UNKNOWN_CATEGORY
+    assert clf.classify_label(doc_unknown, def_cat=def_cat) == def_cat
 
-    assert clf.classify_label(unknown_doc, labels=False) == most_prob_cat_idx
-    assert clf.classify_label(unknown_doc, def_cat=STR_UNKNOWN, labels=False) == -1
-    assert clf.classify_label(unknown_doc, def_cat=def_cat, labels=False) == def_cat_idx
+    assert clf.classify_label(doc_unknown, labels=False) == most_prob_cat_idx
+    assert clf.classify_label(doc_unknown, def_cat=STR_UNKNOWN, labels=False) == -1
+    assert clf.classify_label(doc_unknown, def_cat=def_cat, labels=False) == def_cat_idx
 
     # classify_multilabel
 
@@ -138,18 +140,18 @@ def perform_tests_with(clf, cv_test):
     assert len(multilabel_labels) == len(r)
     assert r[0] in multilabel_idxs and r[1] in multilabel_idxs
 
-    assert clf.classify_multilabel(unknown_doc) == [most_prob_cat]
-    assert clf.classify_multilabel(unknown_doc, def_cat=STR_UNKNOWN) == [pyss3.STR_UNKNOWN_CATEGORY]
-    assert clf.classify_multilabel(unknown_doc, def_cat=def_cat) == [def_cat]
+    assert clf.classify_multilabel(doc_unknown) == [most_prob_cat]
+    assert clf.classify_multilabel(doc_unknown, def_cat=STR_UNKNOWN) == [pyss3.STR_UNKNOWN_CATEGORY]
+    assert clf.classify_multilabel(doc_unknown, def_cat=def_cat) == [def_cat]
 
-    assert clf.classify_multilabel(unknown_doc, labels=False) == [most_prob_cat_idx]
-    assert clf.classify_multilabel(unknown_doc, def_cat=STR_UNKNOWN, labels=False) == [-1]
-    assert clf.classify_multilabel(unknown_doc, def_cat=def_cat, labels=False) == [def_cat_idx]
+    assert clf.classify_multilabel(doc_unknown, labels=False) == [most_prob_cat_idx]
+    assert clf.classify_multilabel(doc_unknown, def_cat=STR_UNKNOWN, labels=False) == [-1]
+    assert clf.classify_multilabel(doc_unknown, def_cat=def_cat, labels=False) == [def_cat_idx]
 
-    # "learn an unknown_doc and a new category" case
-    clf.learn(unknown_doc * 2, new_cat, update=True)
+    # "learn an doc_unknown and a new category" case
+    clf.learn(doc_unknown * 2, new_cat, update=True)
     assert new_cat in clf.get_categories()
-    y_pred = clf.predict([unknown_doc])
+    y_pred = clf.predict([doc_unknown])
     assert y_pred[0] == new_cat
 
     # get_stopwords
@@ -157,19 +159,19 @@ def perform_tests_with(clf, cv_test):
     assert [sw for sw in stopwords if sw in learned_stopwords] == stopwords
 
     # set_block_delimiters
-    pred = clf.classify(blocks_doc0, json=True)
+    pred = clf.classify(doc_blocks0, json=True)
     assert len(pred["pars"]) == 1 and len(pred["pars"][0]["sents"]) == 1
     assert len(pred["pars"][0]["sents"][0]["words"]) == 8
 
     clf.set_block_delimiters(parag="!", sent=r"\?")
-    pred = clf.classify(blocks_doc0, json=True)
+    pred = clf.classify(doc_blocks0, json=True)
     assert len(pred["pars"]) == 2 + 1  # two paragraphs plus one delimiter
     assert len(pred["pars"][0]["sents"]) == 4
     clf.set_block_delimiters(sent=r"(\?)")
     assert len(pred["pars"][0]["sents"]) == 4
 
     clf.set_block_delimiters(word="-")
-    pred = clf.classify(blocks_doc1, json=True)
+    pred = clf.classify(doc_blocks1, json=True)
     assert len(pred["pars"][0]["sents"][0]["words"]) == 3
     clf.set_block_delimiters(parag=PARA_DELTR, sent=SENT_DELTR, word=WORD_DELTR)
 
@@ -245,20 +247,19 @@ def test_pyss3_ss3():
     assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.86708, 0]
 
     # extract_insight
-    doc = "Dude, this text is about sports. Football soccer, you know!\nSecond paragraph."
-    t = clf.extract_insight(doc)
-    assert len(t) == 2 and t[0] == (' Football soccer, you know!', 1.8670788645841605)
-    t = clf.extract_insight(doc, sort=False)
-    assert len(t) == 2 and t[0] == ('text is about sports', 1.0)
-    t = clf.extract_insight(doc, window_size=1)
-    assert len(t) == 2 and t[0] == (' Football soccer, you know!', 1.8670788645841605)
-    t = clf.extract_insight(doc, window_size=0)
+    t = clf.extract_insight(doc_insight)
+    assert len(t) == 1 and t[0][0] == 'text is about sports. Football soccer, you know!'
+    t = clf.extract_insight(doc_insight, window_size=1)
+    assert len(t) == 1 and t[0] == ('about sports. Football soccer, you ', 2.8670788645841605)
+    t = clf.extract_insight(doc_insight, window_size=0)
     assert t == [('Football soccer, ', 1.8670788645841605), ('sports', 1.0)]
-    assert clf.extract_insight(doc, cat="music") == []
-    assert len(clf.extract_insight(doc, min_cv=1)) == 1
-    t = clf.extract_insight(doc, level="sentence", sort=False)
+    assert clf.extract_insight(doc_insight, cat="music") == []
+    assert len(clf.extract_insight(doc_insight, min_cv=1)) == 1
+    t = clf.extract_insight(doc_insight, level="sentence")
+    assert len(t) == 2 and t[0][0] == ' Football soccer, you know!'
+    t = clf.extract_insight(doc_insight, level="sentence", sort=False)
     assert len(t) == 2 and t[0][0] == 'Dude, this text is about sports'
-    t = clf.extract_insight(doc, level="paragraph", min_cv=-1)
+    t = clf.extract_insight(doc_insight, level="paragraph", min_cv=-1)
     assert len(t) == 2 + 1 and t[2][0] == "Second paragraph."
 
     # load and save model tests
