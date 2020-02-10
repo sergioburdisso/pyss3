@@ -31,6 +31,8 @@ WORD_DELTR = r"\s"
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[unknown]"
 IDX_UNKNOWN_CATEGORY = -1
+STR_UNKNOWN_WORD = ''
+IDX_UNKNOWN_WORD = -1
 STR_VANILLA, STR_XAI = "vanilla", "xai"
 STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
 
@@ -59,8 +61,6 @@ class SS3:
     The SS3 classifier was originally  defined in Section 3 of
     https://dx.doi.org/10.1016/j.eswa.2019.05.023
     (preprint avialable here: https://arxiv.org/abs/1905.08772)
-
-
 
     :param s: the "smoothness"(sigma) hyperparameter value
     :type s: float
@@ -1046,7 +1046,8 @@ class SS3:
 
         :param name: The category name
         :type name: str
-        :returns: the category index
+        :returns: the category index (or ``IDX_UNKNOWN_CATEGORY``
+                  if the category doesn't exist).
         :rtype: int
         """
         try:
@@ -1062,7 +1063,8 @@ class SS3:
 
         :param index: The category index
         :type index: int
-        :returns: the category name
+        :returns: the category name (or ``STR_UNKNOWN_CATEGORY``
+                  if the category doesn't exist).
         :rtype: str
         """
         try:
@@ -1078,13 +1080,13 @@ class SS3:
 
         :param name: a word
         :type name: str
-        :returns: the word index
+        :returns: the word index (or ``IDX_UNKNOWN_WORD`` if the word doesn't exist).
         :rtype: int
         """
         try:
             return self.__word_to_index__[word]
         except KeyError:
-            return None
+            return IDX_UNKNOWN_WORD
 
     def get_word(self, index):
         """
@@ -1092,12 +1094,13 @@ class SS3:
 
         :param index: the word index
         :type index: int
-        :returns: the word
+        :returns: the word (or ``STR_UNKNOWN_WORD`` if the word doesn't exist).
+        :rtype: int
         :rtype: str
         """
         return (
             self.__index_to_word__[index]
-            if index in self.__index_to_word__ else ""
+            if index in self.__index_to_word__ else STR_UNKNOWN_WORD
         )
 
     def get_next_words(self, sent, cat, n=None):
@@ -1500,17 +1503,26 @@ class SS3:
 
         word_index = self.get_word_index
         n_gram_str = ngram
-        ngram = [word_index(w) for w in ngram.split(" ") if w]
+        ngram = [word_index(w)
+                 for w in re.split(self.__word_delimiter__, ngram)
+                 if w]
 
         print()
         print(
-            " %s: %s" % (
+            " %s: %s (%s)" % (
                 Print.style.green(
                     "%d-GRAM" % len(ngram) if len(ngram) > 1 else "WORD"
                 ),
-                Print.style.warning(n_gram_str)
+                Print.style.warning(n_gram_str),
+                "is unknown"
+                if IDX_UNKNOWN_WORD in ngram
+                else "index: " + str(ngram if len(ngram) > 1 else ngram[0])
             )
         )
+
+        if IDX_UNKNOWN_WORD in ngram:
+            print()
+            return
 
         cat_len = max([
             len(self.get_category_name(ic))
