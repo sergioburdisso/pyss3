@@ -251,7 +251,7 @@ def test_pyss3_ss3():
     t = clf.extract_insight(doc, sort=False)
     assert len(t) == 2 and t[0] == ('text is about sports', 1.0)
     t = clf.extract_insight(doc, window_size=1)
-    assert len(t) == 2 and t[0] == (' Football soccer, you ', 1.8670788645841605)
+    assert len(t) == 2 and t[0] == (' Football soccer, you know!', 1.8670788645841605)
     t = clf.extract_insight(doc, window_size=0)
     assert t == [('Football soccer, ', 1.8670788645841605), ('sports', 1.0)]
     assert clf.extract_insight(doc, cat="music") == []
