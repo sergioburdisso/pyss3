@@ -25,8 +25,8 @@ __version__ = "0.3.9.2"
 ENCODING = "utf-8"
 
 PARA_DELTR = "\n"
-SENT_DELTR = r"(\.)"
-WORD_DELTR = " "
+SENT_DELTR = r"\."
+WORD_DELTR = r"\s"
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[unknown]"
@@ -348,13 +348,13 @@ class SS3:
             if prep:
                 sent_words = [
                     (w, Pp.clean_and_ready(w, dots=False))
-                    for w in re.split(word_delimiter, sent)
+                    for w in re_split_keep(word_delimiter, sent)
                     if w
                 ]
             else:
                 sent_words = [
                     (w, w)
-                    for w in re.split(word_delimiter, sent)
+                    for w in re_split_keep(word_delimiter, sent)
                     if w
                 ]
 
@@ -367,6 +367,12 @@ class SS3:
             words = re.split(word_delimiter, seq)
             for iw in xrange(len(words)):
                 word = words[iw]
+
+                if json and re.match(self.__word_delimiter__, raw_seq):
+                    if len(flat_raw_sent):
+                        flat_raw_sent[-1] += raw_seq
+                        continue
+
                 wordi = word_index(word)
 
                 if iw == len(words) - 1:
@@ -447,7 +453,7 @@ class SS3:
             info = [
                 {
                     "token": u"→".join(map(get_word, sequence)),
-                    "lexeme": u" ".join(raw_sequence),
+                    "lexeme": u"".join(raw_sequence),
                     "cv": classify_trans(sequence),
                     "lv": [local_value(sequence, ic) for ic in cats],
                     "fr": [get_tip(sequence, ic)[FR] for ic in cats]
@@ -474,7 +480,7 @@ class SS3:
         else:
             info = [
                 self.__classify_sentence__(sent, prep=prep, json=True)
-                for sent in re.split(self.__sent_delimiter__, parag)
+                for sent in re_split_keep(self.__sent_delimiter__, parag)
                 if sent
             ]
             if info:
@@ -923,9 +929,6 @@ class SS3:
         :param regex: the regular expression of the new delimiter
         :type regex: str
         """
-        if not re.match(r"\(.*\)", regex):
-            # force the inclusion of unmatched items by re.split
-            regex = "(%s)" % regex
         self.__sent_delimiter__ = regex
 
     def set_delimiter_word(self, regex):
@@ -1653,7 +1656,7 @@ class SS3:
         if level == 'paragraph':
             insights = [
                 (
-                    " ".join([word["lexeme"]
+                    "".join([word["lexeme"]
                              for s in p["sents"]
                              for word in s["words"]]),
                     p["cv"][c_i]
@@ -1664,7 +1667,7 @@ class SS3:
         elif level == 'sentence':
             insights = [
                 (
-                    " ".join([word["lexeme"]
+                    "".join([word["lexeme"]
                              for word in s["words"]]),
                     s["cv"][c_i]
                 )
@@ -1690,7 +1693,7 @@ class SS3:
                                 if words[w_i]["cv"][c_i] > min_cv:
                                     ww_i_end = min(w_i + window_size, len(words) - 1)
                                 w_i += 1
-                            insights.append((" ".join(ww), ww_cv))
+                            insights.append(("".join(ww), ww_cv))
                         else:
                             w_i += 1
         else:
@@ -1863,7 +1866,7 @@ class SS3:
         else:
             info = [
                 self.__classify_paragraph__(parag, prep=prep, json=True)
-                for parag in re.split(self.__parag_delimiter__, doc)
+                for parag in re_split_keep(self.__parag_delimiter__, doc)
                 if parag
             ]
 
@@ -2186,6 +2189,18 @@ def key_as_int(dct):
             new_dct[int(key)] = dct[key]
         return new_dct
     return dct
+
+
+def re_split_keep(regex, string):
+    """
+    Force the inclusion of unmatched items by re.split.
+
+    This allows keeping the original content after splitting the input
+    document for later use (e.g. for using it from the Live Test)
+    """
+    if not re.match(r"\(.*\)", regex):
+        regex = "(%s)" % regex
+    return re.split(regex, string)
 
 
 def vsum(v0, v1):
