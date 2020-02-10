@@ -170,7 +170,6 @@ def perform_tests_with(clf, cv_test):
     clf.set_block_delimiters(word="-")
     pred = clf.classify(blocks_doc1, json=True)
     assert len(pred["pars"][0]["sents"][0]["words"]) == 3
-
     clf.set_block_delimiters(parag=PARA_DELTR, sent=SENT_DELTR, word=WORD_DELTR)
 
 
@@ -243,6 +242,23 @@ def test_pyss3_ss3():
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "football soccer"
     assert argmax(pred["cv"]) == clf.get_category_index("sports")
     assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, .53463, 0, 1.86708, 0]
+
+    # extract_insight
+    doc = "Dude, this text is about sports. Football soccer, you know!\nSecond paragraph."
+    t = clf.extract_insight(doc)
+    assert len(t) == 2 and t[0] == ('Football soccer, you know!', 1.8670788645841605)
+    t = clf.extract_insight(doc, sort=False)
+    assert len(t) == 2 and t[0] == ('text is about sports', 1.0)
+    t = clf.extract_insight(doc, window_size=1)
+    assert len(t) == 2 and t[0] == ('Football soccer, you', 1.8670788645841605)
+    t = clf.extract_insight(doc, window_size=0)
+    assert t == [('Football soccer,', 1.8670788645841605), ('sports', 1.0)]
+    assert clf.extract_insight(doc, cat="music") == []
+    assert len(clf.extract_insight(doc, min_cv=1)) == 1
+    t = clf.extract_insight(doc, level="sentence", sort=False)
+    assert len(t) == 2 and t[0][0] == 'Dude, this text is about sports'
+    t = clf.extract_insight(doc, level="paragraph", min_cv=-1)
+    assert len(t) == 2 and t[1][0] == "Second paragraph ."
 
     # load and save model tests
     clf.set_model_path("tests/")
