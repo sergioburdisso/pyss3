@@ -15,7 +15,7 @@ to help you developing your machine learning models in a clearer and
 faster way. These tools let you analyze, monitor and understand your
 models by allowing you to see what they have actually learned and why. To
 achieve this, PySS3 provides you with 3 main components: the ``SS3``
-class, the ``Server`` class and the ``PySS3 Command Line`` tool, as
+class, the ``Live_Test`` class and the ``PySS3 Command Line`` tool, as
 pointed out below.
 
 
@@ -34,7 +34,7 @@ of ``sklearn``):
         y_pred = clf.predict(x_test)
 
 
-The ``Server`` class
+The ``Live_Test`` class
 ~~~~~~~~~~~~~~~~~~~~
 
 which allows you to interactively test your model and visually see the
@@ -42,13 +42,13 @@ reasons behind classification decisions, **with just one line of code**:
 
 .. code:: python
 
-        from pyss3.server import Server
+        from pyss3.server import Live_Test
         from pyss3 import SS3
 
         clf = SS3(name="my_model")
         ...
         clf.fit(x_train, y_train)
-        Server.serve(clf, x_test, y_test) # <- this one! cool uh? :)
+        Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
 
 As shown in the image below, this will open up, locally, an interactive
 tool in your browser which you can use to (live) test your models with

@@ -17,7 +17,7 @@ Before we begin, let's import needed modules...
 
     from pyss3 import SS3
     from pyss3.util import Dataset
-    from pyss3.server import Server
+    from pyss3.server import Live_Test
     
     from sklearn.metrics import accuracy_score
 
@@ -109,7 +109,7 @@ Not bad using the default :ref:`hyperparameter <ss3-hyperparameter>` values... l
 manually analyze what this model has actually learned by using the
 interactive "live test". Note that since we are not going to use the
 ``x_test`` for this live test\ **(\*)** but instead the documents in
-"datasets/topic/live\_test", we must use the ``set_testset_from_files``
+``"datasets/topic/live\_test"``, we must use the ``set_testset_from_files``
 method to tell the server to load documents from there instead.
 
 **(\*)** *try it if you want but since* ``x_test`` *contains
@@ -117,12 +117,12 @@ method to tell the server to load documents from there instead.
 
 .. code:: python
 
-    # Server.serve(clf, x_test, y_test)  # <- this visualization doesn't look really clean and good so, instead,
-                                         #    we will use the documents in "live_test" folder:
+    # Live_Test.run(clf, x_test, y_test)  # <- this visualization doesn't look really clean and good so, instead,
+                                          #    we will use the documents in "live_test" folder:
     
-    Server.set_testset_from_files("datasets/topic/live_test")
+    Live_Test.set_testset_from_files("datasets/topic/live_test")
     
-    Server.serve(clf)
+    Live_Test.run(clf)
 
 
 Live test doesn't look bad, however, we will create a "more intelligent"
@@ -189,7 +189,7 @@ category). Let's see...
 
 .. code:: python
 
-    Server.serve(clf)
+    Live_Test.run(clf)
 
 Fortunately, our model has learned to recognize these important
 sequences (such as "artificial intelligence" and "machine learning" in
@@ -238,7 +238,7 @@ learned and how it is classifying the documents...
 
 .. code:: python
 
-    Server.serve(clf)
+    Live_Test.run(clf)
 
 Perfect! now the documents are classified properly! (including *doc_3.txt*) :D
 

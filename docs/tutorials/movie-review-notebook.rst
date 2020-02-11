@@ -16,7 +16,7 @@ Before we begin, let's import needed modules...
 
     from pyss3 import SS3
     from pyss3.util import Dataset
-    from pyss3.server import Server
+    from pyss3.server import Live_Test
     
     from sklearn.metrics import accuracy_score
 
@@ -107,7 +107,7 @@ analyze what our model has actually learned by using the interactive
 
 .. code:: python
 
-    Server.serve(clf, x_test, y_test)
+    Live_Test.run(clf, x_test, y_test)
 
 Makes sense to you? (remember you can select "words" as the
 Description Level if you want to know based on what words is making
@@ -181,7 +181,7 @@ sequences of words when using the interactive "live test"
 
 .. code:: python
 
-    Server.serve(clf, x_test, y_test)
+    Live_Test.run(clf, x_test, y_test)
 
 
 .. _movie-review-notebook-continue:
