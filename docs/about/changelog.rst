@@ -9,13 +9,13 @@ All notable changes to PySS3 will be documented here.
 [0.4.0] 2020-02-11
 ==================
 
-Among other minior improvements and changes, the most important ones that were added are:
+Among other minor improvements and changes, the most important ones that were added are:
 
 Added
 -----
 
 - ``SS3`` class:
-  - The classifier now explicitely supports multi-label classification:
+  - The classifier now explicitly supports multi-label classification:
     - Created the following two methods in ``SS3`` class: `classify_multilabel() <../api/index.html#pyss3.SS3.classify_multilabel>`__ and `classify_label() <../api/index.html#pyss3.SS3.classify_label>`__ (`0759bca <https://github.com/sergioburdisso/pyss3/commit/0759bca4392b2441d8a3668c8aca6bd85791e06f>`__).
     - A ``multilabel`` argument was added to the ``predict`` method (`c5ac946 <https://github.com/sergioburdisso/pyss3/commit/c5ac94681196fb5f7b22fe39a9f6b5bda5362d13>`__). 
   - A new `extract_insight() <../api/index.html#pyss3.SS3.extract_insight>`__  method was added to the ``SS3`` class. This method, given a document, returns the pieces of text that were involved in the classification decision (`eee1e29 <https://github.com/sergioburdisso/pyss3/commit/eee1e292f410679ea3d25ba45bc1e70c57a3613c>`__).
