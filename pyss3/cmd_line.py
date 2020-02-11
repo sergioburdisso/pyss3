@@ -17,7 +17,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
 from .server import Server
-from .util import Print, Dataset, RecursiveDefaultDict
+from .util import Print, VERBOSITY, Dataset, RecursiveDefaultDict
 from . import \
     SS3, InvalidCategoryError, STR_MODEL_EXT, \
     STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, __version__
@@ -873,9 +873,9 @@ def delete_results_slpa(rh_metric, hparams, only_count=False, best=True):
 
 def delete_results(data_path, method, def_cat, hparams, only_count=False):
     """Remove evaluations from history."""
-    Print.quiet_begin()
+    Print.verbosity_region_begin(VERBOSITY.QUIET)
     load_results_history()
-    Print.quiet_end()
+    Print.verbosity_region_end()
 
     rh = RESULTS_HISTORY
     hps = hparams
@@ -975,9 +975,9 @@ def evaluations_remove(data_path, method, def_cat, hparams):
         if input() == 'Y':
             delete_results(data_path, method, def_cat, hparams)
             if RESULTS_HISTORY:
-                Print.quiet_begin()
+                Print.verbosity_region_begin(VERBOSITY.QUIET)
                 save_results_history()
-                Print.quiet_end()
+                Print.verbosity_region_end()
             else:
                 rh_file = path.join(
                     CLF.__models_folder__,
@@ -1037,7 +1037,7 @@ def k_fold_validation(
     except GetTestDataError:
         return
 
-    Print.set_quiet(True)
+    Print.set_verbosity(VERBOSITY.NORMAL)
     model_name = CLF.get_name()
     method = k_fold2method(k_fold)
 
@@ -1074,15 +1074,14 @@ def k_fold_validation(
 
             progress_bar.update(1)
     except KeyboardInterrupt:
-        Print.set_quiet(False)
+        Print.set_verbosity(VERBOSITY.VERBOSE)
         print()
         Print.warn("Interrupted!")
-        pass
 
     progress_bar.close()
     CLF = SS3(name=model_name)
     CLF.load_model()
-    Print.set_quiet(False)
+    Print.set_verbosity(VERBOSITY.VERBOSE)
 
     Print.show()
     k_fold_classification_report(
@@ -1114,7 +1113,7 @@ def grid_search_loop(
     method = k_fold2method(k_fold)
     S, L, P, _ = CLF.get_hyperparameters()
 
-    Print.quiet_begin()
+    Print.verbosity_region_begin(VERBOSITY.QUIET)
     try:
         for s, l, p in slp_list:
             CLF.set_hyperparameters(s, l, p)
@@ -1165,7 +1164,7 @@ def grid_search_loop(
                 progress_bar.update(1)
                 progress_desc.update(1)
     except KeyboardInterrupt:
-        Print.set_quiet(False)
+        Print.set_verbosity(VERBOSITY.VERBOSE)
         print()
         Print.warn("Interrupted!")
 
@@ -1176,7 +1175,7 @@ def grid_search_loop(
     CLF.set_hyperparameters(S, L, P)
     CLF.update_values()
 
-    Print.quiet_end()
+    Print.verbosity_region_end()
 
 
 def grid_search(
@@ -1211,7 +1210,7 @@ def grid_search(
             except GetTestDataError:
                 return
 
-            Print.set_quiet(True)
+            Print.set_verbosity(VERBOSITY.NORMAL)
             model_name = CLF.get_name()
             s, l, p, a = CLF.get_hyperparameters()
 
@@ -1241,7 +1240,7 @@ def grid_search(
 
                     progress_bar.update(1)
             except KeyboardInterrupt:
-                Print.set_quiet(False)
+                Print.set_verbosity(VERBOSITY.VERBOSE)
                 print()
                 Print.warn("Interrupted!")
 
@@ -1249,7 +1248,7 @@ def grid_search(
             CLF = SS3(name=model_name)
             CLF.load_model()
             CLF.set_hyperparameters(s, l, p, a)
-            Print.set_quiet(False)
+            Print.set_verbosity(VERBOSITY.VERBOSE)
 
         Print.warn(
             "Suggestion: use the command 'plot %s' to visualize the results"
@@ -2607,6 +2606,8 @@ def main():
     prompt = SS3Prompt()
     prompt.prompt = '(pyss3) >>> '
     prompt.doc_header = "Documented commands (type help <command>):"
+
+    Print.set_verbosity(VERBOSITY.VERBOSE)
     Print.info(
         'PySS3 Command Line v%s | Sergio Burdisso (sergio.burdisso@gmail.com).\n'
         'PySS3 comes with ABSOLUTELY NO WARRANTY. This is free software,\n'

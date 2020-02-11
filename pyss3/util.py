@@ -35,6 +35,14 @@ regex_dots_chars = re.compile(r"(?:([(),;:?!=\"/.|<>\[\]]+)|(#(?![a-zA-Z])))")
 regex_dots_chained = re.compile(r"(?:(#[a-zA-Z0-9]+)(\s)*(?=#))")
 
 
+class VERBOSITY:
+    """verbosity "enum" constants."""
+
+    QUIET = 0
+    NORMAL = 1
+    VERBOSE = 2
+
+
 class Dataset:
     """A helper class with methods to read/write datasets."""
 
@@ -64,7 +72,8 @@ class Dataset:
         if not folder_label:
 
             files = listdir(data_path)
-            for file in tqdm(files, desc=" Category files", leave=False):
+            for file in tqdm(files, desc=" Category files",
+                             leave=False, disable=Print.is_quiet()):
                 file_path = path.join(data_path, file)
                 if path.isfile(file_path):
                     cat = path.splitext(file)[0]
@@ -80,12 +89,14 @@ class Dataset:
         else:
 
             folders = listdir(data_path)
-            for item in tqdm(folders, desc=" Categories", leave=False):
+            for item in tqdm(folders, desc=" Categories",
+                             leave=False, disable=Print.is_quiet()):
                 item_path = path.join(data_path, item)
                 if not path.isfile(item_path):
                     cat_info[item] = 0
                     files = listdir(item_path)
-                    for file in tqdm(files, desc=" Documents", leave=False):
+                    for file in tqdm(files, desc=" Documents",
+                                     leave=False, disable=Print.is_quiet()):
                         file_path = path.join(item_path, file)
                         if path.isfile(file_path):
                             with open(file_path, "r", encoding=ENCODING) as ffile:
@@ -236,9 +247,6 @@ class Style:
 class Print:
     """Helper class to handle print functionalities."""
 
-    __quiet__ = False
-    __quiet_ov__ = False
-
     __error_start__ = '*** '
     __error_end__ = ''
     __warn_start__ = '* '
@@ -247,6 +255,9 @@ class Print:
     __info_end__ = ' ]'
 
     style = Style
+
+    __verbosity__ = VERBOSITY.NORMAL
+    __verbosity_old__ = None
 
     @staticmethod
     def error(msg, raises=None, offset=0, decorator=True):
@@ -301,7 +312,7 @@ class Print:
             raise raises
 
     @staticmethod
-    def info(msg, newln=True, offset=0, decorator=True):
+    def info(msg, newln=True, offset=0, decorator=True, force_show=False):
         """
         Print an info message.
 
@@ -313,15 +324,18 @@ class Print:
         :type offset: int
         :param decorator: if True, use info message decoretor
         :type decorator: bool
+        :param force_show: if True, show message even when not in verbose mode
+        :type force_show: bool
         """
-        Print.show(
-            Style.blue("%s%s%s%s" % (
-                " " * offset,
-                Print.__info_start__ if decorator else '',
-                str(msg),
-                Print.__info_end__ if decorator else '',
-            )), newln
-        )
+        if Print.is_verbose() or force_show:
+            Print.show(
+                Style.blue("%s%s%s%s" % (
+                    " " * offset,
+                    Print.__info_start__ if decorator else '',
+                    str(msg),
+                    Print.__info_end__ if decorator else '',
+                )), newln
+            )
 
     @staticmethod
     def show(msg='', newln=True, offset=0):
@@ -335,7 +349,7 @@ class Print:
         :param offset: shift the message to the right (``offset`` characters)
         :type offset: int
         """
-        if not Print.__quiet__:
+        if not Print.is_quiet():
             print((" " * offset) + str(msg), end='\n' if newln else '')
 
     @staticmethod
@@ -378,24 +392,84 @@ class Print:
         Print.__error_end__ = end or Print.__error_end__
 
     @staticmethod
-    def set_quiet(value):
+    def set_verbosity(level):
         """
-        Set quiet mode value.
+        Set the verbosity level.
 
-        When quiet mode is enable, only error messages will be displayed.
+            - ``0`` (quiet): do not output any message (only error messages)
+            - ``1`` (normal): default behavior, display only warning messages and progress bars
+            - ``2`` (verbose): display also the informative non-essential messages
 
-        :param value: if True, enables quiet mode
-        :type value: bool
+        The following built-in constants can also be used to refer to these 3 values:
+        ``VERBOSITY.QUIET``, ``VERBOSITY.NORMAL``, and ``VERBOSITY.VERBOSE``, respectively.
+
+        For example, if you want PySS3 to hide everything, even progress bars, you could do:
+
+        >>> from pyss3.util import Print, VERBOSITY
+        ...
+        >>> Print.set_verbosity(VERBOSITY.QUIET)  # or, equivalently, Print.set_verbosity(0)
+        ...
+        >>> # here's the rest of your code :D
+
+        :param level: the verbosity level
+        :type level: int
         """
-        Print.__quiet__ = value
+        Print.__verbosity__ = level
 
     @staticmethod
-    def quiet_begin():
-        """Begin a "be quiet" block."""
-        Print.__quiet_ov__ = Print.__quiet__
-        Print.__quiet__ = True
+    def is_quiet():
+        """Check if the current verbosity level is quiet."""
+        return Print.__verbosity__ == VERBOSITY.QUIET
 
     @staticmethod
-    def quiet_end():
-        """End the "be quiet" block."""
-        Print.__quiet__ = Print.__quiet_ov__
+    def is_verbose():
+        """Check if the current verbosity level is verbose."""
+        return Print.__verbosity__ >= VERBOSITY.VERBOSE
+
+    @staticmethod
+    def verbosity_region_begin(level):
+        """
+        Indicate that a region with different verbosity begins.
+
+        When the region ends by calling ``verbosity_region_end``, the previous
+        verbosity will be restored.
+
+        Example:
+
+        >>> from pyss3.util import Print,VERBOSITY
+        ...
+        >>> Print.verbosity_region_begin(VERBOSITY.QUIET)
+        >>> # inside this region (from now on), verbosity will be 'quiet'
+        ...
+        >>> Print.verbosity_region_end()
+        >>> # the verbosity level is restored to what it was before entering the region
+
+        :param level: the verbosity level for this region
+                      (see ``set_verbosity`` documentation for valid values)
+        :type level: int
+        """
+        if not Print.is_quiet():
+            Print.__verbosity_old__ = Print.__verbosity__
+            Print.__verbosity__ = level
+
+    @staticmethod
+    def verbosity_region_end():
+        """
+        Indicate that a region with different verbosity ends.
+
+        The verbosity will be restored to the value it had
+        before beginning this region with ``verbosity_region_begin``.
+
+        Example:
+
+        >>> from pyss3.util import Print,VERBOSITY
+        ...
+        >>> Print.verbosity_region_begin(VERBOSITY.VERBOSE)
+        >>> # inside this region (from now on), verbosity will be 'verbose'
+        ...
+        >>> Print.verbosity_region_end()
+        >>> # the verbosity level is restored to what it was before entering the region
+        """
+        if Print.__verbosity_old__ is not None:
+            Print.__verbosity__ = Print.__verbosity_old__
+            Print.__verbosity_old__ = None

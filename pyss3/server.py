@@ -12,7 +12,7 @@ from select import select
 from datetime import datetime
 
 from . import SS3
-from .util import RecursiveDefaultDict, Print
+from .util import RecursiveDefaultDict, Print, VERBOSITY
 
 import webbrowser
 import argparse
@@ -251,10 +251,9 @@ class Server:
                             r[0][0] if r[0][1] else unkwon_cat_i
                             for r in map(
                                 classify,
-                                tqdm(
-                                    fcat.readlines(),
-                                    desc=" Classifying '%s' docs" % cat
-                                )
+                                tqdm(fcat.readlines(),
+                                     desc=" Classifying '%s' docs" % cat,
+                                     disable=Print.is_quiet())
                             )
                         ]
                         n_docs = len(Server.__docs__[cat]["clf_result"])
@@ -276,10 +275,9 @@ class Server:
                     Server.__docs__[cat]["file"] = []
                     Server.__docs__[cat]["clf_result"] = []
 
-                    for file in tqdm(
-                        sorted(listdir(cat_path)),
-                        desc=" Classifying '%s' docs" % cat
-                    ):
+                    for file in tqdm(sorted(listdir(cat_path)),
+                                     desc=" Classifying '%s' docs" % cat,
+                                     disable=Print.is_quiet()):
                         file_path = path.join(cat_path, file)
                         if path.isfile(file_path):
                             Server.__docs__[cat]["path"].append(file_path)
@@ -404,9 +402,8 @@ class Server:
         Server.__port__ = server_socket.getsockname()[1]
 
         Print.info(
-            "PySS3 server started (listening on port %d)"
-            %
-            Server.__port__
+            "PySS3 server started (listening on port %d)" % Server.__port__,
+            force_show=True
         )
 
         Print.warn(
@@ -465,7 +462,9 @@ class Server:
             webbrowser.open("http://localhost:%d" % Server.__port__)
 
         if quiet:
-            Print.quiet_begin()
+            Print.verbosity_region_begin(VERBOSITY.QUIET)
+        else:
+            Print.verbosity_region_begin(VERBOSITY.VERBOSE)
 
         Print.info("waiting for requests")
         print()
@@ -496,7 +495,7 @@ class Server:
             Server.__server_socket__ = None
 
             if quiet:
-                Print.quiet_end()
+                Print.verbosity_region_end()
 
 
 if __name__ == "__main__":
@@ -517,7 +516,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.quiet:
-        Print.quiet_begin()
+        Print.set_verbosity(VERBOSITY.QUIET)
 
     Print.warn(
         'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'

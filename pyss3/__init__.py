@@ -14,7 +14,7 @@ from io import open
 from time import time
 from tqdm import tqdm
 from math import pow, tanh
-from .util import Print, Preproc as Pp
+from .util import Print, VERBOSITY, Preproc as Pp
 
 # python 2 and 3 compatibility
 from functools import reduce
@@ -38,6 +38,8 @@ STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
 
 STR_MODEL_FOLDER = "ss3_models"
 STR_MODEL_EXT = "ss3m"
+
+VERBOSITY = VERBOSITY  # to allow "from pyss3 import VERBOSITY"
 
 NAME = 0
 VOCAB = 1
@@ -2025,14 +2027,12 @@ class SS3:
         y_train = list(cats)
 
         Print.info("about to start training", offset=1)
-        Print.quiet_begin()
-        for i in tqdm(range(len(x_train)), desc=" Training", leave=leave_pbar):
+        for i in tqdm(range(len(x_train)), desc=" Training",
+                      leave=leave_pbar, disable=Print.is_quiet()):
             self.learn(
                 x_train[i], y_train[i],
                 n_grams=n_grams, prep=prep, update=False
             )
-
-        Print.quiet_end()
         self.__prune_tries__()
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
         self.update_values(force=True)
@@ -2058,7 +2058,7 @@ class SS3:
         classify = self.classify
         return [
             classify(x, sort=False)
-            for x in tqdm(x_test, desc=" Classification")
+            for x in tqdm(x_test, desc=" Classification", disable=Print.is_quiet())
         ]
 
     def predict(
@@ -2117,7 +2117,8 @@ class SS3:
 
         y_pred = [
             classify(doc, def_cat=def_cat, labels=labels, prep=prep)
-            for doc in tqdm(x_test, desc=" Classification", leave=leave_pbar)
+            for doc in tqdm(x_test, desc=" Classification",
+                            leave=leave_pbar, disable=Print.is_quiet())
         ]
 
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
@@ -2235,6 +2236,40 @@ def vmax(v0, v1):
 def vdiv(v0, v1):
     """Vectorial version of division."""
     return [v0[i] / v1[i] if v1[i] else 0 for i in xrange(len(v0))]
+
+
+def set_verbosity(level):
+    """
+    Set the verbosity level.
+
+        - ``0`` (quiet): do not output any message (only error messages)
+        - ``1`` (normal): default behavior, display only warning messages and progress bars
+        - ``2`` (verbose): display also the informative non-essential messages
+
+    The following built-in constants can also be used to refer to these 3 values:
+    ``VERBOSITY.QUIET``, ``VERBOSITY.NORMAL``, and ``VERBOSITY.VERBOSE``, respectively.
+
+    For example, if you want PySS3 to hide everything, even progress bars, you could simply do:
+
+    >>> import pyss3
+    ...
+    >>> pyss3.set_verbosity(0)
+    ...
+    >>> # here's the rest of your code :D
+
+    or, equivalently:
+
+    >>> import pyss3
+    >>> from pyss3 import VERBOSITY
+    ...
+    >>> pyss3.set_verbosity(VERBOSITY.QUIET)
+    ...
+    >>> # here's the rest of your code :D
+
+    :param level: the verbosity level
+    :type level: int
+    """
+    Print.set_verbosity(level)
 
 
 # aliases
