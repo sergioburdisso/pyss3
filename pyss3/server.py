@@ -90,7 +90,7 @@ def get_http_contlength(http_request):
 
 
 class Server:
-    """SS3 HTTP server wrapper."""
+    """SS3's Live Test HTTP server class."""
 
     __port__ = 0  # any (free) port
     __clf__ = None
@@ -403,7 +403,7 @@ class Server:
         Server.__port__ = server_socket.getsockname()[1]
 
         Print.info(
-            "PySS3 server started (listening on port %d)" % Server.__port__,
+            "Live Test server started (listening on port %d)" % Server.__port__,
             force_show=True
         )
 
@@ -498,6 +498,9 @@ class Server:
             if quiet:
                 Print.verbosity_region_end()
 
+# more user-friendly aliases
+Live_Test = Server
+Live_Test.run = Server.serve
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PySS3 Live Test Server')
