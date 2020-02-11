@@ -11,7 +11,7 @@ from tqdm import tqdm
 from select import select
 from datetime import datetime
 
-from . import SS3
+from . import SS3, __version__
 from .util import RecursiveDefaultDict, Print, VERBOSITY
 
 import webbrowser
@@ -195,6 +195,7 @@ class Server:
         """Serve the 'get_info' message."""
         clf = Server.__clf__
         Server.__send_as_json__(sock, {
+            "version": __version__,
             "model_name": clf.get_name(),
             "hps": clf.get_hyperparameters(),
             "categories": clf.get_categories() + ["[unknown]"],
