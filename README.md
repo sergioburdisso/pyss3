@@ -97,8 +97,6 @@ Note: [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-star
 
 Just go to the [Getting Started](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html) page :D
 
-
-
 ### Installation
 
 
@@ -111,6 +109,14 @@ Or, if you already have installed an old version, update it with:
 pip install --upgrade pyss3
 ```
 
+## Want to contribute to this open-source project? :sparkles::octocat::sparkles:
+
+Thanks for your interest in the project, you're ![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)!!
+Any kind of help is very welcome, from simple ideas, suggestions, recommendations to any type of improvement on the source code of this repo, in other words, Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to a new feature, help us make PySS3 better :+1:.
+
+Remember that you can use the "Edit" button ('pencil' icon) up the top to [edit any file of this repo directly on GitHub](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-your-repository).
+
+In case you're planning to create a **new Pull Request**, for committing to this repo, we follow the Chris Beams' "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/)), so make sure your commits follow them as well.
 
 
 ## Further Readings :scroll:
