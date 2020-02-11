@@ -9,7 +9,7 @@ Movie Review (Sentiment Analysis) Tutorial Source Code (Classic Workflow).
 # Before we begin, let's import needed modules...
 from pyss3 import SS3
 from pyss3.util import Dataset
-from pyss3.server import Server
+from pyss3.server import Live_Test
 
 from sklearn.metrics import accuracy_score
 from os import system
@@ -50,7 +50,7 @@ print("Accuracy:", accuracy_score(y_pred, y_test))
 
 # Not bad using the default hyper-parameters values, let's now manually
 # analyze what our model has actually learned by using the interactive "live test".
-Server.serve(clf, x_test, y_test)
+Live_Test.run(clf, x_test, y_test)
 
 # Makes sense to you?
 # (remember you can select "words" as the Description Level if you want to know
@@ -83,7 +83,7 @@ print("Accuracy:", accuracy_score(y_pred, y_test))
 # using the interactive "live test" to observe what our model has learned (like
 # "was supposed to", "has nothing to", "low budget", "your money", etc. for the
 # "negative" class). Let's see...
-Server.serve(clf, x_test, y_test)
+Live_Test.run(clf, x_test, y_test)
 
 # As described in the "Hyper-parameter Optimization" section of the tutorial,
 # (https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html#hyper-parameter-optimization)

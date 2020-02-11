@@ -9,7 +9,7 @@ Topic Categorization Tutorial Source Code (Classic Workflow).
 # Before we begin, let's import needed modules...
 from pyss3 import SS3
 from pyss3.util import Dataset
-from pyss3.server import Server
+from pyss3.server import Live_Test
 
 from sklearn.metrics import accuracy_score
 from os import system
@@ -62,12 +62,12 @@ print("Accuracy:", accuracy_score(y_pred, y_test))
 # (*) try it if you want but since `x_test` contains (preprocessed) tweets,
 # they don't look really good and clean.
 #
-# Server.serve(clf, x_test, y_test)  # <- this visualization doesn't look really clean and good so,
-#                                    #     instead, we will use the documents in "live_test" folder:
+# Live_Test.run(clf, x_test, y_test)  # <- this visualization doesn't look really clean and good so,
+#                                     #     instead, we will use the documents in "live_test" folder:
 
-Server.set_testset_from_files("datasets/topic/live_test")
+Live_Test.set_testset_from_files("datasets/topic/live_test")
 
-Server.serve(clf)
+Live_Test.run(clf)
 
 # Live test doesn't look bad, however, we will create a "more intelligent" version of this model,
 # a version that can recognize variable-length word n-grams "on the fly". Thus, when calling the
@@ -99,7 +99,7 @@ print("Accuracy:", accuracy_score(y_pred, y_test))
 # interactive "live test" to observe what our model has learned (like "machine learning",
 # "artificial intelligence", "self-driving cars", etc. for the "science&technology" category.
 # Let's see...
-Server.serve(clf)
+Live_Test.run(clf)
 
 # Fortunately, our model has learned to recognize these important sequences (such as
 # "artificial intelligence" and "machine learning" in doc_2.txt,  "self-driving cars"
@@ -127,7 +127,7 @@ print("Accuracy:", accuracy_score(y_pred, y_test))
 #
 # Let's perform the last check and visualize what our final model has
 # learned and how it is classifying the documents...
-Server.serve(clf)
+Live_Test.run(clf)
 
 
 # Perfect! now the documents are classified properly! (including *doc_3.txt*) :D
