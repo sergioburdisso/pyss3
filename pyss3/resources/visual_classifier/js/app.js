@@ -302,7 +302,7 @@ app.controller("mainCtrl", function($scope) {
     for (var ip=0; ip < $ss3.pars.length; ip++){
       var par = $ss3.pars[ip];
       par.index = pari++;
-      if (!((par.sents.length + par.sents[0].words.length) == 2 && !par.sents[0].words[0].lexeme)){
+      if (!(par.sents.length == 1 && par.sents[0].words.length == 1 && !par.sents[0].words[0].token)){
         if (crow_pars)
           crow_pars.add(par.cv);
         else
