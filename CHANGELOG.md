@@ -2,6 +2,27 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.4.0] 2020-02-11
+
+Among other minior improvements and changes, the most important ones that were added are:
+
+### Added
+
+- ``SS3`` class:
+  - The classifier now explicitely supports multi-label classification:
+    - Created the following two methods in ``SS3`` class: [``classify_multilabel``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel) and [``classify_label``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.classify_label) ([0759bca](https://github.com/sergioburdisso/pyss3/commit/0759bca4392b2441d8a3668c8aca6bd85791e06f)).
+    - A ``multilabel`` argument was added to the ``predict`` method ([c5ac946](https://github.com/sergioburdisso/pyss3/commit/c5ac94681196fb5f7b22fe39a9f6b5bda5362d13)). 
+  - A new [``extract_insight()``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.extract_insight)  method was added to the ``SS3`` class. This method, given a document, returns the pieces of text that were involved in the classification decision ([eee1e29](https://github.com/sergioburdisso/pyss3/commit/eee1e292f410679ea3d25ba45bc1e70c57a3613c)).
+  - Created four new methods to allow the user to set the delimiters ([b632fe0](https://github.com/sergioburdisso/pyss3/commit/b632fe05526ed7596b49867094a56718e6fbc219))
+    - [``set_block_delimiters``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.set_block_delimiters)
+    - [``set_delimiter_paragraph``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.set_delimiter_paragraph)
+    - [``set_delimiter_sentence``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.set_delimiter_sentence)
+    - [``set_delimiter_word``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.set_delimiter_word)
+- Live Test tool:
+  - Improved the the interface by which "Live Test" Server was called from source code, now its usage is more user-friendly and less misleading (read [516b526](https://github.com/sergioburdisso/pyss3/commit/516b52685da3649dfcb64650d3cdaf4ee5ae8d3a) for more info).
+  - Improved the way by which multi-label classification was carried out in the Web interface ([046f9f4](https://github.com/sergioburdisso/pyss3/commit/046f9f424a241ce0cdef833d2561ff80bb3f5b2e)).
+- Improved how PySS3 handles verbosity levels (read [216be41](https://github.com/sergioburdisso/pyss3/commit/216be41e4824f60071be219ce783134528cde795) for more info ): created the [``set_verbosity()``](https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.set_verbosity) function.
+
 ## [0.3.9] 2019-11-27
 
 ### Added
