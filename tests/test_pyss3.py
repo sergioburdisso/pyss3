@@ -3,7 +3,8 @@ from os import path
 from shutil import rmtree
 from pyss3.util import Dataset
 from pyss3 import \
-    SS3, STR_NORM_GV_XAI, STR_XAI, STR_MOST_PROBABLE, \
+    SS3, STR_NORM_GV_XAI, STR_NORM_GV, STR_GV, \
+    STR_XAI, STR_VANILLA, STR_MOST_PROBABLE, \
     STR_UNKNOWN, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, \
     PARA_DELTR, SENT_DELTR, WORD_DELTR
 
@@ -55,9 +56,9 @@ y_test = ["sports",
           "music",
           "science&technology"]
 
-stopwords = ['by', 'the', 'for', 'of', 'new', 'to', 'with', 'is', 'at', 'and', 'in', 'this', 'out']
+STOPWORDS = ['by', 'the', 'for', 'of', 'new', 'to', 'with', 'is', 'at', 'and', 'in', 'this', 'out']
 
-doc_insight = "Dude, this text is about sports. Football soccer, you know!\nSecond paragraph."
+doc_insight = "Dude, this text is about sports. Football soccer, you know!\n2nd paragraph."
 doc_unknown = "bla bla bla."
 doc_blocks0 = "is this a sentence? a paragraph?!who knows"
 doc_blocks1 = "these-are-words"
@@ -68,7 +69,7 @@ def argmax(lst):
     return max(range(len(lst)), key=lst.__getitem__)
 
 
-def perform_tests_with(clf, cv_test):
+def perform_tests_with(clf, cv_test, stopwords=True):
     """Perform some tests with the given classifier."""
     multilabel_doc = x_test[0] + x_test[1]
     multilabel_labels = [y_test[0], y_test[1]]
@@ -109,6 +110,11 @@ def perform_tests_with(clf, cv_test):
     assert y_pred[0] == [0] * len(clf.get_categories())
 
     # classify
+    assert clf.classify("") == []
+
+    pred = clf.classify(doc_unknown, sort=False, prep=False)
+    assert pred == [0] * len(clf.get_categories())
+
     pred = clf.classify(doc_unknown, sort=False)
     assert pred == [0] * len(clf.get_categories())
 
@@ -155,8 +161,9 @@ def perform_tests_with(clf, cv_test):
     assert y_pred[0] == new_cat
 
     # get_stopwords
-    learned_stopwords = clf.get_stopwords(.01)
-    assert [sw for sw in stopwords if sw in learned_stopwords] == stopwords
+    if stopwords:
+        learned_stopwords = clf.get_stopwords(.01)
+        assert [sw for sw in STOPWORDS if sw in learned_stopwords] == STOPWORDS
 
     # set_block_delimiters
     pred = clf.classify(doc_blocks0, json=True)
@@ -221,16 +228,54 @@ def test_pyss3_ss3():
         clf.predict_proba(x_test)
 
     # train and predict/classify tests (model: terms are single words)
+    # cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [.00114, .00295, 0, 0, 0, .00016, .01894, 8.47741])
 
+    # cv_m=STR_NORM_GV, sn_m=STR_XAI
+    clf = SS3(
+        s=.45, l=.5, p=1, a=0, name="test-norm-gv-sn-xai",
+        cv_m=STR_NORM_GV, sn_m=STR_XAI
+    )
+    clf.fit(x_train, y_train)
+
+    perform_tests_with(clf, [0.00114, 0.00295, 0, 0, 0, 0.00016, 0.01894, 8.47741])
+
+    # cv_m=STR_GV, sn_m=STR_XAI
+    clf = SS3(
+        s=.45, l=.5, p=1, a=0, name="test-gv-sn-xai",
+        cv_m=STR_GV, sn_m=STR_XAI
+    )
+    clf.fit(x_train, y_train)
+
+    perform_tests_with(clf, [0.00062, 0.00109, 0, 0, 0, 0.00014, 0.01894, 6.31228])
+
+    # cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
+    clf = SS3(
+        s=.45, l=.5, p=1, a=0, name="test-norm-gv-xai-sn-vanilla",
+        cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
+    )
+    clf.fit(x_train, y_train)
+
+    perform_tests_with(clf, [0.00114, 0.00295, 0, 0, 0, 0.00016, 0.01894, 8.47741], stopwords=False)
+
     # train and predict/classify tests (model: terms are word n-grams)
     clf = SS3(
-        s=.32, l=1.24, p=1.1, a=0, name="test-3grams",
+        name="test-3grams",
         cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
     )
+
     clf.fit(x_train, y_train, n_grams=3)
+
+    # update_values
+    clf.set_l(.3)
+    clf.update_values()
+    clf.set_p(.2)
+    clf.update_values()
+    clf.set_hyperparameters(s=.32, l=1.24, p=1.1, a=0)
+    clf.update_values()
+    clf.update_values()
 
     perform_tests_with(clf, [.00074, .00124, 0, 0, 0, .00028, .00202, 9.19105])
 
@@ -260,7 +305,20 @@ def test_pyss3_ss3():
     t = clf.extract_insight(doc_insight, level="sentence", sort=False)
     assert len(t) == 2 and t[0][0] == 'Dude, this text is about sports'
     t = clf.extract_insight(doc_insight, level="paragraph", min_cv=-1)
-    assert len(t) == 2 + 1 and t[2][0] == "Second paragraph."
+    assert len(t) == 2 + 1 and t[2][0] == "2nd paragraph."
+
+    with pytest.raises(pyss3.InvalidCategoryError):
+        clf.extract_insight(doc_insight, cat=STR_UNKNOWN_CATEGORY)
+    with pytest.raises(ValueError):
+        clf.extract_insight(doc_insight, level="invalid")
+
+    # prints
+    clf.print_model_info()
+    clf.print_hyperparameters_info()
+    clf.print_categories_info()
+    clf.print_ngram_info("machine learning")
+
+    # plot_value_distribution
 
     # load and save model tests
     clf.set_model_path("tests/")
@@ -290,6 +348,14 @@ def test_pyss3_ss3():
     clf.save_model("./tests/tmp/")
     clf.save_model()
     clf.load_model()
+
+    # save_vocab
+    clf.save_vocab("tests/tmp")
+
+    # save_cat_vocab
+    clf.save_cat_vocab("sports", "tests/tmp")
+    with pytest.raises(pyss3.InvalidCategoryError):
+        clf.save_cat_vocab(STR_UNKNOWN_CATEGORY, "tests/tmp")
 
     rmtree("./tests/tmp", ignore_errors=True)
     rmtree("./tests/ss3_models", ignore_errors=True)

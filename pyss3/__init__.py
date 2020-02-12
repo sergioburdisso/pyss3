@@ -164,7 +164,7 @@ class SS3:
         self.__cv_mode__ = cv_m
         self.__sn_mode__ = sn_m
 
-    def __lv__(self, ngram, icat, cache=False):
+    def __lv__(self, ngram, icat, cache=True):
         """Local value function."""
         if cache:
             return self.__trie_node__(ngram, icat)[LV]
