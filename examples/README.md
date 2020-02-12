@@ -2,9 +2,12 @@
 
 This folder contains files related tutorials, for instance, the following two tutorials:
 
-[Movie Reviews (Sentiment Analysis)](https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html)
+:page_facing_up: [Movie Reviews (Sentiment Analysis)](https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html)
 
-[Topic Categorization](https://pyss3.readthedocs.io/en/latest/tutorials/topic-categorization.html)
+:page_facing_up: [Topic Categorization](https://pyss3.readthedocs.io/en/latest/tutorials/topic-categorization.html)
+
+:page_facing_up: [Getting the text fragments involved in the classification decision](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/extract_insight.ipynb)
+
 
 # Jupyter Notebook
 
