@@ -1,6 +1,8 @@
 build/
 __extra__
 .pytest_cache
+.coverage
+coverage.xml
 docs/_build
 tests/pyss3
 examples/datasets/movie_review
