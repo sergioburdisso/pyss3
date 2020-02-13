@@ -10,6 +10,7 @@ from pyss3 import \
 
 import pyss3
 import pytest
+import matplotlib.pyplot as plt
 
 DATASET_FOLDER = "dataset"
 
@@ -62,6 +63,13 @@ doc_insight = "Dude, this text is about sports. Football soccer, you know!\n2nd 
 doc_unknown = "bla bla bla."
 doc_blocks0 = "is this a sentence? a paragraph?!who knows"
 doc_blocks1 = "these-are-words"
+
+
+def plt_show():
+    """Do nothing."""
+    pass
+
+plt.show = plt_show
 
 
 def argmax(lst):
@@ -316,14 +324,18 @@ def test_pyss3_ss3():
     clf.print_model_info()
     clf.print_hyperparameters_info()
     clf.print_categories_info()
-    clf.print_ngram_info("machine learning")
+    clf.print_ngram_info("video games")
 
     # plot_value_distribution
+    clf.plot_value_distribution(y_test[0])
 
     # load and save model tests
     clf.set_model_path("tests/")
     clf.save_model()
     clf.load_model()
+
+    # get_next_words
+    assert clf.get_next_words("android", "science&technology")[0][0] == "mobile"
 
     clf = SS3(name="test-3grams")
 
