@@ -3,6 +3,7 @@ __extra__
 .pytest_cache
 .coverage
 coverage.xml
+htmlcov
 docs/_build
 tests/pyss3
 examples/datasets/movie_review
