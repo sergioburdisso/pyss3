@@ -1,4 +1,4 @@
-"""Tests for pytest."""
+"""Tests for pyss3."""
 from os import path
 from shutil import rmtree
 from pyss3.util import Dataset
@@ -6,11 +6,13 @@ from pyss3 import \
     SS3, STR_NORM_GV_XAI, STR_NORM_GV, STR_GV, \
     STR_XAI, STR_VANILLA, STR_MOST_PROBABLE, \
     STR_UNKNOWN, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, \
-    PARA_DELTR, SENT_DELTR, WORD_DELTR
+    PARA_DELTR, SENT_DELTR, WORD_DELTR, VERBOSITY
 
 import pyss3
 import pytest
 import matplotlib.pyplot as plt
+
+pyss3.set_verbosity(VERBOSITY.QUIET)
 
 DATASET_FOLDER = "dataset"
 
