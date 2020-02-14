@@ -115,8 +115,9 @@ class Server:
     def __recvall_body__(sock, data, length):
         """Receive all HTTP message body."""
         body = get_http_body(data)
-        while len(body) < length:
-            body += sock.recv(RECV_BUFFER).decode()
+        while len(body) < length and data:
+            data = sock.recv(RECV_BUFFER).decode()
+            body += data
         return url_decode(body)
 
     @staticmethod
