@@ -53,6 +53,50 @@ ENCODING = "utf-8"
 BASE_PATH = path.join(path.dirname(__file__), "resources/visual_classifier")
 
 
+def main():
+    """The main function to be called when called from the command-line."""
+    parser = argparse.ArgumentParser(description='PySS3 Live Test Server')
+
+    parser.add_argument('MODEL', help="the model name")
+    parser.add_argument('-ph', '--path', help="the test set path")
+    parser.add_argument(
+        '-l', '--label', choices=["file", "folder"], default="folder",
+        help="indicates where to read category labels from"
+    )
+    parser.add_argument(
+        '-p', '--port', type=int, default=0, help="the server port"
+    )
+    parser.add_argument(
+        '-q', '--quiet', help="quiet mode", action="store_true"
+    )
+    args = parser.parse_args()
+
+    if args.quiet:
+        Print.set_verbosity(VERBOSITY.QUIET)
+
+    Print.warn(
+        'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
+        '\nand you are welcome to redistribute it under certain conditions'
+        '\n(read license.txt for more details)\n', decorator=False
+    )
+
+    try:
+        clf = SS3(name=args.MODEL)
+        clf.load_model()
+    except IOError:
+        Print.error("No such model: '%s'" % args.MODEL)
+        exit()
+
+    Server.set_model(clf)
+    if args.path:
+        Server.set_testset_from_files(args.path, args.label == 'folder')
+
+    try:
+        Server.serve(port=args.port, browser=False, quiet=args.quiet)
+    except IOError:
+        Print.error("Error: port number already in use")
+
+
 def content_type(ext):
     """Given a file extension, return the content type."""
     return CONTET_TYPE[ext] if ext in CONTET_TYPE else CONTET_TYPE["_other_"]
@@ -505,43 +549,4 @@ Live_Test = Server
 Live_Test.run = Server.serve
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='PySS3 Live Test Server')
-
-    parser.add_argument('MODEL', help="the model name")
-    parser.add_argument('-ph', '--path', help="the test set path")
-    parser.add_argument(
-        '-l', '--label', choices=["file", "folder"], default="folder",
-        help="indicates where to read category labels from"
-    )
-    parser.add_argument(
-        '-p', '--port', type=int, default=0, help="the server port"
-    )
-    parser.add_argument(
-        '-q', '--quiet', help="quiet mode", action="store_true"
-    )
-    args = parser.parse_args()
-
-    if args.quiet:
-        Print.set_verbosity(VERBOSITY.QUIET)
-
-    Print.warn(
-        'PySS3 Server comes with ABSOLUTELY NO WARRANTY. This is free software,'
-        '\nand you are welcome to redistribute it under certain conditions'
-        '\n(read license.txt for more details)\n', decorator=False
-    )
-
-    try:
-        clf = SS3(name=args.MODEL)
-        clf.load_model()
-    except IOError:
-        Print.error("No such model: '%s'" % args.MODEL)
-        exit()
-
-    Server.set_model(clf)
-    if args.path:
-        Server.set_testset_from_files(args.path, args.label == 'folder')
-
-    try:
-        Server.serve(port=args.port, browser=False, quiet=args.quiet)
-    except IOError:
-        Print.error("Error: port number already in use")
+    main()
