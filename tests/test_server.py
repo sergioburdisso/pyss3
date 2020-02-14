@@ -30,6 +30,17 @@ webbrowser.open = lambda x: x
 
 pyss3.set_verbosity(0)
 
+x_train, y_train = Dataset.load_from_files(dataset_path_mr)
+x_train, y_train = Dataset.load_from_files(dataset_path, folder_label=False)
+clf = SS3()
+
+clf.fit(x_train, y_train)
+
+LT.get_port()
+
+LT.run()  # error
+LT.set_model(clf)
+
 
 class FakeArgs:
     """A fake version of args (argparse)."""
@@ -112,22 +123,6 @@ def test_http_helper_functions():
     assert s.get_http_path(http_request(request_path)) == request_path
     assert s.get_http_body(http_request("", request_body)) == request_body
     assert s.get_http_contlength(http_request("", request_body)) == len(request_body)
-
-
-def test_live_test_setters_and_getters():
-    """Live Test server test."""
-    global PORT, clf, x_train, y_train
-
-    x_train, y_train = Dataset.load_from_files(dataset_path_mr)
-    x_train, y_train = Dataset.load_from_files(dataset_path, folder_label=False)
-    clf = SS3()
-
-    clf.fit(x_train, y_train)
-
-    LT.get_port()
-
-    LT.run()  # error
-    LT.set_model(clf)
 
 
 def test_live_test(test_case):
