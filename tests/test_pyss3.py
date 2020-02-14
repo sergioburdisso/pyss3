@@ -8,6 +8,7 @@ from pyss3 import \
     STR_UNKNOWN, STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, \
     PARA_DELTR, SENT_DELTR, WORD_DELTR, VERBOSITY
 
+import sys
 import pyss3
 import pytest
 import matplotlib.pyplot as plt
@@ -330,7 +331,8 @@ def test_pyss3_ss3():
     clf.print_ngram_info("video games")
 
     # plot_value_distribution
-    clf.plot_value_distribution(y_test[0])
+    if sys.version_info[0] >= 3:
+        clf.plot_value_distribution(y_test[0])
 
     # load and save model tests
     clf.set_model_path("tests/")
