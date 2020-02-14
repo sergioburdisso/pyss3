@@ -7,6 +7,7 @@ import socket
 import pytest
 import pyss3
 import json
+import sys
 
 from os import path
 from pyss3 import SS3
@@ -15,6 +16,7 @@ from pyss3.util import Dataset, Print
 HTTP_REQUEST = "%s %s HTTP/1.1\r\nContent-Length: %d\r\n\r\n%s"
 RECV_BUFFER = 1024 * 1024  # 1MB
 
+PYTHON3 = sys.version_info[0] >= 3
 DATASET_FOLDER = "dataset"
 DATASET_FOLDER_MR = "dataset_mr"
 ADDRESS, PORT = "localhost", None
@@ -36,10 +38,9 @@ clf = SS3()
 
 clf.fit(x_train, y_train)
 
-LT.get_port()
-
-LT.run()  # error
+LT.serve()  # error
 LT.set_model(clf)
+LT.get_port()
 
 
 class FakeArgs:
@@ -89,11 +90,12 @@ def http_response_body(sock):
 
 def send_http_request(path, body='', get=False, json_rsp=True):
     """Send an HTTP  request to the Live Test Server."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.connect((ADDRESS, PORT))
-        sock.sendall(http_request(path, body, get, as_bytes=True))
-        r = http_response_body(sock)
-        return json.loads(r) if json_rsp and r else r
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ADDRESS, PORT))
+    sock.sendall(http_request(path, body, get, as_bytes=True))
+    r = http_response_body(sock)
+    sock.close()
+    return json.loads(r) if json_rsp and r else r
 
 
 @pytest.fixture(params=[0, 1, 2, 3])
@@ -119,7 +121,7 @@ def test_http_helper_functions():
     request_path = "/the/path"
     request_body = "the body"
     assert s.parse_and_sanitize("../../a/path/../../")[0][-17:] == "a/path/index.html"
-    assert s.parse_and_sanitize("/")[0][-11:] == "/index.html"
+    assert s.parse_and_sanitize("/")[0][-10:] == "index.html"
     assert s.get_http_path(http_request(request_path)) == request_path
     assert s.get_http_body(http_request("", request_body)) == request_body
     assert s.get_http_contlength(http_request("", request_body)) == len(request_body)
@@ -134,29 +136,31 @@ def test_live_test(test_case):
     else:
         Print.error = lambda _: None  # do nothing
 
-    # if live_test_server is None:
-    threading.Thread(
-        target=LT.run,
-        kwargs={
-            "x_test": x_train if test_case == 2 or test_case == 3 else None,
-            "y_test": y_train if test_case == 2 else None,
-            "quiet": test_case != 0
-        },
-        daemon=True
-    ).start()
+    serve_args = {
+        "x_test": x_train if test_case == 2 or test_case == 3 else None,
+        "y_test": y_train if test_case == 2 else None,
+        "quiet": test_case != 0
+    }
+
+    if PYTHON3:
+        threading.Thread(target=LT.serve, kwargs=serve_args, daemon=True).start()
+    else:
+        threading.Thread(target=LT.serve, kwargs=serve_args).start()
 
     if test_case == 3:
         return
 
     # empty message
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.connect((ADDRESS, PORT))
-        sock.sendall(b'')
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ADDRESS, PORT))
+    sock.sendall(b'')
+    sock.close()
 
     # decode error
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.connect((ADDRESS, PORT))
-        sock.sendall(b'\x01\x0E\xFF\xF0\x02\x0F\xE1')
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ADDRESS, PORT))
+    sock.sendall(b'\x01\x0E\xFF\xF0\x02\x0F\xE1')
+    sock.close()
 
     # 404 error
     send_http_request("/404")
