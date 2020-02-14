@@ -145,7 +145,8 @@ def test_live_test(test_case):
     if PYTHON3:
         threading.Thread(target=LT.serve, kwargs=serve_args, daemon=True).start()
     else:
-        threading.Thread(target=LT.serve, kwargs=serve_args).start()
+        return
+        # threading.Thread(target=LT.serve, kwargs=serve_args).start()
 
     if test_case == 3:
         return
@@ -201,6 +202,9 @@ def test_main():
     """Test the main() function."""
     global clf
     argparse.ArgumentParser = fake_argument_parser
+
+    if not PYTHON3:
+        return
 
     SS3.load_model = SS3.get_s  # i.e. do nothing
     LT.serve = fake_argument_parser  # i.e. do nothing
