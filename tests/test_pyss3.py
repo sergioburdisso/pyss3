@@ -71,6 +71,7 @@ def plt_show():
     """Do nothing."""
     pass
 
+
 plt.show = plt_show
 
 
