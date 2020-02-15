@@ -62,7 +62,7 @@ if __name__ == "__main__":
                             'matplotlib'],
           tests_require=['pytest',
                          'pytest-mock'
-                         'pytest-cov>=2.5'
+                         'pytest-cov>=2.8.1'
                          'codecov',
                          'flake8',
                          'six',
