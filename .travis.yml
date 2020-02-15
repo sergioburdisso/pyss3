@@ -30,6 +30,3 @@ script:
   - flake8 pyss3
   - flake8 tests
   - pytest tests
-
-after_success:
-    - codecov

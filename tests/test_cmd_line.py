@@ -109,7 +109,8 @@ def test_ss3prompt(mocker, monkeypatch):
 
     # do_plot
     cmd.do_plot("evaluations")
-    cmd.do_plot("distribution food")
+    if PYTHON3:
+        cmd.do_plot("distribution food")
 
     cmd.do_plot("distribution")
     cmd.do_plot("distribution non-existing")
