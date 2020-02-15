@@ -1772,7 +1772,7 @@ class SS3Prompt(Cmd):
             cat, n_grams, document = self.args_learn(args)
 
             if document.strip():
-                CLF.learn(document, cat, max_depth=n_grams)
+                CLF.learn(document, cat, n_grams=n_grams)
                 ARGS_CATS = CLF.get_categories()
             else:
                 Print.info("empty document")
