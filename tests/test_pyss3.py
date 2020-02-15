@@ -11,7 +11,7 @@ from pyss3 import \
 import sys
 import pyss3
 import pytest
-import matplotlib.pyplot as plt
+import matplotlib.pyplot
 
 pyss3.set_verbosity(VERBOSITY.QUIET)
 
@@ -68,12 +68,10 @@ doc_blocks0 = "is this a sentence? a paragraph?!who knows"
 doc_blocks1 = "these-are-words"
 
 
-def plt_show():
-    """Do nothing."""
-    pass
-
-
-plt.show = plt_show
+@pytest.fixture()
+def mockers(mocker):
+    """Set mockers up."""
+    mocker.patch.object(matplotlib.pyplot, "show")
 
 
 def argmax(lst):
@@ -221,7 +219,7 @@ def test_pyss3_functions():
         pyss3.mad([], 0)
 
 
-def test_pyss3_ss3():
+def test_pyss3_ss3(mockers):
     """Test SS3."""
     clf = SS3(
         s=.45, l=.5, p=1, a=0, name="test",

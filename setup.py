@@ -61,6 +61,7 @@ if __name__ == "__main__":
                             'tqdm>=4.8.4',
                             'matplotlib'],
           tests_require=['pytest',
+                         'pytest-mock'
                          'flake8',
                          'six',
                          'cython',

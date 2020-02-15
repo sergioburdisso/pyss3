@@ -1,4 +1,5 @@
 pytest
+pytest-mock
 flake8
 six
 cython

@@ -38,13 +38,13 @@ clf = SS3()
 
 clf.fit(x_train, y_train)
 
-LT.serve()  # error
+LT.serve()  # no model error
 LT.set_model(clf)
 LT.get_port()
 
 
-class FakeArgs:
-    """A fake version of args (argparse)."""
+class MockCmdLineArgs:
+    """Mocked command-line arguments."""
 
     quiet = True
     MODEL = "name"
@@ -53,22 +53,28 @@ class FakeArgs:
     port = 0
 
 
-class FakeParser:
-    """A fake version of parser (argparse)."""
-
-    def add_argument(self, sn, ln=None, type=None,
-                     choices=None, default=None, action=None, help=''):
-        """Fake verion of parser.add argument (argparse)."""
-        pass
-
-    def parse_args(self):
-        """Fake verion of parser.parse args (argparse)."""
-        return FakeArgs
+@pytest.fixture()
+def mockers(mocker):
+    """Set mockers up."""
+    mocker.patch.object(argparse.ArgumentParser, "add_argument")
+    mocker.patch.object(argparse.ArgumentParser, "parse_args").return_value = MockCmdLineArgs
+    mocker.patch.object(SS3, "load_model")
+    mocker.patch.object(LT, "serve")
 
 
-def fake_argument_parser(description='', port=None, browser=None, quiet=None):
-    """Fake verion of argparse.ArgumentParser."""
-    return FakeParser()
+@pytest.fixture(params=[0, 1, 2, 3])
+def test_case(request):
+    """Argument values generator for test_live_test(test_case)."""
+    if request.param == 0:
+        LT.set_testset_from_files(dataset_path, folder_label=False)
+    elif request.param == 1:
+        LT.set_testset_from_files(dataset_path_mr, folder_label=True)
+    elif request.param == 2:
+        LT.set_testset(x_train, y_train)
+    else:
+        LT.__server_socket__ = None
+
+    yield request.param
 
 
 def http_request(path, body='', get=False, as_bytes=False):
@@ -96,21 +102,6 @@ def send_http_request(path, body='', get=False, json_rsp=True):
     r = http_response_body(sock)
     sock.close()
     return json.loads(r) if json_rsp and r else r
-
-
-@pytest.fixture(params=[0, 1, 2, 3])
-def test_case(request):
-    """Argument values generator for test_live_test(test_case)."""
-    if request.param == 0:
-        LT.set_testset_from_files(dataset_path, folder_label=False)
-    elif request.param == 1:
-        LT.set_testset_from_files(dataset_path_mr, folder_label=True)
-    elif request.param == 2:
-        LT.set_testset(x_train, y_train)
-    else:
-        LT.__server_socket__ = None
-
-    yield request.param
 
 
 def test_http_helper_functions():
@@ -198,14 +189,9 @@ def test_live_test(test_case):
     assert "</html>" in r
 
 
-def test_main():
+def test_main(mockers):
     """Test the main() function."""
-    global clf
-    argparse.ArgumentParser = fake_argument_parser
-
     if not PYTHON3:
         return
 
-    SS3.load_model = SS3.get_s  # i.e. do nothing
-    LT.serve = fake_argument_parser  # i.e. do nothing
     s.main()
