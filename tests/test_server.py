@@ -1,6 +1,5 @@
 """Tests for pyss3.server."""
 import pyss3.server as s
-import webbrowser
 import threading
 import argparse
 import socket
@@ -64,7 +63,7 @@ def mockers(mocker):
 @pytest.fixture(params=[0, 1, 2, 3])
 def test_case(request, mocker):
     """Argument values generator for test_live_test(test_case)."""
-    mocker.patch.object(webbrowser, "open")
+    mocker.patch("webbrowser.open")
 
     if request.param == 0:
         LT.set_testset_from_files(dataset_path, folder_label=False)

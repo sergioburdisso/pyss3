@@ -11,7 +11,6 @@ from pyss3 import \
 import sys
 import pyss3
 import pytest
-import matplotlib.pyplot
 
 pyss3.set_verbosity(VERBOSITY.QUIET)
 
@@ -71,7 +70,7 @@ doc_blocks1 = "these-are-words"
 @pytest.fixture()
 def mockers(mocker):
     """Set mockers up."""
-    mocker.patch.object(matplotlib.pyplot, "show")
+    mocker.patch("matplotlib.pyplot.show")
 
 
 def argmax(lst):
