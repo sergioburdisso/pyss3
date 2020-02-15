@@ -28,8 +28,6 @@ dataset_path_mr = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER
 x_train, y_train = None, None
 clf = None
 
-webbrowser.open = lambda x: x
-
 pyss3.set_verbosity(0)
 
 x_train, y_train = Dataset.load_from_files(dataset_path_mr)
@@ -56,15 +54,18 @@ class MockCmdLineArgs:
 @pytest.fixture()
 def mockers(mocker):
     """Set mockers up."""
-    mocker.patch.object(argparse.ArgumentParser, "add_argument")
-    mocker.patch.object(argparse.ArgumentParser, "parse_args").return_value = MockCmdLineArgs
-    mocker.patch.object(SS3, "load_model")
     mocker.patch.object(LT, "serve")
+    mocker.patch.object(SS3, "load_model")
+    mocker.patch.object(argparse.ArgumentParser, "add_argument")
+    mocker.patch.object(argparse.ArgumentParser,
+                        "parse_args").return_value = MockCmdLineArgs
 
 
 @pytest.fixture(params=[0, 1, 2, 3])
-def test_case(request):
+def test_case(request, mocker):
     """Argument values generator for test_live_test(test_case)."""
+    mocker.patch.object(webbrowser, "open")
+
     if request.param == 0:
         LT.set_testset_from_files(dataset_path, folder_label=False)
     elif request.param == 1:
