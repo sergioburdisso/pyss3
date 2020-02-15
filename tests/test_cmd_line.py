@@ -17,7 +17,8 @@ dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 
 def test_ss3prompt(mocker, monkeypatch):
     """Test the Command-Line."""
-    monkeypatch.setattr('builtins.input', lambda: 'Y')
+    if PYTHON3:
+        monkeypatch.setattr('builtins.input', lambda: 'Y')
     mocker.patch.object(SS3Prompt, "cmdloop")
     mocker.patch("pyss3.cmd_line.STOPWORDS_FILE", "tests/ss3_models/ss3_stopwords[%s].txt")
     mocker.patch(

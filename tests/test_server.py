@@ -187,7 +187,7 @@ def test_live_test(test_case):
 
     # GET index.html
     r = send_http_request("/", get=True, json_rsp=False)
-    assert "</html>" in r
+    assert "<html>" in r
 
 
 def test_main(mockers):
