@@ -1347,31 +1347,39 @@ class SS3Prompt(Cmd):
         required arguments:
          NEW_MODEL_NAME      the model's new name
         """
+                """
+        Rename the current model with a given name.
+
+        usage:
+            rename NEW_MODEL_NAME
+
+        required arguments:
+         NEW_MODEL_NAME      the model's new name
+        """
         args = split_args(args)
 
         if len(args) == 1:
             m_folder = CLF.__models_folder__
             m_name = CLF.__name__
+            m_ext = STR_MODEL_EXT
+            model_file = path.join(m_folder, "%s.%s" % (m_name, m_ext))
+            model_new_file = path.join(m_folder, "%s.%s" % (args[0], m_ext))
             rh_ext = RESULT_HISTORY_EXT
             rh_file = path.join(m_folder, m_name + rh_ext)
             rh_new_file = path.join(m_folder, args[0] + rh_ext)
 
             rename = True
-            if path.exists(rh_new_file):
+            if path.exists(model_new_file):
                 print()
                 Print.warn(WARN_OVERWRITE, False)
                 if input() != 'Y':
                     rename = False
 
             if rename:
-                rename_file(rh_file, rh_new_file)
-
-                m_ext = STR_MODEL_EXT
-                model_file = path.join(m_folder, "%s.%s" % (m_name, m_ext))
-                model_new_file = path.join(
-                    m_folder, "%s.%s" % (args[0], m_ext)
-                )
-                rename_file(model_file, model_new_file)
+                if path.exists(rh_file):
+                    rename_file(rh_file, rh_new_file)
+                if path.exists(model_file):
+                    rename_file(model_file, model_new_file)
                 CLF.__name__ = args[0]
         else:
             Print.error(ERROR_WAN % (1, len(args)))
