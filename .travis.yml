@@ -10,8 +10,6 @@ jobs:
       python: 3.6
     - name: "Python 3.7 on Linux"
       python: 3.7
-      after_success:
-        - codecov
     - name: "Python 3.7.4 on macOS"
       os: osx
       osx_image: xcode11.2  # Python 3.7.4 running on macOS 10.14.4
@@ -32,3 +30,6 @@ script:
   - flake8 pyss3
   - flake8 tests
   - pytest -v --cov-report=xml --cov=pyss3 tests
+
+after_success:
+  - codecov
