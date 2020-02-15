@@ -1347,15 +1347,6 @@ class SS3Prompt(Cmd):
         required arguments:
          NEW_MODEL_NAME      the model's new name
         """
-                """
-        Rename the current model with a given name.
-
-        usage:
-            rename NEW_MODEL_NAME
-
-        required arguments:
-         NEW_MODEL_NAME      the model's new name
-        """
         args = split_args(args)
 
         if len(args) == 1:
