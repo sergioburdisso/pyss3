@@ -46,17 +46,17 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd.do_next_word("android")
     cmd.do_next_word('')  # doesn't work ¯\_(ツ)_/¯
 
-    # do_test
-    mocker.patch("matplotlib.pyplot.show")
     if PYTHON3:
+        mocker.patch("matplotlib.pyplot.show")
+        # do_test
         cmd.do_test(dataset_path + " file")
         cmd.do_test(dataset_path + " file")  # cache
         cmd.do_test(ArgsParserError)
 
-    # do_k_fold
-    cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")
-    cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")  # cache
-    cmd.do_k_fold(ArgsParserError)
+        # do_k_fold
+        cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")
+        cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")  # cache
+        cmd.do_k_fold(ArgsParserError)
 
     # do_grid_search
     cmd.do_grid_search(dataset_path + " file 3-fold p [.2] l [.2] s [.2]")
