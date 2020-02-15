@@ -1368,8 +1368,12 @@ class SS3Prompt(Cmd):
 
             if rename:
                 if path.exists(rh_file):
+                    if path.exists(rh_new_file):
+                        remove_file(rh_new_file)
                     rename_file(rh_file, rh_new_file)
                 if path.exists(model_file):
+                    if path.exists(model_new_file):
+                        remove_file(model_new_file)
                     rename_file(model_file, model_new_file)
                 CLF.__name__ = args[0]
         else:

@@ -48,9 +48,10 @@ def test_ss3prompt(mocker, monkeypatch):
 
     # do_test
     mocker.patch("matplotlib.pyplot.show")
-    cmd.do_test(dataset_path + " file")
-    cmd.do_test(dataset_path + " file")  # cache
-    cmd.do_test(ArgsParserError)
+    if PYTHON3:
+        cmd.do_test(dataset_path + " file")
+        cmd.do_test(dataset_path + " file")  # cache
+        cmd.do_test(ArgsParserError)
 
     # do_k_fold
     cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")
