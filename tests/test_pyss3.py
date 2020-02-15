@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for pyss3."""
 from os import path
 from shutil import rmtree

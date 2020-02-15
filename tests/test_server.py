@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for pyss3.server."""
 import pyss3.server as s
 import threading

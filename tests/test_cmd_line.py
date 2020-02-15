@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for pyss3.cmd_line."""
 from pyss3.cmd_line import SS3Prompt, main
 from pyss3.server import Server
@@ -5,10 +6,12 @@ from pyss3 import SS3
 from os import path
 
 import pytest
+import sys
 
 MODEL_NAME = "cmd_test"
 DATASET_FOLDER = "dataset"
 ArgsParserError = "1 2 3 4"
+PYTHON3 = sys.version_info[0] >= 3
 dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 
 
@@ -63,7 +66,8 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd.do_evaluations("info")
     cmd.do_evaluations("save")
     cmd.do_evaluations("plot")
-    cmd.do_evaluations("remove test s .2 l .2 p .2")
+    if PYTHON3:
+        cmd.do_evaluations("remove test s .2 l .2 p .2")
 
     cmd.do_evaluations("otherwise")
     cmd.do_evaluations(ArgsParserError)
@@ -144,11 +148,12 @@ def test_ss3prompt(mocker, monkeypatch):
 
     # do_rename
     cmd.do_rename(MODEL_NAME + "_renamed")
-    cmd.do_rename(MODEL_NAME)
-    mocker.patch("pyss3.cmd_line.MODELS", [MODEL_NAME])
-    cmd.do_new(MODEL_NAME)
-    cmd.do_load(MODEL_NAME + "_copy")
-    cmd.do_rename(MODEL_NAME)
+    if PYTHON3:
+        cmd.do_rename(MODEL_NAME)
+        mocker.patch("pyss3.cmd_line.MODELS", [MODEL_NAME])
+        cmd.do_new(MODEL_NAME)
+        cmd.do_load(MODEL_NAME + "_copy")
+        cmd.do_rename(MODEL_NAME)
 
     # do_license
     cmd.do_license("")

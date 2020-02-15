@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for pyss3.util."""
 from os import path
 from pyss3.util import Dataset, RecursiveDefaultDict, Print, VERBOSITY
