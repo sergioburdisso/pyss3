@@ -1,5 +1,7 @@
 pytest
 pytest-mock
+pytest-cov>=2.5
+codecov
 flake8
 six
 cython
