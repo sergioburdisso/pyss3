@@ -19,7 +19,7 @@ on.
 
 Let us begin! First, we need to import the modules we will be using:
 
-.. code:: ipython3
+.. code:: python
 
     from pyss3 import SS3
     from pyss3.util import Dataset
@@ -31,7 +31,7 @@ as this notebook file
 (`extract\_insight.ipynb <https://github.com/sergioburdisso/pyss3/blob/master/examples/extract_insight.ipynb>`__),
 we could simply use the following command-line command:
 
-.. code:: ipython3
+.. code:: shell
 
     !unzip -u datasets/topic.zip -d datasets/
 
@@ -44,7 +44,7 @@ related to these 8 different categories: *“art&photography”,
 “beauty&fashion”, “business&finance”, “food”, “health”, “music”,
 “science&technology” and “sports”*.
 
-.. code:: ipython3
+.. code:: python
 
     # [create a new instance of the SS3 classifier]
     # Just ignore those hyperparameter values (s=0.32, l=1.24, p=1.1)
@@ -107,7 +107,7 @@ parts involved in classifying it:
 
 We will assign it to the ``document`` variable:
 
-.. code:: ipython3
+.. code:: python
 
     document="""
     Effects of intensive short-term dynamic psychotherapy on social cognition in major depression
@@ -123,7 +123,7 @@ We will assign it to the ``document`` variable:
 Now, before we ask SS3 to extract those relevant fragments used for
 classifying this document, we will ask SS3 to classify it.
 
-.. code:: ipython3
+.. code:: python
 
     clf.classify_label(document)
 
@@ -147,7 +147,7 @@ in the classification decision, along with the *confidence values*
 associated with each (Its documentation is available
 `here <https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.extract_insight>`__).
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document)
     
@@ -161,7 +161,7 @@ associated with each (Its documentation is available
 
 Let's see what the first fragment looks like...
 
-.. code:: ipython3
+.. code:: python
 
     fragments[0]
 
@@ -179,7 +179,7 @@ As we can see, each returned fragment is a pair of the form
 ``(text fragment, confidence value)``, and therefore, if we want only
 the text we can select the only the first component:
 
-.. code:: ipython3
+.. code:: python
 
     print("Text:", fragments[0][0])
     print()
@@ -195,7 +195,7 @@ the text we can select the only the first component:
 
 Now, let's take a look at the entire ``fragments`` list:
 
-.. code:: ipython3
+.. code:: python
 
     fragments
 
@@ -241,7 +241,7 @@ assigned category. This is really desirable since in "real life"
 documents will be arbitrarily long, we can always use the top ``n``
 elements, for example, let's select the top 3 elements:
 
-.. code:: ipython3
+.. code:: python
 
     fragments[:3]
 
@@ -275,7 +275,7 @@ it is called ``classify_multilabel``. So let's ask SS3 to try to
 classify again the document, but this time getting rid of the
 "select-only-one-category" constraint imposed by ``classify_label``.
 
-.. code:: ipython3
+.. code:: python
 
     clf.classify_multilabel(document)
 
@@ -303,7 +303,7 @@ For instance, if we want SS3 to give us the text fragments that were
 used for classifying the document as ``science&technology``, we can do
 as follows:
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, cat="science&technology")
     
@@ -335,7 +335,7 @@ Just for fun, let's force SS3 to extract the text fragments that he
 would use to classify the document, in a parallel universe, as
 ``sports``-ish.
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, cat="sports")
     
@@ -368,7 +368,7 @@ If not given, by default ``window_size=3``, but bigger values produce
 longer fragments while smaller, you guessed it! shorter ones. Let's try
 out some values.
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, window_size=0) # window_size=0
     
@@ -385,7 +385,7 @@ out some values.
 
 
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, window_size=1) # window_size=1
     
@@ -402,7 +402,7 @@ out some values.
 
 
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, window_size=2) # window_size=2
     
@@ -422,7 +422,7 @@ out some values.
 
 
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, window_size=5) # window_size=5
     
@@ -453,7 +453,7 @@ constructed.
 For instance, let's ask SS3 to give us the most relevant paragraph that
 was used for classifying the document as scientific:
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, cat="science&technology", level="paragraph")
     
@@ -473,7 +473,7 @@ was used for classifying the document as scientific:
 
 And what about the 3 most relevant sentences to ``'health'``?
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(document, level="sentence")
     
@@ -502,7 +502,7 @@ these "@-paragraph" blocks are, in turn, composed of smaller blocks
 delimited by the # character (as if they were sentences). Let's also
 suppose that we want to analyze the following document:
 
-.. code:: ipython3
+.. code:: python
 
     weird_document="@Effects of#intensive short-term dynamic psychotherapy@on social cognition#in major depression@"
 
@@ -512,7 +512,7 @@ it will only return a single fragment since SS3 sees this weird document
 as a "normal" one, a document with a single paragraph with a single
 sentence:
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(weird_document, level="sentence")
     
@@ -534,13 +534,13 @@ can do this by using the ``set_block_delimiters`` method (documentation
 `here <https://pyss3.readthedocs.io/en/latest/api/index.html#pyss3.SS3.set_block_delimiters>`__),
 as follows:
 
-.. code:: ipython3
+.. code:: python
 
     clf.set_block_delimiters(parag="@", sent="#")
 
 Now, let's try again...
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(weird_document, level="sentence")
     
@@ -562,7 +562,7 @@ Perfect! this time, all four "#-sentences" got caught :)
 
 Let's see what happens with the @-paragraphs:
 
-.. code:: ipython3
+.. code:: python
 
     fragments = clf.extract_insight(weird_document, level="paragraph")
     
