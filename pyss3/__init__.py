@@ -323,6 +323,20 @@ class SS3:
         except TypeError:
             return 0
 
+    def __apply_fn__(self, fn, ngram, cat):
+        """Private method used by gv, lv, sn, sg functions."""
+        icat = self.get_category_index(cat)
+        if icat == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
+        if ngram.strip() == '':
+            return 0
+
+        ngram = [self.get_word_index(w)
+                 for w in re.split(self.__word_delimiter__, ngram)
+                 if w]
+        return fn(ngram, icat) if IDX_UNKNOWN_WORD not in ngram else 0
+
     def __classify_ngram__(self, ngram):
         """Classify the given n-gram."""
         cv = [
@@ -2123,6 +2137,122 @@ class SS3:
 
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
         return y_pred
+
+    def cv(self, ngram, cat):
+        """
+        Return the "confidence value" of a given word n-gram for the given category.
+
+        This value is obtained applying a final transformation on the global value
+        of the given word n-gram using the gv function [*].
+
+        These transformation are given when creating a new SS3 instance (see the
+        SS3 class constructor's ``cv_m`` argument for more information).
+
+        [*] the gv function is defined in Section 3.2.2 of the original paper:
+         https://arxiv.org/pdf/1905.08772.pdf
+
+        Example
+        >>> clf.cv("chicken", "food")
+        >>> clf.cv("roast chicken", "food")
+        >>> clf.cv("chicken", "sports")
+
+        :param ngram: the word or word n-gram
+        :type ngram: str
+        :param cat: the category label
+        :type cat: str
+        :returns: the confidence value
+        :rtype: float
+        :raises: InvalidCategoryError
+        """
+        return self.__apply_fn__(self.__cv__, ngram, cat)
+
+    def gv(self, ngram, cat):
+        """
+        Return the "global value" of a given word n-gram for the given category.
+
+        (gv function is defined in Section 3.2.2 of the original paper:
+         https://arxiv.org/pdf/1905.08772.pdf)
+
+        Example
+        >>> clf.gv("chicken", "food")
+        >>> clf.gv("roast chicken", "food")
+        >>> clf.gv("chicken", "sports")
+
+        :param ngram: the word or word n-gram
+        :type ngram: str
+        :param cat: the category label
+        :type cat: str
+        :returns: the global value
+        :rtype: float
+        :raises: InvalidCategoryError
+        """
+        return self.__apply_fn__(self.__gv__, ngram, cat)
+
+    def lv(self, ngram, cat):
+        """
+        Return the "local value" of a given word n-gram for the given category.
+
+        (lv function is defined in Section 3.2.2 of the original paper:
+         https://arxiv.org/pdf/1905.08772.pdf)
+
+        Example
+        >>> clf.lv("chicken", "food")
+        >>> clf.lv("roast chicken", "food")
+        >>> clf.lv("chicken", "sports")
+
+        :param ngram: the word or word n-gram
+        :type ngram: str
+        :param cat: the category label
+        :type cat: str
+        :returns: the local value
+        :rtype: float
+        :raises: InvalidCategoryError
+        """
+        return self.__apply_fn__(self.__lv__, ngram, cat)
+
+    def sg(self, ngram, cat):
+        """
+        Return the "significance factor" of a given word n-gram for the given category.
+
+        (sg function is defined in Section 3.2.2 of the original paper:
+         https://arxiv.org/pdf/1905.08772.pdf)
+
+        Example
+        >>> clf.sg("chicken", "food")
+        >>> clf.sg("roast chicken", "food")
+        >>> clf.sg("chicken", "sports")
+
+        :param ngram: the word or word n-gram
+        :type ngram: str
+        :param cat: the category label
+        :type cat: str
+        :returns: the significance factor
+        :rtype: float
+        :raises: InvalidCategoryError
+        """
+        return self.__apply_fn__(self.__sg__, ngram, cat)
+
+    def sn(self, ngram, cat):
+        """
+        Return the "sanction factor" of a given word n-gram for the given category.
+
+        (sn function is defined in Section 3.2.2 of the original paper:
+         https://arxiv.org/pdf/1905.08772.pdf)
+
+        Example
+        >>> clf.sn("chicken", "food")
+        >>> clf.sn("roast chicken", "food")
+        >>> clf.sn("chicken", "sports")
+
+        :param ngram: the word or word n-gram
+        :type ngram: str
+        :param cat: the category label
+        :type cat: str
+        :returns: the sanction factor
+        :rtype: float
+        :raises: InvalidCategoryError
+        """
+        return self.__apply_fn__(self.__sn__, ngram, cat)
 
 
 class EmptyModelError(Exception):

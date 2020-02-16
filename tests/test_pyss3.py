@@ -193,6 +193,20 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     clf.set_block_delimiters(parag=PARA_DELTR, sent=SENT_DELTR, word=WORD_DELTR)
 
 
+def perform_tests_on(fn, value, ngram="chicken", cat="food"):
+    """Perform tests on gv, lv, sn, or sg."""
+    assert round(fn(ngram, cat), 4) == value
+    assert round(fn("xxx", cat), 4) == 0
+    assert round(fn("the xxx chicken", cat), 4) == 0
+    assert round(fn("", cat), 4) == 0
+    with pytest.raises(pyss3.InvalidCategoryError):
+        fn("chicken", "xxx")
+    with pytest.raises(pyss3.InvalidCategoryError):
+        fn("chicken", "")
+    with pytest.raises(pyss3.InvalidCategoryError):
+        fn("", "")
+
+
 def test_pyss3_functions():
     """Test pyss3 functions."""
     assert pyss3.sigmoid(1, 0) == 0
@@ -242,6 +256,13 @@ def test_pyss3_ss3(mockers):
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [.00114, .00295, 0, 0, 0, .00016, .01894, 8.47741])
+    perform_tests_on(clf.cv, 0.4307)
+    perform_tests_on(clf.gv, 0.2148)
+    perform_tests_on(clf.lv, 0.2148)
+    perform_tests_on(clf.sg, 1)
+    perform_tests_on(clf.sn, 1)
+    perform_tests_on(clf.cv, 0, "video games", "science&technology")
+    perform_tests_on(clf.gv, 0, "video games", "science&technology")
 
     # cv_m=STR_NORM_GV, sn_m=STR_XAI
     clf = SS3(
@@ -251,6 +272,7 @@ def test_pyss3_ss3(mockers):
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [0.00114, 0.00295, 0, 0, 0, 0.00016, 0.01894, 8.47741])
+    perform_tests_on(clf.cv, 0.4307)
 
     # cv_m=STR_GV, sn_m=STR_XAI
     clf = SS3(
@@ -260,6 +282,7 @@ def test_pyss3_ss3(mockers):
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [0.00062, 0.00109, 0, 0, 0, 0.00014, 0.01894, 6.31228])
+    assert clf.cv("chicken", "food") == clf.gv("chicken", "food")
 
     # cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
     clf = SS3(
@@ -288,6 +311,11 @@ def test_pyss3_ss3(mockers):
     clf.update_values()
 
     perform_tests_with(clf, [.00074, .00124, 0, 0, 0, .00028, .00202, 9.19105])
+    perform_tests_on(clf.cv, 1.5664, "video games", "science&technology")
+    perform_tests_on(clf.gv, 0.6697, "video games", "science&technology")
+    perform_tests_on(clf.lv, 0.6697, "video games", "science&technology")
+    perform_tests_on(clf.sg, 1, "video games", "science&technology")
+    perform_tests_on(clf.sn, 1, "video games", "science&technology")
 
     # n-gram recognition tests
     pred = clf.classify("android mobile and video games", json=True)
