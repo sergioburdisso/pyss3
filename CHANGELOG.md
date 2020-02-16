@@ -2,6 +2,17 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.4.1] 2020-02-16
+
+### Added
+- Public methods for the SS3's ``cv``, ``gv``, ``lv``, ``sg`` and ``sn`` functions have been added to the ``SS3 class`` ([ef35b25](https://github.com/sergioburdisso/pyss3/commit/ef35b25d8e194569007e6274cbbde856941f5627)). These functions were originally defined in Section 3.2.2 of the [original paper](https://arxiv.org/pdf/1905.08772.pdf).
+- Slightly improving training time (due to previously disabled 'by-default' cache of "local value" function).
+
+### Fix
+
+- A bug on the HTTP Live Test Server ([d106d68](https://github.com/sergioburdisso/pyss3/commit/d106d68bad782c3e5bab9376fc7c4ec52a97cc5c))
+- Some bug on the Command-Line tool ([cd42b61](https://github.com/sergioburdisso/pyss3/commit/cd42b61c5c3e163f3aa5e7410fbeb27bb2180363), [8745603](https://github.com/sergioburdisso/pyss3/commit/874560356b439985e676b2a239958f4cb226368a), [dfe8b95](https://github.com/sergioburdisso/pyss3/commit/dfe8b952fadd7082b83f529110dd5e31b0a3e075))
+
 ## [0.4.0] 2020-02-11
 
 Among other minor improvements and changes, the most important ones that were added are:

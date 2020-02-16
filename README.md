@@ -6,7 +6,7 @@
 [![PyPI version](https://badge.fury.io/py/pyss3.svg)](https://badge.fury.io/py/pyss3)
 [![codecov](https://codecov.io/gh/sergioburdisso/pyss3/branch/master/graph/badge.svg)](https://codecov.io/gh/sergioburdisso/pyss3)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples)
-[![MIT License][license-badge]][license]
+[![MIT License](https://img.shields.io/github/license/boyney123/performance-budgets.svg)](LICENSE.txt)
 
 ---
 
@@ -150,7 +150,3 @@ Thanks goes to these awesome people ([emoji key](https://allcontributors.org/doc
 [API documentation](https://pyss3.readthedocs.io/en/latest/api/)
 
 [Paper preprint](https://arxiv.org/abs/1912.09322)
-
-
-[license-badge]: https://img.shields.io/github/license/boyney123/performance-budgets.svg
-[license]: LICENSE.txt
