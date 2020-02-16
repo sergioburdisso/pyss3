@@ -41,6 +41,19 @@ which implements the classifier using a clear API (very similar to that of `skle
     y_pred = clf.predict(x_test)
 ````
 
+Also, this class provides a handful of other useful methods, such as, for instance, [``classify_multilabel``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel) to provide [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification) support: 
+
+````python
+    doc = "Liverpool CEO Peter Moore on Building a Global Fanbase"
+    
+    # standard "single-label" classification
+    label = clf.classify_label(doc) # 'business'
+
+    # multi-label classification
+    labels = clf.classify_multilabel(doc)  # ['business', 'sports']
+````
+or [``extract_insight``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to allow the user to [get the text fragments involved in the classification decision](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/extract_insight.ipynb).
+
 ### :point_right: The `Live_Test` class
 
 which allows you to interactively test your model and visually see the reasons behind classification decisions, **with just one line of code**:
@@ -119,9 +132,9 @@ Remember that you can use the "Edit" button ('pencil' icon) up the top to [edit 
 
 In case you're planning to create a **new Pull Request**, for committing to this repo, we follow the Chris Beams' "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/), so make sure your commits follow them as well.
 
-### Contributors :blue_heart:
+<!-- ### Contributors :blue_heart:
 
-Thanks goes to these awesome people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these awesome people ([emoji key](https://allcontributors.org/docs/en/emoji-key -->
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
