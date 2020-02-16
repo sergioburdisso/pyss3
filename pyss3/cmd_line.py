@@ -681,10 +681,9 @@ def results(
         (Print.style.bold("accuracy"), accuracy)
     )
 
-    unknown_cati = len(categories) - 1
     unclassified = None
     if data_path and def_cat == STR_UNKNOWN:
-        unclassified = sum(map(lambda v: v == unknown_cati, y_pred))
+        unclassified = sum(map(lambda v: v == IDX_UNKNOWN_CATEGORY, y_pred))
 
     if data_path and unclassified:
         cat_acc = []
@@ -693,7 +692,7 @@ def results(
                 cat,
                 accuracy_score(
                     [
-                        CLF.get_category_index(cat) if y == unknown_cati else y
+                        CLF.get_category_index(cat) if y == IDX_UNKNOWN_CATEGORY else y
                         for y in y_pred
                     ],
                     y_true

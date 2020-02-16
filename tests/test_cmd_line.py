@@ -10,9 +10,11 @@ import sys
 
 MODEL_NAME = "cmd_test"
 DATASET_FOLDER = "dataset"
+DATASET_FOLDER_MR = "dataset_mr"
 ArgsParserError = "1 2 3 4"
 PYTHON3 = sys.version_info[0] >= 3
 dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
+dataset_path_mr = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER_MR)
 
 
 def test_ss3prompt(mocker, monkeypatch):
@@ -37,9 +39,13 @@ def test_ss3prompt(mocker, monkeypatch):
     # do_new
     cmd.do_new(MODEL_NAME)
 
+    # do_save evaluations - empty result history case
+    cmd.do_save("evaluations")
+
     # do_train
     cmd.do_train(dataset_path + " 3-grams file")
     cmd.do_train("non-existing 3-grams file")
+    cmd.do_train(dataset_path)  # no test documents
     cmd.do_train(ArgsParserError)
 
     # do_next_word
@@ -51,16 +57,28 @@ def test_ss3prompt(mocker, monkeypatch):
         # do_test
         cmd.do_test(dataset_path + " file")
         cmd.do_test(dataset_path + " file")  # cache
+        cmd.do_test(dataset_path + " file unknown")  # def_cat=unknown
+        cmd.do_test(dataset_path + " file xxx")  # def_cat=xxx
+        cmd.do_test(dataset_path + " file s .5 p")  # IndexError
+        cmd.do_test(dataset_path + " file s .5 l 'a'")  # BaseException
+        cmd.do_test("not-a-directory")
+        cmd.do_test(dataset_path)  # no documents
+        cmd.do_test(dataset_path_mr + " file")  # no documents
+        cmd.do_test(dataset_path_mr)  # unknown categories
         cmd.do_test(ArgsParserError)
 
         # do_k_fold
         cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")
         cmd.do_k_fold(dataset_path + " file 3-grams 3-fold")  # cache
+        cmd.do_k_fold(dataset_path + " file 3-grams 3-fold xxx")
+        cmd.do_k_fold(dataset_path_mr + " 3-grams 3-fold xxx")
         cmd.do_k_fold(ArgsParserError)
 
     # do_grid_search
-    cmd.do_grid_search(dataset_path + " file 3-fold p [.2] l [.2] s [.2]")
-    cmd.do_grid_search(dataset_path + " file 2-grams p [.2] l [.2] s [.2]")
+    cmd.do_grid_search(dataset_path + " file 3-fold unknown p [.2] l [.2] s [.2]")
+    cmd.do_grid_search(dataset_path + " file 2-grams unknown p [.2] l [.2] s [.2]")
+    cmd.do_grid_search(dataset_path + " file 2-grams xxx p [.2] l [.2] s [.2]")
+    cmd.do_grid_search(dataset_path_mr + " 2-grams p [.2] l [.2] s [.2]")
     cmd.do_grid_search(ArgsParserError)
 
     # do_evaluations
@@ -70,6 +88,8 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd.do_evaluations("plot")
     if PYTHON3:
         cmd.do_evaluations("remove test s .2 l .2 p .2")
+        cmd.do_evaluations("remove test")
+        cmd.do_evaluations("remove 3-fold")
 
     cmd.do_evaluations("otherwise")
     cmd.do_evaluations(ArgsParserError)
