@@ -52,7 +52,7 @@ Also, this class provides a handful of other useful methods, such as, for instan
     # multi-label classification
     labels = clf.classify_multilabel(doc)  # ['business', 'sports']
 ````
-or [``extract_insight``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to allow you to [get the text fragments involved in the classification decision](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/extract_insight.ipynb).
+or [``extract_insight``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to allow you to [extract the text fragments involved in the classification decision](https://pyss3.readthedocs.io/en/latest/tutorials/extract-insight.html).
 
 ### :point_right: The `Live_Test` class
 

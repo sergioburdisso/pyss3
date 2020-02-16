@@ -33,6 +33,20 @@ of ``sklearn``):
         clf.fit(x_train, y_train)
         y_pred = clf.predict(x_test)
 
+Also, this class provides a handful of other useful methods, such as, for instance, `classify_multilabel() <https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel>`__ to provide `multi-label classification <https://en.wikipedia.org/wiki/Multi-label_classification>`__ support: 
+
+.. code:: python
+
+    doc = "Liverpool CEO Peter Moore on Building a Global Fanbase"
+    
+    # standard "single-label" classification
+    label = clf.classify_label(doc) # 'business'
+
+    # multi-label classification
+    labels = clf.classify_multilabel(doc)  # ['business', 'sports']
+
+or `extract_insight() <https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight>`__ to allow you to :ref:`get the text fragments involved in the classification decision <extract-insight>`.
+
 
 The ``Live_Test`` class
 ~~~~~~~~~~~~~~~~~~~~
@@ -130,6 +144,12 @@ Just go to the :ref:`getting-started` page :D
 
 ----
 
+Want to contribute to this Open Source project?
+===============================================
+
+Thanks for your interest in the project, you're awesome! Take a look at the `project Githug repository <https://github.com/sergioburdisso/pyss3>`__, any kind of help is very welcome (Code, Bug reports, Content, Data, Documentation, Design, Examples, Ideas, Feedback, etc.),  Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to new features, help us make PySS3 better.
+
+
 Further Readings
 ================
 
@@ -153,6 +173,7 @@ Further Readings
    tutorials/setup
    tutorials/topic-categorization
    tutorials/movie-review
+   tutorials/extract-insight
 
 .. toctree::
    :maxdepth: 3

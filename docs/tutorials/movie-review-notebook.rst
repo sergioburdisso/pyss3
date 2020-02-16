@@ -3,10 +3,15 @@
 Movie Review (Sentiment Analysis) - Jupyter Notebook
 ====================================================
 
-This is the static (html) version of the notebook for the tutorial :ref:`"Movie Review - Classic
-Workflow" <movie-review_classic-workflow>`.
+.. raw:: html
 
-(the orginal notebook file, "movie_review.ipynb", can be found `here <https://github.com/sergioburdisso/pyss3/tree/master/examples>`__, and an interactive online version `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb>`__)
+    <br>
+    <div style="text-align:right; color: #585858"><i>To <b>open and run</b> this notebook <b style="color:#E66581">online</b>, click here: <a href="https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/movie_review.ipynb" target="_blank"><img src="https://mybinder.org/badge_logo.svg" style="display: inline"></a></i></div>
+    <br>
+    <br>
+
+This is the static (html) version of `the notebook <https://github.com/sergioburdisso/pyss3/tree/master/examples/movie_review.ipynb>`__ for the tutorial :ref:`"Movie Review - Classic
+Workflow" <movie-review_classic-workflow>`.
 
 --------------
 

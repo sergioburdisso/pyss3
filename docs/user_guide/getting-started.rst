@@ -41,11 +41,11 @@ User Guide
 Tutorials
 ----------
 
-Describes step-by-step how to develop classification models for:
-
 * :ref:`topic-categorization` 
 
 * :ref:`movie-reviews`
+
+* :ref:`extract-insight`
 
 
 API Documentation
