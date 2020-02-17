@@ -132,7 +132,7 @@ Remember that you can use the "Edit" button ('pencil' icon) up the top to [edit 
 
 In case you're planning to create a **new Pull Request**, for committing to this repo, we follow the Chris Beams' "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/), so make sure your commits follow them as well.
 
-Please do not hesitate to send an email to sergio.burdisso@gmail.com for anything.
+(please do not hesitate to send me an email to sergio.burdisso@gmail.com for anything)
 
 <!-- ### Contributors :blue_heart:
 
