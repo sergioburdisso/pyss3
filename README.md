@@ -18,6 +18,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 
 * It has the **ability to naturally explain its rationale**.
 * It is robust to **the class-imbalance problem** since it learns a (special kind of) language model for each class (making the relative difference in the number of documents among classes irrelevant).
+* Naturally supports both, **multinomial and multi-label classification**.
 * Naturally supports **incremental (online) learning** and **incremental classification**.
 * Well suited for classification over **text streams**.
 * It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
