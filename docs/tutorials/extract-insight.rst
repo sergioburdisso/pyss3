@@ -54,10 +54,6 @@ related to these 8 different categories: *“art&photography”,
     # but classification results would have been suboptimal (not optimized)
     clf = SS3(s=0.32, l=1.24, p=1.1)
     
-    # The following lines could be replaced with just a single "clf.load_model()" in case we have
-    # previously saved the model elsewhere (using "clf.save_model())", but since this notebook
-    # is meant to be run from anywhere, we will train our model from scratch: 
-    
     # Let's load the training set
     x_train, y_train = Dataset.load_from_files("datasets/topic/train", folder_label=False)
     
@@ -78,9 +74,8 @@ parts involved in classifying it:
        :name: effects-of-intensive-short-term-dynamic-psychotherapy-on-social-cognition-in-major-depression
 
     Background: Social cognition is commonly affected in psychiatric
-    disorders and is a determinant of quality of life.
-
-    However, there are few studies of treatment.
+    disorders and is a determinant of quality of life. However, there
+    are few studies of treatment.
 
     Objective: To investigate the efficacy of intensive short-term
     dynamic psychotherapy on social cognition in major depression.
@@ -120,7 +115,7 @@ We will assign it to the ``document`` variable:
     Conclusion: Depressed patients receiving ISTDP show a significant improvement in social cognition post treatment compared to a wait-list control group.
     """
 
-Now, before we ask SS3 to extract those relevant fragments used for
+Now, before we ask SS3 to extract those fragments that were relevant for
 classifying this document, we will ask SS3 to classify it.
 
 .. code:: python
@@ -141,7 +136,7 @@ Among the 8 learned category labels, SS3 decided to assign the label
 decision.
 
 Now we are ready to ask SS3 to extract the relevant fragments for us. To
-do this, we will use the ``clf.extract_insight()`` method. This new
+do this, we will use the ``clf.extract_insight()`` method. This 
 method, given a document, returns the pieces of text that were involved
 in the classification decision, along with the *confidence values*
 associated with each (Its documentation is available
@@ -177,7 +172,7 @@ Let's see what the first fragment looks like...
 
 As we can see, each returned fragment is a pair of the form
 ``(text fragment, confidence value)``, and therefore, if we want only
-the text we can select the only the first component:
+the text fragment we can select only the first component:
 
 .. code:: python
 
@@ -295,9 +290,9 @@ document is clearly a scientific article related to health.
 
 The problem is that, if we use ``extract_insight`` again in the same
 way, it will obviously show us the same result, that is, the fragments
-related to ``'health'`` (the category assigned if it has to select only
-one), how do we tell SS3 we want extract fragments related to other
-categories? using the ``cat`` argument!
+related to ``'health'`` (the category assigned if it had to select only
+one), how do we tell SS3 we want to extract fragments related to other
+categories? use the ``cat`` argument!
 
 For instance, if we want SS3 to give us the text fragments that were
 used for classifying the document as ``science&technology``, we can do
