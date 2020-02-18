@@ -130,7 +130,9 @@ Any kind of help is very welcome (Code, Bug reports, Content, Data, Documentatio
 
 Remember that you can use the "Edit" button ('pencil' icon) up the top to [edit any file of this repo directly on GitHub](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-your-repository).
 
-In case you're planning to create a **new Pull Request**, for committing to this repo, we follow the Chris Beams' "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/), so make sure your commits follow them as well.
+You could also help PySS3 to gain more visibility and reach the hands of people who may find it useful, by starring (:star2:) this repo since different search results are usually ordered by the total number of stars.
+
+Finally, in case you're planning to create a **new Pull Request**, for committing to this repo, we follow the "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/), so make sure your commits follow them as well.
 
 (please do not hesitate to send me an email to sergio.burdisso@gmail.com for anything)
 

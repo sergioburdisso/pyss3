@@ -268,7 +268,7 @@ method has, just in case some of them can be useful to you.
 What about the other categories?
 ================================
 
-SS3 provides a version of the ``clf.classify_label(long_document)``
+SS3 provides a version of the ``clf.classify_label``
 method for `multi-label
 classification <https://en.wikipedia.org/wiki/Multi-label_classification>`__,
 it is called ``classify_multilabel``. So let's ask SS3 to try to
