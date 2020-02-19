@@ -2032,7 +2032,10 @@ class SS3:
 
         x_train = [
             "".join([
-                x_train[i] if x_train[i][-1] == '\n' else x_train[i] + '\n'
+                x_train[i]
+                if x_train[i] and x_train[i][-1] == '\n'
+                else
+                x_train[i] + '\n'
                 for i in xrange(len(x_train))
                 if y_train[i] == cat
             ])
