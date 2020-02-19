@@ -417,6 +417,20 @@ class Print:
         Print.__verbosity__ = level
 
     @staticmethod
+    def get_verbosity():
+        """
+        Return the verbosity level.
+
+            - ``0`` (quiet): do not output any message (only error messages)
+            - ``1`` (normal): default behavior, display only warning messages and progress bars
+            - ``2`` (verbose): display also the informative non-essential messages
+
+        :returns: the verbosity level
+        :rtype: int
+        """
+        return Print.__verbosity__
+
+    @staticmethod
     def is_quiet():
         """Check if the current verbosity level is quiet."""
         return Print.__verbosity__ == VERBOSITY.QUIET
