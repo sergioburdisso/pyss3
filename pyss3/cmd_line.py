@@ -8,23 +8,16 @@ from __future__ import print_function
 from os import listdir, path, remove as remove_file, rename as rename_file
 from io import open
 from cmd import Cmd
-from tqdm import tqdm
-from math import ceil
-from numpy import mean, linspace
-from itertools import product
-from sklearn.metrics import classification_report, accuracy_score
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import StratifiedKFold
+
 
 from .server import Server
-from .util import Print, VERBOSITY, Dataset, RecursiveDefaultDict
+from .util import \
+    Evaluation, Print, VERBOSITY, Dataset, \
+    round_fix, span, frange, EVAL_CACHE_EXT
 from . import \
     SS3, InvalidCategoryError, STR_MODEL_EXT, \
-    STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, __version__
+    IDX_UNKNOWN_CATEGORY, __version__
 
-import numpy as np
-import webbrowser
-import json
 import sys
 import re
 try:
@@ -39,13 +32,6 @@ HISTFILE = '.ss3_history'
 HISTFILE_SIZE = 1000
 
 STOPWORDS_FILE = "./ss3_stopwords[%s].txt"
-RESULT_HTML_OUT_FILE = "./ss3_model_evaluation[%s].html"
-RESULT_HTML_SRC_FOLDER = "resources/model_evaluation/"
-RESULT_HISTORY_EXT = ".ss3ev"
-
-METRICS = ["precision", "recall", "f1-score"]
-EXCP_METRICS = ["accuracy", "confusion_matrix", "categories"]
-AVGS = ["micro avg", "macro avg", "weighted avg"]
 
 ERROR_MR = "A model is required: either load a model or create a new one"
 ERROR_AR = "Empty arguments: at least one argument must be given"
@@ -59,7 +45,7 @@ ERROR_HVM = ("Hyperparameter value missing: "
              "the value for the hyperparameter '%s' is missing")
 ERROR_NSF = "No such file: %s"
 ERROR_NSD = "No such directory: %s"
-ERROR_MNT = "Test not allowed: The model hasn't been trained yet"
+ERROR_MNT = "Evaluation not allowed: The model hasn't been trained yet"
 ERROR_WNAUA = "Wrong number of arguments: there are unknown arguments"
 ERROR_WNGRAM = ("Wrong n-grams argument value: "
                 "N should be a positive integer (e.g. 2-grams, 3-grams, etc.)")
@@ -107,13 +93,11 @@ ARGS = {
 ARGS["grid_search"] += ARGS["train"] + ARGS["test"] + ARGS_HYP
 
 MODELS = []
-RESULTS_HISTORY = None
 CLF = None
-F_PRECISION = 4
 
-frange = linspace  # an alias for grid_search command
-r = frange  # an alias for grid_search command
-
+# aliases for grid_search command
+r = span
+frange = frange  # to avoid flake8 F401 error
 
 try:
     input = raw_input  # Python 2
@@ -121,7 +105,7 @@ except NameError:
     pass
 
 
-class GetTestDataError(Exception):
+class LoadDataError(Exception):
     """Exception thrown when an error occur while retrieving the test data."""
 
     def __init__(self):
@@ -171,17 +155,6 @@ def requires_args(func):
     return arg_check
 
 
-def json2rh(dct):
-    """Convert a given dictionary to a RecursiveDefaultDict."""
-    r_ddct = RecursiveDefaultDict()
-    for key in dct.keys():
-        try:
-            r_ddct[float(key)] = dct[key]
-        except ValueError:
-            r_ddct[key] = dct[key]
-    return r_ddct
-
-
 def split_args(args):
     """Parse and split arguments."""
     return [a.strip('"-') for a in re.findall(r'[^\s\"]+|".+"', args)]
@@ -219,11 +192,6 @@ def parse_hparams_args(op_args, defaults=True):
     return hparams, used_args_ix
 
 
-def k_fold2method(k_fold):
-    """Convert the k number to a proper method string."""
-    return STR_TEST if k_fold == 1 else str(k_fold) + '-' + STR_FOLD
-
-
 def intersect(l0, l1):
     """Given two lists return the intersection."""
     return [e for e in l0 if e in l1]
@@ -241,249 +209,6 @@ def re_in(regex, l):
         if match:
             return match
     return None
-
-
-def module_path(file_path):
-    """Convert a file path relative to this module path."""
-    return path.join(path.dirname(__file__), file_path)
-
-
-def round_fix(v):
-    """Round the number v (used to keep the results history file small)."""
-    return round(float(v), F_PRECISION)
-
-
-def k_fold_classification_report(data_path, method, def_cat, s, l, p, a):
-    """Create the classification report for k-fold validations."""
-    s, l = round_fix(s), round_fix(l)
-    p, a = round_fix(p), round_fix(a)
-
-    rh = get_results_history(data_path, method, def_cat)
-    categories = rh["categories"]
-
-    name_width = max(len(cn) for cn in categories)
-    width = max(name_width, len(AVGS[-1]))
-    head_fmt = '{:>{width}s} ' + ' {:>9}' * len(METRICS)
-
-    report = head_fmt.format('', *['avg'] * len(METRICS), width=width)
-    report += '\n'
-    report += head_fmt.format('', *METRICS, width=width)
-    report += '\n\n'
-
-    for cat in categories:
-        report += '{:>{width}s} '.format(cat, width=width)
-        for metric in METRICS:
-            report += ' {:>9.2f}'.format(
-                rh[metric]["categories"][cat]["value"][s][l][p][a]
-            )
-        report += '\n'
-    report += '\n'
-    for avg in AVGS:
-        if avg in rh[metric]:
-            report += '{:>{width}s} '.format(avg, width=width)
-            for metric in METRICS:
-                report += ' {:>9.2f}'.format(
-                    rh[metric][avg]["value"][s][l][p][a]
-                )
-            report += '\n'
-
-    report += "\n\n %s: %.3f\n" % (
-        Print.style.bold("avg accuracy"), rh["accuracy"]["value"][s][l][p][a]
-    )
-
-    Print.show(report)
-
-    plot_confusion_matrices(
-        rh["confusion_matrix"][s][l][p][a], categories,
-        r"$\sigma=%.3f; \lambda=%.3f; \rho=%.3f; \alpha=%.3f$"
-        %
-        (s, l, p, a)
-    )
-
-
-def plot_confusion_matrices(cms, classes, info='', max_colums=3):
-    """Show and plot the confusion matrices."""
-    import matplotlib.pyplot as plt
-
-    n_cms = len(cms)
-
-    rows = int(ceil(n_cms / (max_colums + .0)))
-    columns = max_colums if n_cms > max_colums else n_cms
-
-    title = 'Confusion Matri%s' % ('x' if n_cms == 1 else 'ces')
-
-    if info:
-        title += "\n(%s)" % info
-
-    fig, _ = plt.subplots(rows, columns, figsize=(8, 8))
-    # fig.tight_layout()
-
-    if n_cms > 1:
-        fig.suptitle(title + '\n', fontweight="bold")
-
-    for axi, ax in enumerate(fig.axes):
-        if axi >= n_cms:
-            fig.delaxes(ax)
-            continue
-
-        cm = np.array(cms[axi])
-        ax.set_xticks(np.arange(cm.shape[1]))
-        ax.set_yticks(np.arange(cm.shape[0]))
-        im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Purples)
-
-        if n_cms == 1:
-            ax.figure.colorbar(im, ax=ax)
-
-        if n_cms == 1:
-            ax.set_title(title + '\n', fontweight="bold")
-
-        if (axi % max_colums) == 0:
-            ax.set_ylabel('True', fontweight="bold")
-            ax.set_yticklabels(classes)
-        else:
-            ax.tick_params(labelleft=False)
-
-        if axi + 1 > n_cms - max_colums:
-            ax.set_xlabel('Predicted', fontweight="bold")
-            ax.set_xticklabels(classes)
-        else:
-            ax.tick_params(labelbottom=False)
-
-        # Rotate the tick labels and set their alignment.
-        plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
-                 rotation_mode="anchor")
-
-        # Loop over data dimensions and create text annotations.
-        thresh = cm.max() / 2.
-        for i in range(cm.shape[0]):
-            for j in range(cm.shape[1]):
-                ax.text(j, i, str(cm[i, j]),
-                        ha="center", va="center",
-                        color="white" if cm[i, j] > thresh else "black")
-    plt.show()
-
-
-def load_results_history():
-    """Load results history (evaluations) from disk."""
-    global RESULTS_HISTORY
-
-    if not RESULTS_HISTORY:
-        Print.info("loading results history")
-        try:
-            rh_path = path.join(
-                CLF.__models_folder__,
-                CLF.__name__ + RESULT_HISTORY_EXT
-            )
-            with open(rh_path, "r", encoding=ENCODING) as json_file:
-                RESULTS_HISTORY = json.loads(
-                    json_file.read(),
-                    object_hook=json2rh
-                )
-        except IOError:
-            Print.info("no results history found, creating a new one")
-            RESULTS_HISTORY = RecursiveDefaultDict()
-
-
-def save_results_history():
-    """Save results history (evaluations) to disk."""
-    Print.info("saving results")
-    rh_path = path.join(
-        CLF.__models_folder__,
-        CLF.__name__ + RESULT_HISTORY_EXT
-    )
-    with open(rh_path, "w", encoding=ENCODING) as json_file:
-        try:  # Python 3
-            json_file.write(json.dumps(RESULTS_HISTORY))
-        except TypeError:  # Python 2
-            json_file.write(json.dumps(RESULTS_HISTORY).decode(ENCODING))
-
-
-def get_global_best(values):
-    """Given a list of evaluations values, return the best one."""
-    best = RecursiveDefaultDict()
-    best["value"] = -1
-    for s in values:
-        for l in values[s]:
-            for p in values[s][l]:
-                for a in values[s][l][p]:
-                    if values[s][l][p][a] > best["value"]:
-                        best["value"] = values[s][l][p][a]
-                        best["s"] = s
-                        best["l"] = l
-                        best["p"] = p
-                        best["a"] = a
-    return best
-
-
-def save_html_evaluations(show_plot=True):
-    """Save results history (evaluations) to disk (interactive html file)."""
-    load_results_history()
-
-    if not RESULTS_HISTORY:
-        Print.info("results history is empty")
-        Print.warn(
-            "Suggestion: evaluate your model using the commands "
-            "'test', 'k-fold' or 'grid_search'"
-        )
-        return
-
-    html_src = RESULT_HTML_SRC_FOLDER
-    result_html_file = RESULT_HTML_OUT_FILE % CLF.__name__
-    fout = open(result_html_file, 'w', encoding=ENCODING)
-    fhtml = open(
-        module_path(html_src + "model_evaluation.html"),
-        'r', encoding=ENCODING
-    )
-
-    for line in fhtml.readlines():
-        if "plotly.min.js" in line:
-            plotly_path = module_path(html_src + "plotly.min.js")
-            with open(plotly_path, 'r', encoding=ENCODING) as fplotly:
-                fout.write(u'    <script type="text/javascript">')
-                fout.write(fplotly.read())
-                fout.write(u'</script>\n')
-
-        elif "angular.min.js" in line:
-            angular_path = module_path(html_src + "angular.min.js")
-            with open(angular_path, 'r', encoding=ENCODING) as fangular:
-                fout.write(u'    <script type="text/javascript">')
-                fout.write(fangular.read())
-                fout.write(u'</script>\n')
-
-        elif "data.js" in line:
-            fout.write(u'    <script type="text/javascript">')
-            fout.write(u'var $model_name = "%s"; ' % CLF.get_name())
-            fout.write(
-                u'var $results = JSON.parse("%s");'
-                %
-                json.dumps(RESULTS_HISTORY).replace('"', r'\"')
-            )
-            fout.write(u'</script>\n')
-        else:
-            fout.write(line)
-
-    fhtml.close()
-    fout.close()
-
-    if show_plot:
-        webbrowser.open(result_html_file)
-        # webbrowser.get('firefox').open(result_html_file)
-
-    Print.info("saved in file '%s'" % result_html_file)
-
-
-def get_results_history(path, method, def_cat):
-    """Given a path, a method and a default category return results history."""
-    load_results_history()
-    return RESULTS_HISTORY[path][method][def_cat]
-
-
-def is_in_cache(path, method, def_cat, s, l, p, a):
-    """Return whether this evaluation is already computed."""
-    s, l = round_fix(s), round_fix(l)
-    p, a = round_fix(p), round_fix(a)
-    results = get_results_history(path, method, def_cat)
-    return results["accuracy"]["value"][s][l][p][a] != {}
 
 
 def train(
@@ -512,40 +237,25 @@ def train(
         )
 
 
-def get_test_data_cache(path, def_cat, method, s, l, p, a):
-    """Return test results from cache."""
-    s, l = round_fix(s), round_fix(l)
-    p, a = round_fix(p), round_fix(a)
-    if is_in_cache(path, method, def_cat, s, l, p, a):
-        Print.info("retrieving from cache")
+def overwrite_model(model_path, model_name):
+    cache_file = path.join(model_path, model_name + EVAL_CACHE_EXT)
+    if path.exists(cache_file):
+        remove_file(cache_file)
 
-        y_true = []
-        y_pred = []
-
-        rh = get_results_history(path, method, def_cat)
-        cm = np.array(rh["confusion_matrix"][s][l][p][a][0])
-        categories = rh["categories"]
-
-        for icat_true, row in enumerate(cm):
-            y_true.extend([icat_true] * sum(row))
-            for icat_pred in range(len(row)):
-                y_pred.extend([icat_pred] * row[icat_pred])
-
-        return y_true, y_pred, categories
-    return None, None, None
+    model_file = path.join(model_path, "%s.%s" % (model_name, STR_MODEL_EXT))
+    if path.exists(model_file):
+        remove_file(model_file)
+    Print.info("model has been overwritten")
 
 
-def load_data(
-    data_path, folder_label, def_cat=None,
-    return_cat_index=True, cmd_name=STR_TEST
-):
+def load_data(data_path, folder_label, cmd_name=STR_TEST):
     """Load documents from disk, return the x_data, y_data and categories."""
     categories = CLF.get_categories()
 
     try:
         x_data, y_data = Dataset.load_from_files(data_path, folder_label)
     except OSError:
-        Print.error(ERROR_NSD % data_path, raises=GetTestDataError)
+        Print.error(ERROR_NSD % data_path, raises=LoadDataError)
 
     y_cats = set(y_data)
     if len(y_cats) == 0:
@@ -556,7 +266,7 @@ def load_data(
                 cmd_name, data_path,
                 STR_FOLDER if not folder_label else STR_FILE,
                 " ..." if cmd_name != STR_TEST else ''
-            ), raises=GetTestDataError
+            ), raises=LoadDataError
         )
 
     unkown_cats = [cat for cat in y_cats if cat not in categories]
@@ -567,390 +277,33 @@ def load_data(
             (
                 ", ".join(["'%s'" % c for c in categories]),
                 ", ".join(["'%s'" % c for c in unkown_cats])
-            ), raises=GetTestDataError
+            ), raises=LoadDataError
         )
 
-    if return_cat_index:
-        y_data = [CLF.get_category_index(y) for y in y_data]
-
-    if def_cat == STR_UNKNOWN:
-        categories += [STR_UNKNOWN_CATEGORY]
-
-    return x_data, y_data, categories
+    return x_data, y_data
 
 
-def save_results(
-    rh, categories, accuracy, report, conf_matrix, k_fold, i_fold, s, l, p, a
-):
-    """Save evaluation results to disk."""
-    rf = round_fix
-    s, l = rf(s), rf(l)
-    p, a = rf(p), rf(a)
-
-    rh["categories"] = categories
-
-    # if there aren't previous best results, initialize them to -1
-    if rh["accuracy"]["best"]["value"] == {}:
-        rh["accuracy"]["best"]["value"] = -1
-        for metric, avg in product(METRICS, AVGS):
-            if avg in report:  # scikit-learn > 0.20 does not include 'micro avg' in report
-                rh[metric][avg]["best"]["value"] = -1
-        for cat in categories:
-            for metric in METRICS:
-                rh[metric]["categories"][cat]["best"]["value"] = -1
-
-    # if fold results array is empty, create new ones
-    if rh["accuracy"]["fold_values"][s][l][p][a] == {}:
-        rh["accuracy"]["fold_values"][s][l][p][a] = [0] * k_fold
-        rh["confusion_matrix"][s][l][p][a] = [None] * k_fold
-        for metric, avg in product(METRICS, AVGS):
-            if avg in report:
-                rh[metric][avg]["fold_values"][s][l][p][a] = [0] * k_fold
-        for cat in categories:
-            for metric in METRICS:
-                rh[metric]["categories"][cat]["fold_values"][s][l][p][a] = [0] * k_fold
-
-    # saving fold results
-    rh["accuracy"]["fold_values"][s][l][p][a][i_fold] = rf(accuracy)
-    for metric, avg in product(METRICS, AVGS):
-        if avg in report:
-            rh[metric][avg]["fold_values"][s][l][p][a][i_fold] = rf(report[avg][metric])
-    for cat in categories:
-        for metric in METRICS:
-            rh[metric]["categories"][cat]["fold_values"][s][l][p][a][i_fold] = rf(
-                report[cat][metric]
-            )
-    rh["confusion_matrix"][s][l][p][a][i_fold] = conf_matrix.tolist()
-
-    # if this is the last fold, compute and store averages and best values
-    if i_fold + 1 == k_fold:
-        accuracy_avg = rf(mean(rh["accuracy"]["fold_values"][s][l][p][a]))
-        rh["accuracy"]["value"][s][l][p][a] = accuracy_avg
-
-        best_acc = rh["accuracy"]["best"]
-        if accuracy_avg > best_acc["value"]:
-            best_acc["value"] = accuracy_avg
-            best_acc["s"], best_acc["l"] = s, l
-            best_acc["p"], best_acc["a"] = p, a
-
-        for metric, avg in product(METRICS, AVGS):
-            if avg in report:
-                metric_avg = rf(mean(rh[metric][avg]["fold_values"][s][l][p][a]))
-                rh[metric][avg]["value"][s][l][p][a] = metric_avg
-
-                best_metric_avg = rh[metric][avg]["best"]
-                if metric_avg > best_metric_avg["value"]:
-                    best_metric_avg["value"] = metric_avg
-                    best_metric_avg["s"], best_metric_avg["l"] = s, l
-                    best_metric_avg["p"], best_metric_avg["a"] = p, a
-
-        for cat in categories:
-            for metric in METRICS:
-                metric_cat_avg = rf(mean(
-                    rh[metric]["categories"][cat]["fold_values"][s][l][p][a]
-                ))
-                rh[metric]["categories"][cat]["value"][s][l][p][a] = metric_cat_avg
-
-                best_metric_cat = rh[metric]["categories"][cat]["best"]
-                if metric_cat_avg > best_metric_cat["value"]:
-                    best_metric_cat["value"] = metric_cat_avg
-                    best_metric_cat["s"], best_metric_cat["l"] = s, l
-                    best_metric_cat["p"], best_metric_cat["a"] = p, a
-
-    save_results_history()
-
-
-def results(
-    y_true, y_pred, categories, def_cat, cache=True, method="test",
-    data_path='', folder=False, plots=True, k_fold=1, i_fold=0
-):
-    """Compute evaluation results and save them to disk."""
-    import warnings
-    warnings.filterwarnings('ignore')
-    accuracy = accuracy_score(y_pred, y_true)
-    Print.show()
-    Print.show(
-        classification_report(
-            y_true, y_pred,
-            labels=range(len(categories)), target_names=categories
-        )
-    )
-    Print.show(
-        "\n %s: %.3f"
-        %
-        (Print.style.bold("accuracy"), accuracy)
-    )
-
-    unclassified = None
-    if data_path and def_cat == STR_UNKNOWN:
-        unclassified = sum(map(lambda v: v == IDX_UNKNOWN_CATEGORY, y_pred))
-
-    if data_path and unclassified:
-        cat_acc = []
-        for cat in CLF.get_categories():
-            cat_acc.append((
-                cat,
-                accuracy_score(
-                    [
-                        CLF.get_category_index(cat) if y == IDX_UNKNOWN_CATEGORY else y
-                        for y in y_pred
-                    ],
-                    y_true
-                )
-            ))
-
-        best_acc = sorted(cat_acc, key=lambda e: -e[1])[0]
+def evaluation_plot(open_browser=True):
+    if not Evaluation.plot(open_browser):
         Print.warn(
-            "A better accuracy (%.3f) would be obtained "
-            "with '%s' as the default category"
-            %
-            (best_acc[1], best_acc[0])
+            "Suggestion: evaluate your model using one of the commands: "
+            "'test', 'k-fold' or 'grid_search'"
         )
-        Print.warn(
-            "(Since %d%% of the documents were classified as 'unknown')"
-            %
-            (unclassified * 100.0 / len(y_true))
-        )
-        Print.warn(
-            "Suggestion: test %s %s %s"
-            %
-            (
-                data_path,
-                STR_FOLDER if folder else STR_FILE,
-                best_acc[0]
-            )
-        )
-
-    Print.show()
-
-    conf_matrix = confusion_matrix(y_true, y_pred)
-    report = classification_report(
-        y_true, y_pred,
-        labels=range(len(categories)), target_names=categories,
-        output_dict=True
-    )
-
-    s, l, p, a = CLF.get_hyperparameters()
-
-    if not cache or not is_in_cache(data_path, method, def_cat, s, l, p, a):
-        save_results(
-            get_results_history(data_path, method, def_cat),
-            categories, accuracy, report,
-            conf_matrix, k_fold, i_fold,
-            s, l, p, a
-        )
-
-    if plots:
-        plot_confusion_matrices(
-            [conf_matrix], categories,
-            r"$\sigma=%.3f; \lambda=%.3f; \rho=%.3f; \alpha=%.3f$"
-            %
-            (s, l, p, a)
-        )
-
-    warnings.filterwarnings('default')
-
-
-def evaluations_info(data_path=None, method=None):
-    """Print evaluations best values."""
-    load_results_history()
-    rh = RESULTS_HISTORY
-    ps = Print.style
-
-    for dpath in rh:
-        if data_path and dpath != data_path:
-            continue
-
-        for md in rh[dpath]:
-
-            if method and md != method:
-                continue
-
-            for def_cat in rh[dpath][md]:
-                Print.show("\n%s %s %s %s " % (
-                    ps.fail(">"), ps.green(md),
-                    ps.blue(dpath), ps.blue(def_cat)
-                ), False)
-
-                evl = rh[dpath][md][def_cat]["accuracy"]["value"]
-                n_evl = len([
-                    a for s in evl for l in evl[s]
-                    for p in evl[s][l] for a in evl[s][l][p]
-                ])
-                Print.show("(%d evaluations)" % n_evl)
-
-                best = rh[dpath][md][def_cat]["accuracy"]["best"]
-                Print.show(
-                    "Best %s: %s %s" % (
-                        ps.green("accuracy"), ps.warning(best["value"]),
-                        ps.blue("(s %s l %s p %s a %s)") % (
-                            best["s"], best["l"], best["p"], best["a"]
-                        )
-                    ),
-                    offset=4
-                )
-                for metric in sorted(rh[dpath][md][def_cat].keys()):
-
-                    if metric not in EXCP_METRICS:
-                        Print.show("Best %s:" % ps.green(metric), offset=4)
-                        rh_metric = rh[dpath][md][def_cat][metric]
-                        for cat in rh_metric["categories"]:
-                            best = rh_metric["categories"][cat]["best"]
-                            Print.show("%s: %s %s" % (
-                                cat, ps.warning(best["value"]),
-                                ps.blue("(s %s l %s p %s a %s)") % (
-                                    best["s"], best["l"], best["p"], best["a"]
-                                )
-                            ), offset=8)
-
-                        Print.show(ps.header(ps.bold("Averages:")), offset=8)
-                        for avg in rh_metric:
-                            if avg != "categories":
-                                best = rh_metric[avg]["best"]
-                                Print.show("%s: %s %s" % (
-                                    ps.header(avg), ps.warning(best["value"]),
-                                    ps.blue("(s %s l %s p %s a %s)")
-                                    % (
-                                        best["s"], best["l"],
-                                        best["p"], best["a"]
-                                    )
-                                ), offset=10)
-
-    print()
-
-
-def delete_results_slpa(rh_metric, hparams, only_count=False, best=True):
-    """Remove evaluations from history given hyperparameters s, l, p, a."""
-    count = 0
-    update_best = False
-    hps = hparams
-    if best:
-        values = rh_metric["value"]
-        best = rh_metric["best"]
-
-        if best["s"] == hps["s"] or best["l"] == hps["l"] or \
-           best["p"] == hps["p"] or best["a"] == hps["a"]:
-            update_best = True
-    else:
-        values = rh_metric
-    ss = list(values.keys())
-    for s in ss:
-        if hps["s"] is not None and s != hps["s"]:
-            continue
-        ll = list(values[s].keys())
-        for l in ll:
-            if hps["l"] is not None and l != hps["l"]:
-                continue
-            pp = list(values[s][l].keys())
-            for p in pp:
-                if hps["p"] is not None and p != hps["p"]:
-                    continue
-                aa = list(values[s][l][p].keys())
-                for a in aa:
-                    if hps["a"] is not None and a != hps["a"]:
-                        continue
-
-                    if not only_count:
-                        del values[s][l][p][a]
-
-                    count += 1
-
-                if not values[s][l][p]:
-                    del values[s][l][p]
-
-            if not values[s][l]:
-                del values[s][l]
-
-        if not values[s]:
-            del values[s]
-
-    if update_best and not only_count:
-        rh_metric["best"] = get_global_best(values)
-
-    return count
-
-
-def delete_results(data_path, method, def_cat, hparams, only_count=False):
-    """Remove evaluations from history."""
-    Print.verbosity_region_begin(VERBOSITY.QUIET)
-    load_results_history()
-    Print.verbosity_region_end()
-
-    rh = RESULTS_HISTORY
-    hps = hparams
-    count_details = RecursiveDefaultDict()
-    count = 0
-    dpaths = list(rh.keys())
-    for dpath in dpaths:
-        if data_path and dpath != data_path:
-            continue
-        methods = list(rh[dpath].keys())
-        for md in methods:
-            if method and md != method:
-                continue
-            def_cats = list(rh[dpath][md].keys())
-            for dc in def_cats:
-                if def_cat and dc != def_cat:
-                    continue
-                rh_accuracy = rh[dpath][md][dc]["accuracy"]
-                count_details[dpath][md][dc] = delete_results_slpa(
-                    rh_accuracy, hps, only_count
-                )
-                count += count_details[dpath][md][dc]
-
-                if not only_count:
-                    delete_results_slpa(
-                        rh[dpath][md][dc]["confusion_matrix"], hps, best=False
-                    )
-
-                if not rh[dpath][md][dc]["confusion_matrix"]:
-                    del rh[dpath][md][dc]
-
-                metrics = list(rh[dpath][md][dc].keys())
-                for metric in metrics:
-                    if metric not in EXCP_METRICS:
-                        rh_metric = rh[dpath][md][dc][metric]
-                        categories = list(rh_metric["categories"].keys())
-                        for cat in categories:
-                            if not only_count:
-                                delete_results_slpa(
-                                    rh_metric["categories"][cat],
-                                    hps
-                                )
-                        avgs = list(rh_metric.keys())
-                        for avg in avgs:
-                            if avg != "categories":
-                                rh_avg = rh[dpath][md][dc][metric][avg]
-                                if not only_count:
-                                    delete_results_slpa(rh_avg, hps)
-
-                if not rh[dpath][md][dc]:
-                    del rh[dpath][md][dc]
-
-            if not rh[dpath][md]:
-                del rh[dpath][md]
-
-        if not rh[dpath]:
-            del rh[dpath]
-
-    return count, count_details
 
 
 def evaluations_remove(data_path, method, def_cat, hparams):
-    """Evaluation remove command handler."""
-    global RESULTS_HISTORY
-    count, count_details = delete_results(
-        data_path, method, def_cat, hparams, only_count=True
+    count, count_details = Evaluation.remove(
+        hparams["s"], hparams["l"], hparams["p"], hparams["a"],
+        method, def_cat, tag=data_path,
+        simulate=True
     )
-
     if count > 0:
-        print()
+        Print.warn()
         Print.warn(
             "A total of %d evaluation(s) will be %s" %
             (count, Print.style.bold("removed")), False
         )
-        Print.warn(". Details below:", decorator=False)
-        print()
+        Print.warn(". Details below:\n", decorator=False)
     else:
         Print.info("nothing to be removed")
         return
@@ -967,295 +320,21 @@ def evaluations_remove(data_path, method, def_cat, hparams):
                         "%d evaluation(s)" % (count_details[dp][md][dc])
                     )))
 
-    print()
+    Print.warn()
     Print.warn("Do you %s" % Print.style.bold("really"), False)
     Print.warn(" want to proceed? [Y/n] ", False, decorator=False)
     try:
         if input() == 'Y':
-            delete_results(data_path, method, def_cat, hparams)
-            if RESULTS_HISTORY:
-                Print.verbosity_region_begin(VERBOSITY.QUIET)
-                save_results_history()
-                Print.verbosity_region_end()
-            else:
-                rh_file = path.join(
-                    CLF.__models_folder__,
-                    CLF.get_name() + RESULT_HISTORY_EXT
-                )
-                if path.exists(rh_file):
-                    remove_file(rh_file)
+            Evaluation.remove(
+                hparams["s"], hparams["l"], hparams["p"], hparams["a"],
+                method, def_cat, tag=data_path
+            )
+
+            Print.info()
             Print.info("%d items were removed" % count)
     except EOFError:
         pass
-    print()
-
-
-def test(test_path, folder_label, def_cat, s, l, p, a, cache):
-    """Test the model with a given test set."""
-    try:
-        y_pred = None
-
-        CLF.set_hyperparameters(s, l, p, a)
-
-        if cache:
-            y_test, y_pred, categories = get_test_data_cache(
-                test_path, def_cat, STR_TEST, s, l, p, a
-            )
-
-        if not y_pred:
-            x_test, y_test, categories = load_data(
-                test_path, folder_label, def_cat
-            )
-
-            try:
-                y_pred = CLF.predict(x_test, def_cat, labels=False)
-            except InvalidCategoryError:
-                Print.error(ERROR_ICN % def_cat)
-                return
-
-        results(
-            y_test, y_pred, categories,
-            def_cat, cache, STR_TEST,
-            test_path, folder_label
-        )
-    except GetTestDataError:
-        pass
-
-
-def k_fold_validation(
-    data_path, folder_label, def_cat, n_grams, k_fold, s, l, p, a, cache=True
-):
-    """Perform a stratified k-fold cross validation using the given data."""
-    global CLF
-
-    try:
-        x_data, y_data, categories = load_data(
-            data_path, folder_label, def_cat,
-            return_cat_index=False, cmd_name="k_fold"
-        )
-    except GetTestDataError:
-        return
-
-    Print.set_verbosity(VERBOSITY.NORMAL)
-    model_name = CLF.get_name()
-    method = k_fold2method(k_fold)
-
-    x_data, y_data = np.array(x_data), np.array(y_data)
-    skf = StratifiedKFold(n_splits=k_fold)
-    progress_bar = tqdm(total=k_fold, desc=" K-Fold Progress")
-    try:
-        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_data, y_data)):
-            if not cache or not is_in_cache(
-                data_path, method, def_cat, s, l, p, a
-            ):
-                x_train, y_train = x_data[train_ix], y_data[train_ix]
-                y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
-                x_test = x_data[test_ix]
-
-                CLF = SS3(name=model_name)
-                CLF.set_hyperparameters(s, l, p, a)
-                train(x_train, y_train, n_grams, save=False, leave_pbar=False)
-
-                try:
-                    y_pred = CLF.predict(
-                        x_test, def_cat, labels=False, leave_pbar=False
-                    )
-                except InvalidCategoryError:
-                    Print.error(ERROR_ICN % def_cat)
-                    return
-
-                results(
-                    y_test, y_pred,
-                    categories, def_cat,
-                    cache, method, data_path,
-                    plots=False, k_fold=k_fold, i_fold=i_fold
-                )
-
-            progress_bar.update(1)
-    except KeyboardInterrupt:
-        Print.set_verbosity(VERBOSITY.VERBOSE)
-        print()
-        Print.warn("Interrupted!")
-
-    progress_bar.close()
-    CLF = SS3(name=model_name)
-    CLF.load_model()
-    Print.set_verbosity(VERBOSITY.VERBOSE)
-
     Print.show()
-    k_fold_classification_report(
-        data_path, method, def_cat,
-        s, l, p, a
-    )
-
-
-def grid_search_loop(
-    data_path, x_test, y_test, categories, def_cat,
-    k_fold, i_fold, ss, ll, pp, aa, cache=True, leave_pbar=True
-):
-    """Grid search main loop."""
-    ss = [round_fix(s) for s in ss]
-    ll = [round_fix(l) for l in ll]
-    pp = [round_fix(p) for p in pp]
-    aa = [round_fix(a) for a in aa]
-
-    slp_list = list(product(ss, ll, pp))
-    progress_bar = tqdm(
-        total=len(slp_list) * len(aa),
-        desc=" Grid Search", leave=leave_pbar
-    )
-    progress_desc = tqdm(
-        total=0,
-        bar_format='{desc}', leave=leave_pbar
-    )
-
-    method = k_fold2method(k_fold)
-    S, L, P, _ = CLF.get_hyperparameters()
-
-    Print.verbosity_region_begin(VERBOSITY.QUIET)
-    try:
-        for s, l, p in slp_list:
-            CLF.set_hyperparameters(s, l, p)
-            updated = False
-            for a in aa:
-                if not cache or not is_in_cache(
-                    data_path, method, def_cat, s, l, p, a
-                ):
-                    if not updated:
-                        progress_desc.set_description_str(
-                            " Status: [updating model...] "
-                            "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
-                            %
-                            (s, l, p, a)
-                        )
-                        CLF.update_values()
-                        updated = True
-
-                    CLF.set_alpha(a)
-                    progress_desc.set_description_str(
-                        " Status: [classifying...] "
-                        "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
-                        %
-                        (s, l, p, a)
-                    )
-
-                    try:
-                        y_pred = CLF.predict(
-                            x_test, def_cat, labels=False, leave_pbar=False
-                        )
-                    except InvalidCategoryError:
-                        Print.error(ERROR_ICN % def_cat)
-                        return
-
-                    results(
-                        y_test, y_pred,
-                        categories, def_cat,
-                        cache, method, data_path,
-                        plots=False, k_fold=k_fold, i_fold=i_fold
-                    )
-                else:
-                    progress_desc.set_description_str(
-                        " Status: [skipping (already cached)...] "
-                        "(s=%.3f; l=%.3f; p=%.3f; a=%.3f)"
-                        %
-                        (s, l, p, a)
-                    )
-                progress_bar.update(1)
-                progress_desc.update(1)
-    except KeyboardInterrupt:
-        Print.set_verbosity(VERBOSITY.VERBOSE)
-        print()
-        Print.warn("Interrupted!")
-
-    progress_desc.set_description_str(" Status: [finished]")
-    progress_bar.close()
-    progress_desc.close()
-
-    CLF.set_hyperparameters(S, L, P)
-    CLF.update_values()
-
-    Print.verbosity_region_end()
-
-
-def grid_search(
-    data_path, folder_label, def_cat, n_gram, k_fold,
-    ss, ll, pp, aa, cache=True
-):
-    """Perform a grid search using values from `ss`, ``ll``, ``pp``, ``aa``."""
-    global CLF
-
-    try:
-        print()
-        if not k_fold:  # if test
-            try:
-                x_data, y_data, categories = load_data(
-                    data_path, folder_label, def_cat,
-                    cmd_name="grid_search"
-                )
-            except GetTestDataError:
-                return
-            x_test, y_test = x_data, y_data
-            grid_search_loop(
-                data_path, x_test, y_test, categories, def_cat,
-                1, 0, ss, ll, pp, aa, cache
-            )
-        else:  # if k-fold
-
-            try:
-                x_data, y_data, categories = load_data(
-                    data_path, folder_label, def_cat,
-                    return_cat_index=False, cmd_name="grid_search"
-                )
-            except GetTestDataError:
-                return
-
-            Print.set_verbosity(VERBOSITY.NORMAL)
-            model_name = CLF.get_name()
-            s, l, p, a = CLF.get_hyperparameters()
-
-            x_data, y_data = np.array(x_data), np.array(y_data)
-            skf = StratifiedKFold(n_splits=k_fold)
-            progress_bar = tqdm(
-                position=0, total=k_fold,
-                desc=" K-Fold Progress"
-            )
-            try:
-                for i_fold, (train_ix, test_ix) in enumerate(
-                    skf.split(x_data, y_data)
-                ):
-                    x_train, y_train = x_data[train_ix], y_data[train_ix]
-                    y_test = [CLF.get_category_index(y) for y in y_data[test_ix]]
-                    x_test = x_data[test_ix]
-
-                    CLF = SS3(name=model_name)
-                    train(x_train, y_train, n_gram, save=False, leave_pbar=False)
-
-                    grid_search_loop(
-                        data_path, x_test, y_test, categories, def_cat,
-                        k_fold, i_fold, ss, ll, pp, aa, cache, leave_pbar=False
-                    )
-
-                    save_results_history()
-
-                    progress_bar.update(1)
-            except KeyboardInterrupt:
-                Print.set_verbosity(VERBOSITY.VERBOSE)
-                print()
-                Print.warn("Interrupted!")
-
-            progress_bar.close()
-            CLF = SS3(name=model_name)
-            CLF.load_model()
-            CLF.set_hyperparameters(s, l, p, a)
-            Print.set_verbosity(VERBOSITY.VERBOSE)
-
-        Print.warn(
-            "Suggestion: use the command 'plot %s' to visualize the results"
-            % STR_EVALUATIONS
-        )
-        print("\n")
-    except KeyboardInterrupt:
-        print("\n\nKeyboardInterrupt")
 
 
 class SS3Prompt(Cmd):
@@ -1272,7 +351,7 @@ class SS3Prompt(Cmd):
         required arguments:
          MODEL_NAME      the model's name
         """
-        global CLF, RESULTS_HISTORY
+        global CLF
         args = split_args(args)
         model_name = args[0].lower()
 
@@ -1281,27 +360,14 @@ class SS3Prompt(Cmd):
                 print()
                 Print.warn(WARN_OVERWRITE, False)
                 if input() == 'Y':
-                    rh_file = path.join(
-                        SS3.__models_folder__,
-                        model_name + RESULT_HISTORY_EXT
-                    )
-                    if path.exists(rh_file):
-                        remove_file(rh_file)
-
-                    model_file = path.join(
-                        SS3.__models_folder__,
-                        "%s.%s" % (model_name, STR_MODEL_EXT)
-                    )
-                    if path.exists(model_file):
-                        remove_file(model_file)
-                    Print.info("model has been overwritten")
+                    overwrite_model(SS3.__models_folder__, model_name)
                     print()
                 else:
                     print()
                     return
 
-            RESULTS_HISTORY = None
             CLF = SS3(name=model_name)
+            Evaluation.set_classifier(CLF)
         else:
             Print.error(
                 "Empty model's name: please provide your model's name"
@@ -1318,7 +384,7 @@ class SS3Prompt(Cmd):
         required arguments:
          MODEL_NAME      the model's name
         """
-        global CLF, ARGS_CATS, RESULTS_HISTORY
+        global CLF, ARGS_CATS
         args = split_args(args)
 
         try:
@@ -1326,8 +392,8 @@ class SS3Prompt(Cmd):
             new_clf.load_model()
 
             CLF = new_clf
+            Evaluation.set_classifier(new_clf)
             ARGS_CATS = CLF.get_categories()
-            RESULTS_HISTORY = None
         except IOError:
             Print.error(
                 "Failed to load the model: "
@@ -1350,13 +416,10 @@ class SS3Prompt(Cmd):
 
         if len(args) == 1:
             m_folder = CLF.__models_folder__
-            m_name = CLF.__name__
-            m_ext = STR_MODEL_EXT
-            model_file = path.join(m_folder, "%s.%s" % (m_name, m_ext))
-            model_new_file = path.join(m_folder, "%s.%s" % (args[0], m_ext))
-            rh_ext = RESULT_HISTORY_EXT
-            rh_file = path.join(m_folder, m_name + rh_ext)
-            rh_new_file = path.join(m_folder, args[0] + rh_ext)
+            model_file = path.join(m_folder, "%s.%s" % (CLF.__name__, STR_MODEL_EXT))
+            model_new_file = path.join(m_folder, "%s.%s" % (args[0], STR_MODEL_EXT))
+            cache_file = path.join(m_folder, CLF.__name__ + EVAL_CACHE_EXT)
+            cache_new_file = path.join(m_folder, args[0] + EVAL_CACHE_EXT)
 
             rename = True
             if path.exists(model_new_file):
@@ -1366,15 +429,16 @@ class SS3Prompt(Cmd):
                     rename = False
 
             if rename:
-                if path.exists(rh_file):
-                    if path.exists(rh_new_file):
-                        remove_file(rh_new_file)
-                    rename_file(rh_file, rh_new_file)
-                if path.exists(model_file):
-                    if path.exists(model_new_file):
-                        remove_file(model_new_file)
-                    rename_file(model_file, model_new_file)
                 CLF.__name__ = args[0]
+                Evaluation.__cache_file__ = path.join(
+                    CLF.__models_folder__,
+                    CLF.__name__ + EVAL_CACHE_EXT
+                )
+                overwrite_model(m_folder, CLF.__name__)
+                if path.exists(cache_file):
+                    rename_file(cache_file, cache_new_file)
+                if path.exists(model_file):
+                    rename_file(model_file, model_new_file)
         else:
             Print.error(ERROR_WAN % (1, len(args)))
 
@@ -1392,10 +456,15 @@ class SS3Prompt(Cmd):
         args = split_args(args)
 
         if len(args) == 1:
-            load_results_history()
+            Evaluation.__cache_load__()
             CLF.__name__ = args[0]
             CLF.save_model()
-            save_results_history()
+            Evaluation.__cache_file__ = path.join(
+                CLF.__models_folder__,
+                CLF.__name__ + EVAL_CACHE_EXT
+            )
+            Evaluation.__cache_update__()
+            Evaluation.set_classifier(CLF)
         else:
             Print.error(ERROR_WAN % (1, len(args)))
 
@@ -1483,15 +552,23 @@ class SS3Prompt(Cmd):
             data_path, folder_label, def_cat,\
                 n_grams, k_fold, hparams, cache = self.args_k_fold(args)
 
+            x_data, y_data = load_data(data_path, folder_label, cmd_name="k_fold")
+
             s, l, p, a = CLF.get_hyperparameters()
-            k_fold_validation(
-                data_path, folder_label, def_cat, n_grams, k_fold,
-                hparams["s"], hparams["l"], hparams["p"], hparams["a"],
-                cache
+            CLF.set_hyperparameters(hparams["s"], hparams["l"], hparams["p"], hparams["a"])
+
+            Evaluation.k_fold(
+                CLF, x_data, y_data, k_fold, n_grams, def_cat, data_path, cache=cache
             )
+
             CLF.set_hyperparameters(s, l, p, a)
-        except ArgsParseError:
+        except (ArgsParseError, LoadDataError):
             return
+        except InvalidCategoryError:
+            Print.error(ERROR_ICN % def_cat)
+        except KeyboardInterrupt:
+            Print.warn("Interrupted!\n")
+            Print.set_verbosity(VERBOSITY.VERBOSE)
 
     @requires_model
     @requires_args
@@ -1530,15 +607,20 @@ class SS3Prompt(Cmd):
             test_path, folder_label,\
                 def_cat, hparams, cache = self.args_test(args)
 
+            x_test, y_test = load_data(test_path, folder_label)
             s, l, p, a = CLF.get_hyperparameters()
-            test(
-                test_path, folder_label, def_cat,
-                hparams["s"], hparams["l"], hparams["p"], hparams["a"],
-                cache
-            )
+            CLF.set_hyperparameters(hparams["s"], hparams["l"], hparams["p"], hparams["a"])
+
+            Evaluation.test(CLF, x_test, y_test, def_cat, test_path, cache=cache)
+
             CLF.set_hyperparameters(s, l, p, a)
-        except ArgsParseError:
+        except (ArgsParseError, LoadDataError):
             return
+        except InvalidCategoryError:
+            Print.error(ERROR_ICN % def_cat)
+        except KeyboardInterrupt:
+            Print.warn("Interrupted!\n")
+            Print.set_verbosity(VERBOSITY.VERBOSE)
 
     @requires_model
     def do_live_test(self, args):
@@ -1632,13 +714,26 @@ class SS3Prompt(Cmd):
         try:
             data_path, folder_label, def_cat,\
                 n_grams, k_fold, hparams, cache = self.args_grid_search(args)
-            grid_search(
-                data_path, folder_label, def_cat, n_grams, k_fold,
+
+            x_data, y_data = load_data(data_path, folder_label, cmd_name="grid_search")
+
+            Evaluation.grid_search(
+                CLF, x_data, y_data,
                 hparams["s"], hparams["l"], hparams["p"], hparams["a"],
-                cache
+                k_fold, n_grams, def_cat, data_path, cache=cache
             )
-        except ArgsParseError:
+            Print.warn(
+                "Suggestion: use the command 'plot %s' to visualize the results"
+                % STR_EVALUATIONS
+            )
+            print("\n")
+        except InvalidCategoryError:
+            Print.error(ERROR_ICN % def_cat)
+        except (ArgsParseError, LoadDataError):
             pass
+        except KeyboardInterrupt:
+            Print.warn("Interrupted!\n")
+            Print.set_verbosity(VERBOSITY.VERBOSE)
 
     @requires_model
     def do_evaluations(self, args):
@@ -1705,11 +800,11 @@ class SS3Prompt(Cmd):
             return
 
         if cmd == STR_INFO:
-            evaluations_info(data_path, method)
+            Evaluation.show_best(data_path, method)
         elif cmd == STR_PLOT:
-            save_html_evaluations()
+            evaluation_plot()
         elif cmd == STR_SAVE:
-            save_html_evaluations(False)
+            evaluation_plot(open_browser=False)
         elif cmd == STR_REMOVE:
             evaluations_remove(data_path, method, def_cat, hparams)
         else:
@@ -1847,7 +942,7 @@ class SS3Prompt(Cmd):
 
         # case 'evaluations'
         elif arg == STR_EVALUATIONS:
-            save_html_evaluations(False)
+            evaluation_plot(open_browser=False)
 
         # case 'stopwords'
         elif arg == STR_STOPWORDS:
@@ -1884,7 +979,7 @@ class SS3Prompt(Cmd):
         args = split_args(args)
 
         if args and args[0] == STR_EVALUATIONS:
-            evaluations_info()
+            Evaluation.show_best()
         else:
             CLF.print_model_info()
             all_on = not args or args[0] == STR_ALL
@@ -1961,7 +1056,7 @@ class SS3Prompt(Cmd):
                 )
                 return
         elif args[0] == STR_EVALUATIONS:  # if evaluations
-            save_html_evaluations()
+            evaluation_plot()
         else:
             Print.error(ERROR_UA % args[0])
 

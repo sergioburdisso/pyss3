@@ -244,9 +244,10 @@ def test_pyss3_functions():
 def test_pyss3_ss3(mockers):
     """Test SS3."""
     clf = SS3(
-        s=.45, l=.5, p=1, a=0, name="test",
+        s=.45, l=.5, p=1, a=0,
         cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
     )
+    clf.set_name("test")
 
     # "cold start" tests
     assert clf.get_name() == "test"

@@ -223,9 +223,9 @@
     <div class="title" style="margin: 0">Data</div>
     Model name: <span class="prop-value">{{model_name}}</span>
     <br>
-    Path:
+    Tag:
     <select ng-model="c.p" ng-change="update(true, true)" ng-show="_keys_(results).length > 1">
-      <option ng-repeat="(path, _) in results" ng-value="path">{{path}}</option>
+      <option ng-repeat="(tag, _) in results" ng-value="tag">{{tag}}</option>
     </select>
     <span class="prop-value" ng-if="_keys_(results).length == 1">{{_keys_(results)[0]}}</span>
     <br>
@@ -241,7 +241,7 @@
     </select>
     <span class="prop-value" ng-if="_keys_(results[c.p][c.m]).length == 1">{{_keys_(results[c.p][c.m])[0]}}</span>
     <br>
-    Measure:
+    Metric:
     <select ng-model="c.mc" ng-change="update()">
       <option ng-repeat="(metric, _) in results[c.p][c.m][c.dc]" ng-value="metric" ng-if="metric != 'confusion_matrix' && metric != 'categories'">{{metric}}</option>
     </select>
