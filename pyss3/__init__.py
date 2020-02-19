@@ -528,7 +528,8 @@ class SS3:
 
         If category name doesn't exist, creates a new one.
         """
-        name = name.lower()
+        if type(name) is str:
+            name = name.lower()
         try:
             return self.__categories_index__[name]
         except KeyError:
@@ -840,6 +841,15 @@ class SS3:
         :rtype: str
         """
         return self.__name__
+
+    def set_name(self, name):
+        """
+        Set the model's name.
+
+        :param name: the model's name.
+        :type name: str
+        """
+        self.__name__ = name
 
     def set_hyperparameters(self, s=None, l=None, p=None, a=None):
         """
@@ -2044,6 +2054,8 @@ class SS3:
         y_train = list(cats)
 
         Print.info("about to start training", offset=1)
+        verbosity = Print.get_verbosity()
+        Print.set_verbosity(VERBOSITY.NORMAL)
         for i in tqdm(range(len(x_train)), desc=" Training",
                       leave=leave_pbar, disable=Print.is_quiet()):
             self.learn(
@@ -2051,6 +2063,7 @@ class SS3:
                 n_grams=n_grams, prep=prep, update=False
             )
         self.__prune_tries__()
+        Print.set_verbosity(verbosity)
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
         self.update_values(force=True)
 
