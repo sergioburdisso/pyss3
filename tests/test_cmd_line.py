@@ -24,6 +24,7 @@ def test_ss3prompt(mocker, monkeypatch):
     if PYTHON3:
         monkeypatch.setattr('builtins.input', lambda: 'Y')
     mocker.patch.object(SS3Prompt, "cmdloop")
+
     # not working in Python 2
     # mocker.patch("pyss3.cmd_line.STOPWORDS_FILE", "tests/ss3_models/ss3_stopwords[%s].txt")
     # mocker.patch(
