@@ -24,7 +24,7 @@ def test_ss3prompt(mocker, monkeypatch):
     mocker.patch.object(SS3Prompt, "cmdloop")
     mocker.patch("pyss3.cmd_line.STOPWORDS_FILE", "tests/ss3_models/ss3_stopwords[%s].txt")
     mocker.patch(
-        "pyss3.cmd_line.RESULT_HTML_OUT_FILE",
+        "pyss3.util.EVAL_HTML_OUT_FILE",
         "tests/ss3_models/ss3_model_evaluation[%s].html"
     )
 
@@ -35,6 +35,13 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd = SS3Prompt()
 
     cmd.do_train(dataset_path + " file")
+
+    # do_new
+    cmd.do_new(MODEL_NAME + "_train_folder")
+    cmd.do_train(dataset_path_mr + " 3-grams")
+    cmd.do_train("non-existing 3-grams")
+    cmd.do_train(dataset_path_mr)  # no test documents
+    cmd.do_train(ArgsParserError)
 
     # do_new
     cmd.do_new(MODEL_NAME)
@@ -86,7 +93,11 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd.do_evaluations("info")
     cmd.do_evaluations("save")
     cmd.do_evaluations("plot")
+
+    # do_load
+    cmd.do_load(MODEL_NAME)
     if PYTHON3:
+        cmd.do_evaluations("remove p " + str(SS3.__p__))
         cmd.do_evaluations("remove test s .2 l .2 p .2")
         cmd.do_evaluations("remove test")
         cmd.do_evaluations("remove 3-fold")
