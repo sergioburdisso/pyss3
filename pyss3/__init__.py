@@ -1959,7 +1959,7 @@ class SS3:
         """
         r = self.classify(doc, sort=True, prep=prep)
 
-        if not r[0][1]:
+        if not r or not r[0][1]:
             if not def_cat or def_cat == STR_UNKNOWN:
                 cat = STR_UNKNOWN_CATEGORY
             elif def_cat == STR_MOST_PROBABLE:
@@ -1999,7 +1999,7 @@ class SS3:
         """
         r = self.classify(doc, sort=True, prep=prep)
 
-        if not r[0][1]:
+        if not r or not r[0][1]:
             if not def_cat or def_cat == STR_UNKNOWN:
                 cat = STR_UNKNOWN_CATEGORY
             elif def_cat == STR_MOST_PROBABLE:

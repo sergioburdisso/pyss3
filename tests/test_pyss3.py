@@ -139,6 +139,10 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     assert clf.classify_label(x_test[0]) == y_test[0]
     assert clf.classify_label(x_test[0], labels=False) == clf.get_category_index(y_test[0])
 
+    assert clf.classify_label('') == most_prob_cat
+    assert clf.classify_label('', def_cat=STR_UNKNOWN) == STR_UNKNOWN_CATEGORY
+    assert clf.classify_label('', def_cat=def_cat) == def_cat
+
     assert clf.classify_label(doc_unknown) == most_prob_cat
     assert clf.classify_label(doc_unknown, def_cat=STR_UNKNOWN) == STR_UNKNOWN_CATEGORY
     assert clf.classify_label(doc_unknown, def_cat=def_cat) == def_cat
@@ -155,6 +159,10 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     r = clf.classify_multilabel(multilabel_doc, labels=False)
     assert len(multilabel_labels) == len(r)
     assert r[0] in multilabel_idxs and r[1] in multilabel_idxs
+
+    assert clf.classify_multilabel('') == [most_prob_cat]
+    assert clf.classify_multilabel('', def_cat=STR_UNKNOWN) == [pyss3.STR_UNKNOWN_CATEGORY]
+    assert clf.classify_multilabel('', def_cat=def_cat) == [def_cat]
 
     assert clf.classify_multilabel(doc_unknown) == [most_prob_cat]
     assert clf.classify_multilabel(doc_unknown, def_cat=STR_UNKNOWN) == [pyss3.STR_UNKNOWN_CATEGORY]
