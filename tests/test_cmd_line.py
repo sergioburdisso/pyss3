@@ -5,6 +5,8 @@ from pyss3.server import Server
 from pyss3 import SS3
 from os import path
 
+import pyss3.cmd_line
+import pyss3.util
 import pytest
 import sys
 
@@ -22,11 +24,15 @@ def test_ss3prompt(mocker, monkeypatch):
     if PYTHON3:
         monkeypatch.setattr('builtins.input', lambda: 'Y')
     mocker.patch.object(SS3Prompt, "cmdloop")
-    mocker.patch("pyss3.cmd_line.STOPWORDS_FILE", "tests/ss3_models/ss3_stopwords[%s].txt")
-    mocker.patch(
-        "pyss3.util.EVAL_HTML_OUT_FILE",
-        "tests/ss3_models/ss3_model_evaluation[%s].html"
-    )
+    # not working in Python 2
+    # mocker.patch("pyss3.cmd_line.STOPWORDS_FILE", "tests/ss3_models/ss3_stopwords[%s].txt")
+    # mocker.patch(
+    #     "pyss3.util.EVAL_HTML_OUT_FILE",
+    #     "tests/ss3_models/ss3_model_evaluation[%s].html"
+    # )
+    # replaced by:
+    pyss3.cmd_line.STOPWORDS_FILE = "tests/ss3_models/ss3_stopwords[%s].txt"
+    pyss3.util.EVAL_HTML_OUT_FILE = "tests/ss3_models/ss3_model_evaluation[%s].html"
 
     main()
 

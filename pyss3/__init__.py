@@ -1772,6 +1772,8 @@ class SS3:
         """
         try:
             doc = doc.decode(ENCODING)
+        except UnicodeEncodeError:  # for python 2 compatibility
+            doc = doc.encode(ENCODING).decode(ENCODING)
         except AttributeError:
             pass
         try:
@@ -1886,6 +1888,8 @@ class SS3:
 
         try:
             doc = doc.decode(ENCODING)
+        except UnicodeEncodeError:  # for python 2 compatibility
+            doc = doc.encode(ENCODING).decode(ENCODING)
         except BaseException:
             pass
 
