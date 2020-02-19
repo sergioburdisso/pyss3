@@ -338,7 +338,7 @@ class Print:
             )
 
     @staticmethod
-    def show(msg='', newln=True, offset=0):
+    def show(msg='', newln=True, offset=0, force_show=False):
         """
         Print a message.
 
@@ -349,7 +349,7 @@ class Print:
         :param offset: shift the message to the right (``offset`` characters)
         :type offset: int
         """
-        if not Print.is_quiet():
+        if Print.is_verbose() or force_show:
             print((" " * offset) + str(msg), end='\n' if newln else '')
 
     @staticmethod
