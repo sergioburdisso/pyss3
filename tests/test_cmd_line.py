@@ -2,6 +2,7 @@
 """Tests for pyss3.cmd_line."""
 from pyss3.cmd_line import SS3Prompt, main
 from pyss3.server import Server
+from pyss3.util import Evaluation
 from pyss3 import SS3
 from os import path
 
@@ -34,6 +35,13 @@ def test_ss3prompt(mocker, monkeypatch):
     # replaced by:
     pyss3.cmd_line.STOPWORDS_FILE = "tests/ss3_models/ss3_stopwords[%s].txt"
     pyss3.util.EVAL_HTML_OUT_FILE = "tests/ss3_models/ss3_model_evaluation[%s].html"
+
+    Evaluation.__cache__ = None
+    Evaluation.__cache_file__ = None
+    Evaluation.__clf__ = None
+    Evaluation.__last_eval_tag__ = None
+    Evaluation.__last_eval_method__ = None
+    Evaluation.__last_eval_def_cat__ = None
 
     main()
 

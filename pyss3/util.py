@@ -2,7 +2,7 @@
 """This is a helper module with utility classes and functions."""
 from __future__ import print_function
 from io import open
-from os import listdir, path
+from os import listdir, makedirs, path
 from tqdm import tqdm
 
 from math import ceil
@@ -16,6 +16,7 @@ from sklearn.model_selection import StratifiedKFold
 import numpy as np
 import unicodedata
 import webbrowser
+import errno
 import json
 import re
 
@@ -58,7 +59,19 @@ AVGS = ["micro avg", "macro avg", "weighted avg"]
 STR_TEST, STR_FOLD = 'test', 'fold'
 STR_MOST_PROBABLE = "most-probable"
 
-ERROR_MNE = "error: the classifier has not been evaluated yet"
+ERROR_NAM = "'%s' is not a valid metric " + "(excepted: %s)" % (
+    ", ".join(["'%s'" % m for m in [STR_ACCURACY] + METRICS])
+)
+ERROR_NAA = "'%s' is not a valid average " + "(excepted: %s)" % (
+    ", ".join(["'%s'" % a for a in AVGS])
+)
+ERROR_CNE = "the classifier has not been evaluated yet"
+ERROR_CNA = ("a classifier has not yet been assigned "
+             "(try using `Evaluation.set_classifier (clf)`)")
+ERROR_IKV = "`k_fold` argument must be an integer greater than or equal to 2"
+ERROR_IKT = "`k_fold` argument must be an integer"
+ERROR_INGV = "`n_grams` argument must be a positive integer"
+ERROR_IHV = "hyperparameter values must be numbers"
 
 # a more user-friendly alias for numpy.linspace
 # to be used along with grid_search
@@ -83,9 +96,15 @@ class Evaluation:
     __last_eval_def_cat__ = None
 
     @staticmethod
-    def __k_fold2method__(k_fold):
+    def __kfold2method__(k_fold):
         """Convert the k number to a proper method string."""
-        return STR_TEST if k_fold <= 1 else str(k_fold) + '-' + STR_FOLD
+        return STR_TEST if not k_fold or k_fold <= 1 else str(k_fold) + '-' + STR_FOLD
+
+    @staticmethod
+    def __avg2avg__(avg):
+        """Convert the k number to a proper method string."""
+        pad = " avg"
+        return str(avg).strip() + pad if str(avg).strip()[-4:] != pad else avg
 
     @staticmethod
     def __set_last_evaluation__(tag, method, def_cat):
@@ -105,7 +124,7 @@ class Evaluation:
             def_cat = Evaluation.__cache__[tag][method].keys()[0]
             return tag, method, def_cat
         else:
-            None, None, None
+            return None, None, None
 
     @staticmethod
     def __cache_json_hook__(dct):
@@ -326,11 +345,12 @@ class Evaluation:
         return count
 
     @staticmethod
-    def __cache_get_default_tag__(clf, n_grams=None):
+    def __cache_get_default_tag__(clf, x_data, n_grams=None):
         n_grams = n_grams or len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1
-        return "%s_%s" % (
+        return "%s_%s[%d-data]" % (
             clf.get_name(),
-            "words" if n_grams == 1 else "%d-grams" % n_grams
+            "words" if n_grams == 1 else "%d-grams" % n_grams,
+            len(x_data)
         )
 
     @staticmethod
@@ -398,7 +418,10 @@ class Evaluation:
         return count, count_details
 
     @staticmethod
-    def __classification_report_k_fold__(tag, method, def_cat, s, l, p, a, plot=True):
+    def __classification_report_k_fold__(
+        tag, method, def_cat, s, l, p, a, plot=True,
+        metric='accuracy', avg='macro'
+    ):
         """Create the classification report for k-fold validations."""
         verbosity = Print.get_verbosity()
         Print.set_verbosity(VERBOSITY.VERBOSE)
@@ -420,18 +443,18 @@ class Evaluation:
 
         for cat in categories:
             report += '{:>{width}s} '.format(cat, width=width)
-            for metric in METRICS:
+            for mc in METRICS:
                 report += ' {:>9.2f}'.format(
-                    cache[metric]["categories"][cat]["value"][s][l][p][a]
+                    cache[mc]["categories"][cat]["value"][s][l][p][a]
                 )
             report += '\n'
         report += '\n'
-        for avg in AVGS:
-            if avg in cache[metric]:
-                report += '{:>{width}s} '.format(avg, width=width)
-                for metric in METRICS:
+        for av in AVGS:
+            if av in cache[mc]:
+                report += '{:>{width}s} '.format(av, width=width)
+                for mc in METRICS:
                     report += ' {:>9.2f}'.format(
-                        cache[metric][avg]["value"][s][l][p][a]
+                        cache[mc][av]["value"][s][l][p][a]
                     )
                 report += '\n'
 
@@ -450,7 +473,14 @@ class Evaluation:
                 (s, l, p, a)
             )
 
-        return cache["accuracy"]["value"][s][l][p][a]
+        if metric == STR_ACCURACY:
+            return cache[metric]["value"][s][l][p][a]
+        else:
+            if metric not in cache:
+                raise KeyError(ERROR_NAM % str(metric))
+            if avg not in cache[metric]:
+                raise KeyError(ERROR_NAA % str(avg))
+            return cache[metric][avg]["value"][s][l][p][a]
 
     @staticmethod
     def __plot_confusion_matrices__(cms, classes, info='', max_colums=3):
@@ -513,6 +543,7 @@ class Evaluation:
                             ha="center", va="center",
                             color="white" if cm[i, j] > thresh else "black")
         plt.show()
+        plt.close()
 
     @staticmethod
     def __get_global_best__(values):
@@ -534,7 +565,8 @@ class Evaluation:
     @staticmethod
     def __evaluation_result__(
         clf, y_true, y_pred, categories, def_cat, cache=True, method="test",
-        tag=None, folder=False, plot=True, k_fold=1, i_fold=0, force_show=False
+        tag=None, folder=False, plot=True, k_fold=1, i_fold=0, force_show=False,
+        metric='accuracy', avg='macro'
     ):
         """Compute evaluation results and save them to disk."""
         import warnings
@@ -549,7 +581,7 @@ class Evaluation:
         if def_cat == STR_UNKNOWN:
             if categories[-1] != STR_UNKNOWN_CATEGORY:
                 categories += [STR_UNKNOWN_CATEGORY]
-            y_pred[:] = [y if y != IDX_UNKNOWN_CATEGORY else n_cats for y in y_pred]
+            y_pred = [y if y != IDX_UNKNOWN_CATEGORY else n_cats for y in y_pred]
 
         accuracy = accuracy_score(y_pred, y_true)
         Print.show()
@@ -626,7 +658,14 @@ class Evaluation:
         Print.set_verbosity(verbosity)
         warnings.filterwarnings('default')
 
-        return accuracy
+        if metric == STR_ACCURACY:
+            return accuracy
+        else:
+            if avg not in report:
+                raise KeyError(ERROR_NAA % str(avg))
+            if metric not in report[avg]:
+                raise KeyError(ERROR_NAM % str(metric))
+            return report[avg][metric]
 
     @staticmethod
     def __grid_search_loop__(
@@ -634,10 +673,10 @@ class Evaluation:
         i_fold, def_cat, tag, categories, cache=True, leave_pbar=True
     ):
         """Grid search main loop."""
-        ss = [round_fix(s) for s in ss]
-        ll = [round_fix(l) for l in ll]
-        pp = [round_fix(p) for p in pp]
-        aa = [round_fix(a) for a in aa]
+        ss = [round_fix(s) for s in list_by_force(ss)]
+        ll = [round_fix(l) for l in list_by_force(ll)]
+        pp = [round_fix(p) for p in list_by_force(pp)]
+        aa = [round_fix(a) for a in list_by_force(aa)]
 
         slp_list = list(product(ss, ll, pp))
         progress_bar = tqdm(
@@ -649,7 +688,7 @@ class Evaluation:
             bar_format='{desc}', leave=leave_pbar
         )
 
-        method = Evaluation.__k_fold2method__(k_fold)
+        method = Evaluation.__kfold2method__(k_fold)
 
         verbosity = Print.get_verbosity()
         Print.set_verbosity(VERBOSITY.QUIET)
@@ -714,7 +753,15 @@ class Evaluation:
                 clf.__models_folder__,
                 clf.get_name() + EVAL_CACHE_EXT
             )
+            try:
+                makedirs(clf.__models_folder__)
+            except OSError as ose:
+                if ose.errno == errno.EEXIST and path.isdir(clf.__models_folder__):
+                    pass
+                else:
+                    raise
             Evaluation.__cache__ = None
+            Evaluation.__cache_load__()
 
     @staticmethod
     def clear_cache():
@@ -726,12 +773,18 @@ class Evaluation:
 
     @staticmethod
     def plot(open_browser=True):
-        """Save results history (evaluations) to disk (interactive html file)."""
+        """
+        Save results history (evaluations) to disk (interactive html file).
+
+        :raises: ValueError
+        """
         clf = Evaluation.__clf__
-        Evaluation.__cache_load__()
+
+        if not clf:
+            raise ValueError(ERROR_CNA)
 
         if not Evaluation.__cache__:
-            Print.warn("no evaluations to be plotted")
+            Print.info("no evaluations to be plotted")
             return False
 
         pyss3_path = path.dirname(__file__)
@@ -780,21 +833,24 @@ class Evaluation:
         return True
 
     @staticmethod
-    def get_best_hyperparameters(metric='accuracy', avg='macro avg',
-                                 tag=None, method=None, def_cat=None):
+    def get_best_hyperparameters(
+        metric='accuracy', avg='macro', tag=None, method=None, def_cat=None
+    ):
+        """
+
+        :raises: ValueError, LookupError, KeyError
+        """
+        avg = Evaluation.__avg2avg__(avg)
+
+        print("Evaluation.__clf__", Evaluation.__clf__)
+        if not Evaluation.__clf__:
+            raise ValueError(ERROR_CNA)
+
         if metric != STR_ACCURACY and metric not in METRICS:
-            raise ValueError(
-                "`metric` argument: '%s' is not a valid metric (excepted: %s)"
-                %
-                (str(metric), ", ".join(["'%s'" % m for m in [STR_ACCURACY] + METRICS]))
-            )
+            raise KeyError(ERROR_NAM % str(metric))
 
         if avg not in AVGS:
-            raise ValueError(
-                "`avg` argument: '%s' is not a valid average (excepted: %s)"
-                %
-                (str(metric), ", ".join(["'%s'" % a for a in AVGS]))
-            )
+            raise KeyError(ERROR_NAA % str(avg))
 
         l_tag, l_method, l_def_cat = Evaluation.__get_last_evaluation__()
         tag, method, def_cat = tag or l_tag, method or l_method, def_cat or l_def_cat
@@ -807,16 +863,27 @@ class Evaluation:
             best = c_metric[avg]["best"]
 
         if not best:
-            raise ValueError(ERROR_MNE)
+            raise LookupError(ERROR_CNE)
 
         return best["s"], best["l"], best["p"], best["a"]
 
     @staticmethod
     def show_best(tag=None, method=None, def_cat=None, metric=None, avg=None):
-        """Print evaluations best values."""
-        Evaluation.__cache_load__()
+        """
+        Print evaluations best values.
+
+        :raises: ValueError
+        """
+        avg = Evaluation.__avg2avg__(avg)
+
+        if not Evaluation.__clf__:
+            raise ValueError(ERROR_CNA)
+
         cache = Evaluation.__cache__
         ps = Print.style
+
+        if not cache:
+            return
 
         for t in cache:
             if tag and t != tag:
@@ -887,12 +954,28 @@ class Evaluation:
 
     @staticmethod
     def remove(s=None, l=None, p=None, a=None, method=None, def_cat=None, tag=None, simulate=False):
-        """Evaluation remove command handler."""
+        """
+        Evaluation remove command handler.
+
+        :raises: ValueError, TypeError
+        """
         clf = Evaluation.__clf__
         count, count_details = None, None
 
         if not clf:
-            return count, count_details
+            raise ValueError(ERROR_CNA)
+
+        try:
+            if s is not None:
+                float(s)
+            if l is not None:
+                float(l)
+            if p is not None:
+                float(p)
+            if a is not None:
+                float(a)
+        except (ValueError, TypeError, AttributeError):
+            raise TypeError(ERROR_IHV)
 
         try:
             count, count_details = Evaluation.__cache_remove__(
@@ -907,10 +990,19 @@ class Evaluation:
         return count, count_details
 
     @staticmethod
-    def test(clf, x_test, y_test, def_cat=STR_MOST_PROBABLE, tag=None, plot=True, cache=True):
-        """Test the model with a given test set."""
+    def test(
+        clf, x_test, y_test, def_cat=STR_MOST_PROBABLE,
+        tag=None, plot=True, metric='accuracy', avg='macro', cache=True
+    ):
+        """
+        Test the model with a given test set.
+
+        :raises: EmptyModelError, KeyError
+        """
+        avg = Evaluation.__avg2avg__(avg)
+
         Evaluation.set_classifier(clf)
-        tag = tag or Evaluation.__cache_get_default_tag__(clf)
+        tag = tag or Evaluation.__cache_get_default_tag__(clf, x_test)
         s, l, p, a = clf.get_hyperparameters()
 
         Evaluation.__set_last_evaluation__(tag, STR_TEST, def_cat)
@@ -926,33 +1018,46 @@ class Evaluation:
             clf.set_hyperparameters(s, l, p, a)
             y_pred = clf.predict(x_test, def_cat, labels=False)
             categories = clf.get_categories()
-            y_test[:] = [clf.get_category_index(y) for y in y_test]
+            y_test = [clf.get_category_index(y) for y in y_test]
         else:
             y_test = _y_test
 
         return Evaluation.__evaluation_result__(
             clf, y_test, y_pred, categories,
-            def_cat, cache, STR_TEST,
-            tag, plot=plot, force_show=True
+            def_cat, cache, STR_TEST, tag,
+            metric=metric, avg=avg,
+            plot=plot, force_show=True
         )
 
     @staticmethod
     def k_fold(
         clf, x_data, y_data, k_fold=4, n_grams=None,
-        def_cat=STR_MOST_PROBABLE, tag=None, plot=True, cache=True
+        def_cat=STR_MOST_PROBABLE, tag=None, plot=True,
+        metric='accuracy', avg='macro', cache=True
     ):
         """
         Perform a stratified k-fold cross validation using the given data.
 
-        :raises: InvalidCategoryError
+        :raises: InvalidCategoryError, EmptyModelError, ValueError, KeyError
         """
-        from . import SS3
+        from . import SS3, EmptyModelError
+        avg = Evaluation.__avg2avg__(avg)
+
+        if not clf or not clf.__categories__:
+            raise EmptyModelError
+
+        if type(k_fold) is not int or k_fold < 2:
+            raise ValueError(ERROR_IKV)
+
+        if n_grams is not None and (type(n_grams) is not int or n_grams < 1):
+            raise ValueError(ERROR_INGV)
+
         Evaluation.set_classifier(clf)
         n_grams = n_grams or (len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1)
-        tag = tag or Evaluation.__cache_get_default_tag__(clf, n_grams)
+        tag = tag or Evaluation.__cache_get_default_tag__(clf, x_data, n_grams)
 
         Print.verbosity_region_begin(VERBOSITY.NORMAL)
-        method = Evaluation.__k_fold2method__(k_fold)
+        method = Evaluation.__kfold2method__(k_fold)
 
         Evaluation.__set_last_evaluation__(tag, method, def_cat)
 
@@ -991,25 +1096,31 @@ class Evaluation:
 
         Print.show()
         return Evaluation.__classification_report_k_fold__(
-            tag, method, def_cat, s, l, p, a, plot=plot
+            tag, method, def_cat, s, l, p, a,
+            metric=metric, avg=avg, plot=plot
         )
 
     @staticmethod
     def grid_search(
         clf, x_data, y_data, s=None, l=None, p=None, a=None,
         k_fold=None, n_grams=None, def_cat=STR_MOST_PROBABLE, tag=None,
-        metric='accuracy', avg='macro avg', cache=True
+        metric='accuracy', avg='macro', cache=True
     ):
         """
         Perform a grid search using values from `s`, ``l``, ``p``, ``a``.
 
-        :raises: InvalidCategoryError
+        :raises: InvalidCategoryError, EmptyModelError, ValueError, TypeError
         """
+        avg = Evaluation.__avg2avg__(avg)
+
+        if k_fold is not None and type(k_fold) is not int:
+            raise TypeError(ERROR_IKT)
+
         from . import SS3
         Evaluation.set_classifier(clf)
         n_grams = n_grams or (len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1)
-        tag = tag or Evaluation.__cache_get_default_tag__(clf, n_grams)
-        method = Evaluation.__k_fold2method__(k_fold)
+        tag = tag or Evaluation.__cache_get_default_tag__(clf, x_data, n_grams)
+        method = Evaluation.__kfold2method__(k_fold)
 
         Evaluation.__set_last_evaluation__(tag, method, def_cat)
 
@@ -1509,4 +1620,16 @@ class Print:
 
 def round_fix(v, precision=4):
     """Round the number v (used to keep the results history file small)."""
-    return round(float(v), precision)
+    try:
+        return round(float(v), precision)
+    except (ValueError, TypeError, AttributeError):
+        raise TypeError(ERROR_IHV)
+
+
+def list_by_force(v):
+    """Convert any non-iterable object into a list."""
+    try:
+        iter(v)
+        return v
+    except TypeError:
+        return [v]

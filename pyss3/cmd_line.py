@@ -292,11 +292,15 @@ def evaluation_plot(open_browser=True):
 
 
 def evaluations_remove(data_path, method, def_cat, hparams):
-    count, count_details = Evaluation.remove(
-        hparams["s"], hparams["l"], hparams["p"], hparams["a"],
-        method, def_cat, tag=data_path,
-        simulate=True
-    )
+    try:
+        count, count_details = Evaluation.remove(
+            hparams["s"], hparams["l"], hparams["p"], hparams["a"],
+            method, def_cat, tag=data_path,
+            simulate=True
+        )
+    except ValueError:
+        return
+
     if count > 0:
         Print.warn()
         Print.warn(
