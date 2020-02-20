@@ -2422,7 +2422,7 @@ def set_verbosity(level):
     Print.set_verbosity(level)
 
 
-# aliases
+# user-friendly aliases
 SS3.set_smoothness = SS3.set_s
 SS3.get_smoothness = SS3.get_s
 SS3.set_significance = SS3.set_l
@@ -2431,3 +2431,5 @@ SS3.set_sanction = SS3.set_p
 SS3.get_sanction = SS3.get_p
 SS3.set_alpha = SS3.set_a
 SS3.get_alpha = SS3.get_a
+SS3.get_alpha = SS3.get_a
+SS3.train = SS3.fit
