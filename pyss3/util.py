@@ -46,7 +46,7 @@ REGEX_NUMBER = re.compile(r"(?:\d+([.,]\d+)?)")
 REGEX_DOTS_CHARS = re.compile(r"(?:([(),;:?!=\"/.|<>\[\]]+)|(#(?![a-zA-Z])))")
 REGEX_DOTS_CHAINED = re.compile(r"(?:(#[a-zA-Z0-9]+)(\s)*(?=#))")
 
-EVAL_HTML_OUT_FILE = "./ss3_model_evaluation[%s].html"
+EVAL_HTML_OUT_FILE = "ss3_model_evaluation[%s].html"
 EVAL_HTML_SRC_FOLDER = "resources/model_evaluation/"
 EVAL_CACHE_EXT = ".ss3ev"
 
@@ -88,6 +88,32 @@ class VERBOSITY:
 
 
 class Evaluation:
+    """
+    Evaluation class.
+
+    This class provides the user easy-to-use methods for model evaluation and
+    hyperparameter optimization, like, for example, the ``Evaluation.test``,
+    ``Evaluation.kfold_cross_validation``, ``Evaluation.grid_search``,
+    ``Evaluation.plot`` methods for performing tests, stratified k-fold cross
+    validations, grid searches for hyperparameter optimization, and
+    visualizing evaluation results using an interactive 3D plot, respectively.
+
+    All the evaluation methods provided by this class internally use a cache
+    mechanism in which all the previously computed evaluation will be
+    permanently stored for later use. This will prevent the user to waste time
+    performing the same evaluation more than once, or, in case of computer
+    crashes or power failure during a long evaluation, once relunched, it
+    will skip previously computed values to continue from the point were the
+    crashed happened on.
+
+    Usage:
+
+    >>> from pyss3.util import Evaluation
+
+    For examples usages for the previously mentioned method, read their
+    documentation, or do one of the tutorials.
+    """
+
     __cache__ = None
     __cache_file__ = None
     __clf__ = None
@@ -102,18 +128,20 @@ class Evaluation:
 
     @staticmethod
     def __avg2avg__(avg):
-        """Convert the k number to a proper method string."""
+        """Convert the average string to its sklearn average string counterpart."""
         pad = " avg"
         return str(avg).strip() + pad if str(avg).strip()[-4:] != pad else avg
 
     @staticmethod
     def __set_last_evaluation__(tag, method, def_cat):
+        """Save the last evaluation tag, method, and default category."""
         Evaluation.__last_eval_tag__ = tag
         Evaluation.__last_eval_method__ = method
         Evaluation.__last_eval_def_cat__ = def_cat
 
     @staticmethod
     def __get_last_evaluation__():
+        """Return the tag, method and default category used in the last evaluation."""
         if Evaluation.__last_eval_tag__:
             return Evaluation.__last_eval_tag__, \
                 Evaluation.__last_eval_method__, \
@@ -140,7 +168,6 @@ class Evaluation:
     @staticmethod
     def __cache_load__():
         """Load evaluations from disk."""
-
         if not Evaluation.__cache__:
             Print.info("loading evaluations from cache")
             clf = Evaluation.__clf__
@@ -164,7 +191,7 @@ class Evaluation:
 
     @staticmethod
     def __cache_update__():
-        """Save results history (evaluations) to disk."""
+        """Save cached values (evaluations) to disk."""
         clf = Evaluation.__clf__
         if not clf:
             return
@@ -180,7 +207,7 @@ class Evaluation:
     def __cache_save_result__(
         cache, categories, accuracy, report, conf_matrix, k_fold, i_fold, s, l, p, a
     ):
-        """Save evaluation results to disk."""
+        """Compute, update and finally save evaluation results to disk."""
         rf = round_fix
         s, l = rf(s), rf(l)
         p, a = rf(p), rf(a)
@@ -259,7 +286,7 @@ class Evaluation:
 
     @staticmethod
     def __cache_is_in__(tag, method, def_cat, s, l, p, a):
-        """Return whether this evaluation is already computed."""
+        """Return whether this evaluation is already cached."""
         s, l = round_fix(s), round_fix(l)
         p, a = round_fix(p), round_fix(a)
         results = Evaluation.__cache_get_evaluations__(tag, method, def_cat)
@@ -267,7 +294,7 @@ class Evaluation:
 
     @staticmethod
     def __cache_get_test_evaluation__(tag, def_cat, s, l, p, a):
-        """Return test results from cache."""
+        """Return test results from the cache storage."""
         s, l = round_fix(s), round_fix(l)
         p, a = round_fix(p), round_fix(a)
         if Evaluation.__cache_is_in__(tag, STR_TEST, def_cat, s, l, p, a):
@@ -290,13 +317,13 @@ class Evaluation:
 
     @staticmethod
     def __cache_get_evaluations__(tag, method, def_cat):
-        """Given a tag, a method and a default category return results history."""
+        """Given a tag, a method and a default category return cached evaluation results."""
         Evaluation.__cache_load__()
         return Evaluation.__cache__[tag][method][def_cat]
 
     @staticmethod
     def __cache_remove_lpsa__(c_metric, s, l, p, a, simulate=False, best=True):
-        """Remove evaluations from history given hyperparameters s, l, p, a."""
+        """Remove evaluation results from cache given hyperparameters s, l, p, a."""
         count = 0
         update_best = False
         if best:
@@ -346,6 +373,7 @@ class Evaluation:
 
     @staticmethod
     def __cache_get_default_tag__(clf, x_data, n_grams=None):
+        """Create and return a default cache tag."""
         n_grams = n_grams or len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1
         return "%s_%s[%d-data]" % (
             clf.get_name(),
@@ -355,7 +383,7 @@ class Evaluation:
 
     @staticmethod
     def __cache_remove__(tag, method, def_cat, s, l, p, a, simulate=False):
-        """Remove evaluations from history."""
+        """Remove evaluations from the cache storage."""
         Print.verbosity_region_begin(VERBOSITY.QUIET)
         Evaluation.__cache_load__()
         Print.verbosity_region_end()
@@ -568,7 +596,7 @@ class Evaluation:
         tag=None, folder=False, plot=True, k_fold=1, i_fold=0, force_show=False,
         metric='accuracy', avg='macro'
     ):
-        """Compute evaluation results and save them to disk."""
+        """Compute evaluation results and save them to disk (cache)."""
         import warnings
         from . import STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, STR_UNKNOWN
         warnings.filterwarnings('ignore')
@@ -747,6 +775,12 @@ class Evaluation:
 
     @staticmethod
     def set_classifier(clf):
+        """
+        Set the classifier to be evaluated.
+
+        :param clf: the classifier
+        :type clf: SS3
+        """
         if Evaluation.__clf__ != clf:
             Evaluation.__clf__ = clf
             Evaluation.__cache_file__ = path.join(
@@ -765,6 +799,7 @@ class Evaluation:
 
     @staticmethod
     def clear_cache():
+        """Wipe out the evaluation cache."""
         Evaluation.__cache__ = None
         clf = Evaluation.__clf__
         if clf:
@@ -772,10 +807,21 @@ class Evaluation:
                 remove_file(Evaluation.__cache_file__)
 
     @staticmethod
-    def plot(open_browser=True):
+    def plot(html_path='./', open_browser=True):
         """
-        Save results history (evaluations) to disk (interactive html file).
+        Open up an interactive 3D plot with the obtained results.
 
+        This 3D plot is opened up in the web browser and shows the results
+        obtained from all the performed evaluations up to date. In addition,
+        before showing the plot in the browser, this method also creates a
+        portable HTML file containing the 3D plot.
+
+        :param html_path: the path in which to store the portable HTML file
+                          (default: './')
+        :type html_path: str
+        :param open_browser: whether to open the HTML in the browser or not
+                             (default: True)
+        :type open_browser: bool
         :raises: ValueError
         """
         clf = Evaluation.__clf__
@@ -789,7 +835,7 @@ class Evaluation:
 
         pyss3_path = path.dirname(__file__)
         html_src = EVAL_HTML_SRC_FOLDER
-        result_html_file = EVAL_HTML_OUT_FILE % clf.__name__
+        result_html_file = path.join(html_path, EVAL_HTML_OUT_FILE % clf.__name__)
         fout = open(result_html_file, 'w', encoding=ENCODING)
         fhtml = open(
             path.join(pyss3_path, html_src + "model_evaluation.html"),
@@ -837,7 +883,41 @@ class Evaluation:
         metric='accuracy', avg='macro', tag=None, method=None, def_cat=None
     ):
         """
+        Return the best hyperparameter values for the given metric.
 
+        From all the evaluations performed using the given ``method``, default
+        category(``def_cat``) and cache ``tag``, this method returns the
+        hyperparameter values that performed the best, according to the given
+        ``metric``, if not supplied, these values will automatically use the
+        ones matching the last performed evaluation.
+
+        Available metrics are: 'accuracy', 'f1-score', 'precision', and
+        'recall'.
+
+        Except for accuracy, for the other metrics an average (``avg``) option
+        must also be supplied, average options are: 'macro', 'micro', and
+        'weighted'.
+
+        :param metric: the evaluation metric, options are: 'accuracy', 'f1-score',
+                       'precision', and 'recall' (default: 'accuracy').
+        :type metric: str
+        :param avg: the averaging method to be used, options are: 'macro', 'micro',
+                    and 'weighted' (default 'macro').
+        :type avg: str
+        :param tag: the cache tag from where to look up the results
+                     (by default it will automatically use the tag of the last
+                     evaluation performed)
+        :type tag: str
+        :param method: the evaluation method used, options are: 'test', 'K-fold',
+                       where K is a positive integer (by default it will match the
+                       method of the last evaluation performed).
+        :type method: str
+        :param def_cat: the default category used the evaluations, options are:
+                        'most-probable', 'unknown' or a category label (by default
+                        it will use the same as the last evaluation performed).
+        :type def_cat: str
+        :returns: a tuple of the hyperparameter values: (s, l, p, a).
+        :rtype: tuple
         :raises: ValueError, LookupError, KeyError
         """
         avg = Evaluation.__avg2avg__(avg)
@@ -870,8 +950,24 @@ class Evaluation:
     @staticmethod
     def show_best(tag=None, method=None, def_cat=None, metric=None, avg=None):
         """
-        Print evaluations best values.
+        Print information regarding the best obtained values according to all the metrics.
 
+        The information showed can be filtered out using any of the following arguments:
+
+        :param tag: a cache tag (optional).
+        :type tag: str
+        :param method: an evaluation method, options are: 'test', 'K-fold',
+                       where K is a positive integer (optional).
+        :type method: str
+        :param def_cat: a default category used in the evaluations, options are:
+                        'most-probable', 'unknown' or a category label (optional).
+        :type def_cat: str
+        :param metric: an evaluation metric, options are: 'accuracy', 'f1-score',
+                       'precision', and 'recall' (optional).
+        :type metric: str
+        :param avg: an averaging method, options are: 'macro', 'micro',
+                    and 'weighted' (optional).
+        :type avg: str
         :raises: ValueError
         """
         avg = Evaluation.__avg2avg__(avg)
@@ -955,8 +1051,53 @@ class Evaluation:
     @staticmethod
     def remove(s=None, l=None, p=None, a=None, method=None, def_cat=None, tag=None, simulate=False):
         """
-        Evaluation remove command handler.
+        Remove evaluation results from the cache storage.
 
+        If not arguments are given, this method will remove everything, and
+        thus it will perform exactly like the ``clear_chache`` method.
+        However, when arguments are given, only values matching that argument
+        value will be removed. For example:
+
+        >>> # remove evaluation results using
+        >>> # s=.5, l=1, and p=1 hyperparameter values:
+        >>> Evaluation.remove(s=.5, l=1, p=1)
+        >>>
+        >>> # remove all 4-fold cross validation evaluations:
+        >>> Evaluation.remove(method="4-fold")
+
+        Besides, this method returns the number of items that were removed.
+        If the argument ``simulate`` is set to ``True``, items won't be removed
+        and only the number of items to be removed will be returned. For example:
+
+        >>> c, _ = Evaluation.remove(s=.45, method="test", simulate=True)
+        >>> if input("%d items will be removed, proceed? (y/n)") == 'y':
+        >>>     Evaluation.remove(s=.45, method="test")
+
+        Here is the full list of arguments that can be used to select what to be
+        permanently removed from the cache storage:
+
+        :param s: a value for the s hyperparameter (optional).
+        :type s: float
+        :param l: a value for the l hyperparameter (optional).
+        :type l: float
+        :param p: a value for the p hyperparameter (optional).
+        :type p: float
+        :param a: a value for the a hyperparameter (optional).
+        :type a: float
+        :param method: an evaluation method, options are: 'test', 'K-fold',
+                       where K is a positive integer (optional).
+        :type method: str
+        :param def_cat: a default category used in the evaluations, options are:
+                        'most-probable', 'unknown' or a category label (optional).
+        :type def_cat: str
+        :param metric: an evaluation metric, options are: 'accuracy', 'f1-score',
+                       'precision', and 'recall' (optional).
+        :param tag: a cache tag (optional).
+        :type tag: str
+        :param simulate: whether to simulate the removal or not (default: False)
+        :type simulate: bool
+        :returns: (number of items removed, details)
+        :rtype: tuple
         :raises: ValueError, TypeError
         """
         clf = Evaluation.__clf__
@@ -995,8 +1136,50 @@ class Evaluation:
         tag=None, plot=True, metric='accuracy', avg='macro', cache=True
     ):
         """
-        Test the model with a given test set.
+        Test the model using the given test set.
 
+        Examples:
+
+        >>> from pyss3.util import Evaluation
+        >>> ...
+        >>> acc = Evaluation.test(clf, x_test, y_test)
+        >>> print("Accuracy:", acc)
+        >>> ...
+        >>> # this line won't perform the test again, it will retrieve, from the cache storage,
+        >>> # the f1-score value computed in previous test.
+        >>> f1 = Evaluation.test(clf, x_test, y_test, metric="f1-score")
+        >>> print("F1 score:", f1)
+
+        :param clf: the classifier to be evaluated.
+        :type clf: SS3
+        :param x_test: the test set documents, i.e, the list of documents to be classified
+        :type x_test: list (of str)
+        :param y_test: the test set category labels, i.e, the list of document labels
+        :type y_test: list (of str)
+        :param def_cat: default category to be assigned when SS3 is not
+                        able to classify a document. Options are
+                        'most-probable', 'unknown' or a given category name.
+                        (default: 'most-probable')
+        :type def_cat: str
+        :param tag: the cache tag to be used, i.e. a string to identify this evaluation
+                    inside the cache storage (optional)
+        :type tag: str
+        :param plot: whether to plot the confusion matrix after finishing the test or not
+                     (default: True)
+        :type plot: bool
+        :param metric: the evaluation metric to return, options are:
+                        'accuracy', 'f1-score', 'precision', or 'recall'
+                        (default: 'accuracy').
+        :type metric: str
+        :param avg: the averaging method for the metric, options are:
+                    'macro', 'micro', and 'weighted' (default: 'macro').
+        :type avg: str
+        :param cache: whether to use cached values or not. Setting ``cache=False`` forces
+                      to completely perform the evaluation ignoring cached values
+                      (default: True).
+        :type cache: bool
+        :returns: the given metric value, by default, the obtained accuracy.
+        :rtype: float
         :raises: EmptyModelError, KeyError
         """
         avg = Evaluation.__avg2avg__(avg)
@@ -1030,14 +1213,66 @@ class Evaluation:
         )
 
     @staticmethod
-    def k_fold(
-        clf, x_data, y_data, k_fold=4, n_grams=None,
+    def kfold_cross_validation(
+        clf, x_train, y_train, k=4, n_grams=None,
         def_cat=STR_MOST_PROBABLE, tag=None, plot=True,
         metric='accuracy', avg='macro', cache=True
     ):
         """
-        Perform a stratified k-fold cross validation using the given data.
+        Perform a Stratified k-fold cross validation on the given training set.
 
+        Examples:
+
+        >>> from pyss3.util import Evaluation
+        >>> ...
+        >>> acc = Evaluation.kfold_cross_validation(clf, x_train, y_train)
+        >>> print("Accuracy obtained using (default) 4-fold cross validation:", acc)
+        >>> ...
+        >>> # this line won't perform the cross validation again, it will retrieve, from the
+        >>> #  cache storage, the f1-score value computed in previous evaluation
+        >>> f1 = Evaluation.kfold_cross_validation(clf, x_train, y_train, metric="f1-score")
+        >>> print("F1 score obtained using (default) 4-fold cross validation:", f1)
+        >>> ...
+        >>> f1 = Evaluation.kfold_cross_validation(clf, x_train, y_train, k=10, metric="f1-score")
+        >>> print("F1 score obtained using 10-fold cross validation:", f1)
+
+        :param clf: the classifier to be evaluated.
+        :type clf: SS3
+        :param x_train: the list of documents
+        :type x_train: list (of str)
+        :param y_train: the list of document category labels
+        :type y_train: list (of str)
+        :param k: indicates the number of folds to be used (default: 4).
+        :type k: int
+        :param n_grams: indicates the maximum ``n``-grams to be learned
+                        (e.g. a value of ``1`` means only 1-grams (words),
+                        ``2`` means 1-grams and 2-grams,
+                        ``3``, 1-grams, 2-grams and 3-grams, and so on.
+        :type n_grams: int
+        :param def_cat: default category to be assigned when SS3 is not
+                        able to classify a document. Options are
+                        'most-probable', 'unknown' or a given category name.
+                        (default: 'most-probable')
+        :type def_cat: str
+        :param tag: the cache tag to be used, i.e. a string to identify this evaluation
+                    inside the cache storage (optional)
+        :type tag: str
+        :param plot: whether to plot the confusion matrix after finishing the test or not
+                     (default: True)
+        :type plot: bool
+        :param metric: the evaluation metric to return, options are:
+                        'accuracy', 'f1-score', 'precision', or 'recall'
+                        (default: 'accuracy').
+        :type metric: str
+        :param avg: the averaging method for the metric, options are:
+                    'macro', 'micro', and 'weighted' (default: 'macro').
+        :type avg: str
+        :param cache: whether to use cached values or not. Setting ``cache=False`` forces
+                      to completely perform the evaluation ignoring cached values
+                      (default: True).
+        :type cache: bool
+        :returns: the given metric value, by default, the obtained accuracy.
+        :rtype: float
         :raises: InvalidCategoryError, EmptyModelError, ValueError, KeyError
         """
         from . import SS3, EmptyModelError
@@ -1046,7 +1281,7 @@ class Evaluation:
         if not clf or not clf.__categories__:
             raise EmptyModelError
 
-        if type(k_fold) is not int or k_fold < 2:
+        if type(k) is not int or k < 2:
             raise ValueError(ERROR_IKV)
 
         if n_grams is not None and (type(n_grams) is not int or n_grams < 1):
@@ -1054,39 +1289,39 @@ class Evaluation:
 
         Evaluation.set_classifier(clf)
         n_grams = n_grams or (len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1)
-        tag = tag or Evaluation.__cache_get_default_tag__(clf, x_data, n_grams)
+        tag = tag or Evaluation.__cache_get_default_tag__(clf, x_train, n_grams)
 
         Print.verbosity_region_begin(VERBOSITY.NORMAL)
-        method = Evaluation.__kfold2method__(k_fold)
+        method = Evaluation.__kfold2method__(k)
 
         Evaluation.__set_last_evaluation__(tag, method, def_cat)
 
         s, l, p, a = clf.get_hyperparameters()
         categories = clf.get_categories()
-        x_data, y_data = np.array(x_data), np.array(y_data)
-        skf = StratifiedKFold(n_splits=k_fold)
-        progress_bar = tqdm(total=k_fold, desc=" K-Fold Progress")
-        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_data, y_data)):
+        x_train, y_train = np.array(x_train), np.array(y_train)
+        skf = StratifiedKFold(n_splits=k)
+        progress_bar = tqdm(total=k, desc=" K-Fold Progress")
+        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_train, y_train)):
             if not cache or not Evaluation.__cache_is_in__(
                 tag, method, def_cat, s, l, p, a
             ):
-                x_train, y_train = x_data[train_ix], y_data[train_ix]
-                y_test = [clf.get_category_index(y) for y in y_data[test_ix]]
-                x_test = x_data[test_ix]
+                x_train_fold, y_train_fold = x_train[train_ix], y_train[train_ix]
+                y_test_fold = [clf.get_category_index(y) for y in y_train[test_ix]]
+                x_test_fold = x_train[test_ix]
 
-                _clf = SS3()
-                _clf.set_hyperparameters(s, l, p, a)
-                _clf.fit(x_train, y_train, n_grams, leave_pbar=False)
+                clf_fold = SS3()
+                clf_fold.set_hyperparameters(s, l, p, a)
+                clf_fold.fit(x_train_fold, y_train_fold, n_grams, leave_pbar=False)
 
-                y_pred = _clf.predict(
-                    x_test, def_cat, labels=False, leave_pbar=False
+                y_pred = clf_fold.predict(
+                    x_test_fold, def_cat, labels=False, leave_pbar=False
                 )
 
                 Evaluation.__evaluation_result__(
-                    _clf, y_test, y_pred,
+                    clf_fold, y_test_fold, y_pred,
                     categories, def_cat,
                     cache, method, tag,
-                    plot=False, k_fold=k_fold, i_fold=i_fold
+                    plot=False, k_fold=k, i_fold=i_fold
                 )
 
             progress_bar.update(1)
@@ -1107,8 +1342,102 @@ class Evaluation:
         metric='accuracy', avg='macro', cache=True
     ):
         """
-        Perform a grid search using values from `s`, ``l``, ``p``, ``a``.
+        Perform a grid search using the provided hyperparameter values.
 
+        Given a test or a training set, this method performs a grid search using the given
+        lists of hyperparameters values. Once finished, it returns the best hyperparameter
+        values found for the given metric.
+
+        If the argument ``k_fold`` is provided, the grid search will perform a stratified
+        k-fold cross validation for each combination of given hyperparameter values. If not
+        given, will use the ``x_data`` as if it were a test set (x_test) and will use this
+        test set to evaluate the classifier performance for each hyperparameter value.
+
+        Examples:
+
+        >>> from pyss3.util import Evaluation
+        >>> ...
+        >>> best_s, _, _, _ = Evaluation.grid_search(clf, x_test, y_test, s=[.3, .4, .5])
+        >>> print("For this test set, the value of s that obtained the "
+        >>>       "best accuracy, among .3, .4, and .5, was:", best_s)
+        >>> ...
+        >>> s, l, p, _ = Evaluation.grid_search(clf,
+        >>>                                     x_test, y_test,
+        >>>                                     s = [.3, .4, .5],
+        >>>                                     l = [.5, 1, 1.5],
+        >>>                                     p = [.5, 1, 2])
+        >>> print("For this test set and these hyperparameter values, "
+        >>>       "the value of s, l and p that obtained the best accuracy were, "
+        >>>       "respectively:", s, l, p)
+        >>> ...
+        >>> # since this grid search performs the same computation than the above
+        >>> # cached values will be used, instead of computing all over again.
+        >>> s, l, p, a = Evaluation.grid_search(clf,
+        >>>                                     x_test, y_test,
+        >>>                                     s = [.3, .4, .5],
+        >>>                                     l = [.5, 1, 1.5],
+        >>>                                     p = [.5, 1, 2],
+        >>>                                     metric="f1-score")
+        >>> print("For this test set and these hyperparameter values, "
+        >>>       "the value of s, l and p that obtained the best F1 score were, "
+        >>>       "respectively:", s, l, p)
+        >>> ...
+        >>> s, l, p, a = Evaluation.grid_search(clf,
+        >>>                                     x_train, y_train,
+        >>>                                     s = [.3, .4, .5],
+        >>>                                     l = [.5, 1, 1.5],
+        >>>                                     p = [.5, 1, 2],
+        >>>                                     k_fold=4)
+        >>> print("For this training set and these hyperparameter values, "
+        >>>       "and using stratified 4-fold cross validation, "
+        >>>       "the value of s, l and p that obtained the best accuracy were, "
+        >>>       "respectively:", s, l, p)
+
+        :param clf: the classifier to be evaluated.
+        :type clf: SS3
+        :param x_data: a list of documents
+        :type x_data: list (of str)
+        :param y_data: a list of document category labels
+        :type y_data: list (of str)
+        :param s: the list of values for the ``s`` hyperparameter (optional).
+                  If not given, will take the classifier (``clf``) current value.
+        :param l: the list of values for the ``l`` hyperparameter (optional).
+                  If not given, will take the classifier (``clf``) current value.
+        :param p: the list of values for the ``p`` hyperparameter (optional).
+                  If not given, will take the classifier (``clf``) current value.
+        :param a: the list of values for the ``a`` hyperparameter (optional).
+                  If not given, will take the classifier (``clf``) current value.
+        :param k_fold: indicates the number of folds to be used (optional).
+                       If not given, it will perform the grid search using
+                       the ``x_data`` as the test test.
+        :type k_fold: int
+        :param n_grams: indicates the maximum ``n``-grams to be learned
+                        (e.g. a value of ``1`` means only 1-grams (words),
+                        ``2`` means 1-grams and 2-grams,
+                        ``3``, 1-grams, 2-grams and 3-grams, and so on.
+        :type n_grams: int
+        :param def_cat: default category to be assigned when SS3 is not
+                        able to classify a document. Options are
+                        'most-probable', 'unknown' or a given category name.
+                        (default: 'most-probable')
+        :type def_cat: str
+        :param tag: the cache tag to be used, i.e. a string to identify this evaluation
+                    inside the cache storage (optional)
+        :type tag: str
+        :param metric: the evaluation metric to return, options are:
+                        'accuracy', 'f1-score', 'precision', or 'recall'
+                        (default: 'accuracy').
+        :type metric: str
+        :param avg: the averaging method for the metric, options are:
+                    'macro', 'micro', and 'weighted' (default: 'macro').
+        :type avg: str
+        :param cache: whether to use cached values or not. Setting ``cache=False`` forces
+                      to completely perform the evaluation ignoring cached values
+                      (default: True).
+        :type cache: bool
+        :returns: a tuple of hyperparameter values (s, l, p, a) with the best
+                  values for the given metric
+        :rtype: tuple
         :raises: InvalidCategoryError, EmptyModelError, ValueError, TypeError
         """
         avg = Evaluation.__avg2avg__(avg)
@@ -1154,11 +1483,11 @@ class Evaluation:
                 x_test = x_data[test_ix]
                 categories = clf.get_categories()
 
-                _clf = SS3()
-                _clf.fit(x_train, y_train, n_grams, leave_pbar=False)
+                clf_fold = SS3()
+                clf_fold.fit(x_train, y_train, n_grams, leave_pbar=False)
 
                 Evaluation.__grid_search_loop__(
-                    _clf, x_test, y_test, s, l, p, a, k_fold, i_fold,
+                    clf_fold, x_test, y_test, s, l, p, a, k_fold, i_fold,
                     def_cat, tag, categories, cache, leave_pbar=False
                 )
 

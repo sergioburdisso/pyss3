@@ -8,11 +8,11 @@ from pyss3.util import Evaluation, Dataset, RecursiveDefaultDict, Print, VERBOSI
 import sys
 import pytest
 import pyss3
-import pyss3.util
 
 DATASET_FOLDER = "dataset_mr"
 PY3 = sys.version_info[0] >= 3
 DATASET_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
+TMP_FOLDER = "tests/ss3_models/"
 
 
 def test_util():
@@ -43,7 +43,8 @@ def test_evaluation(mocker):
     """Test Evaluation class."""
     mocker.patch("webbrowser.open")
     mocker.patch("matplotlib.pyplot.show")
-    pyss3.util.EVAL_HTML_OUT_FILE = "tests/ss3_models/ss3_model_evaluation[%s].html"
+
+    kfold_validation = Evaluation.kfold_cross_validation
 
     Evaluation.__cache__ = None
     Evaluation.__cache_file__ = None
@@ -69,19 +70,19 @@ def test_evaluation(mocker):
     with pytest.raises(ValueError):
         Evaluation.show_best()
     with pytest.raises(ValueError):
-        Evaluation.plot()
+        Evaluation.plot(TMP_FOLDER)
 
     # Not-yet-trained model case
     Evaluation.set_classifier(clf)
     Evaluation.clear_cache()
     Evaluation.remove()
     Evaluation.show_best()
-    assert Evaluation.plot() is False
+    assert Evaluation.plot(TMP_FOLDER) is False
 
     with pytest.raises(pyss3.EmptyModelError):
         Evaluation.test(clf, x_data, y_data)
     with pytest.raises(pyss3.EmptyModelError):
-        Evaluation.k_fold(clf, x_data, y_data)
+        kfold_validation(clf, x_data, y_data)
     with pytest.raises(pyss3.EmptyModelError):
         Evaluation.grid_search(clf, x_data, y_data)
     with pytest.raises(LookupError):
@@ -95,7 +96,7 @@ def test_evaluation(mocker):
     assert Evaluation.test(clf,
                            ['bla bla bla', "I love this love movie!"], ['pos', 'pos'],
                            plot=PY3) == 0.5
-    assert Evaluation.k_fold(clf, x_data, y_data, plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, plot=PY3) > 0
     s, l, p, a = clf.get_hyperparameters()
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data)
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters()
@@ -103,10 +104,10 @@ def test_evaluation(mocker):
     assert s0 == s and l0 == l and p0 == p and a0 == a
     assert s0 == s1 and l0 == l1 and p0 == p1 and a0 == a1
     assert s0 == s2 and l0 == l2 and p0 == p2 and a0 == a2
-    assert Evaluation.plot() is True
+    assert Evaluation.plot(TMP_FOLDER) is True
     Evaluation.remove()
     Evaluation.show_best()
-    assert Evaluation.plot() is False
+    assert Evaluation.plot(TMP_FOLDER) is False
 
     # test
     #   OK
@@ -124,29 +125,29 @@ def test_evaluation(mocker):
 
     # k-fold
     #   OK
-    assert Evaluation.k_fold(clf, x_data, y_data, n_grams=3, plot=PY3) > 0
-    assert Evaluation.k_fold(clf, x_data, y_data, k_fold=10, plot=PY3) > 0
-    assert Evaluation.k_fold(clf, x_data, y_data, k_fold=10, def_cat='unknown', plot=PY3) > 0
-    assert Evaluation.k_fold(clf, x_data, y_data, k_fold=10, def_cat='neg', plot=PY3) > 0
-    assert Evaluation.k_fold(clf, x_data, y_data, metric="f1-score", plot=PY3) > 0
-    assert Evaluation.k_fold(clf, x_data, y_data, metric="recall", avg="weighted", plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, n_grams=3, plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, k=10, plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, k=10, def_cat='unknown', plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, k=10, def_cat='neg', plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, metric="f1-score", plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, metric="recall", avg="weighted", plot=PY3) > 0
     #   Not OK
     with pytest.raises(ValueError):
-        Evaluation.k_fold(clf, x_data, y_data, n_grams=-1, plot=PY3)
+        kfold_validation(clf, x_data, y_data, n_grams=-1, plot=PY3)
     with pytest.raises(ValueError):
-        Evaluation.k_fold(clf, x_data, y_data, n_grams=clf, plot=PY3)
+        kfold_validation(clf, x_data, y_data, n_grams=clf, plot=PY3)
     with pytest.raises(ValueError):
-        Evaluation.k_fold(clf, x_data, y_data, k_fold=-1, plot=PY3)
+        kfold_validation(clf, x_data, y_data, k=-1, plot=PY3)
     with pytest.raises(ValueError):
-        Evaluation.k_fold(clf, x_data, y_data, k_fold=clf, plot=PY3)
+        kfold_validation(clf, x_data, y_data, k=clf, plot=PY3)
     with pytest.raises(ValueError):
-        Evaluation.k_fold(clf, x_data, y_data, k_fold=None, plot=PY3)
+        kfold_validation(clf, x_data, y_data, k=None, plot=PY3)
     with pytest.raises(InvalidCategoryError):
-        Evaluation.k_fold(clf, x_data, y_data, def_cat='xxx', plot=PY3)
+        kfold_validation(clf, x_data, y_data, def_cat='xxx', plot=PY3)
     with pytest.raises(KeyError):
-        Evaluation.k_fold(clf, x_data, y_data, metric="xxx", plot=PY3)
+        kfold_validation(clf, x_data, y_data, metric="xxx", plot=PY3)
     with pytest.raises(KeyError):
-        Evaluation.k_fold(clf, x_data, y_data, metric="recall", avg="xxx", plot=PY3)
+        kfold_validation(clf, x_data, y_data, metric="recall", avg="xxx", plot=PY3)
 
     # grid_search
     #   OK
@@ -200,7 +201,7 @@ def test_evaluation(mocker):
         Evaluation.get_best_hyperparameters(method="4-fold", def_cat="unknown")
 
     # plot OK
-    assert Evaluation.plot() is True
+    assert Evaluation.plot(TMP_FOLDER) is True
 
     # remove
     #   OK
@@ -211,7 +212,7 @@ def test_evaluation(mocker):
     assert Evaluation.remove(def_cat="xxx")[0] == 0
     assert Evaluation.remove(method="xxx")[0] == 0
     assert Evaluation.remove()[0] == 1
-    assert Evaluation.plot() is False  # plot not OK (no evaluations)
+    assert Evaluation.plot(TMP_FOLDER) is False  # plot not OK (no evaluations)
     #   not OK
     with pytest.raises(TypeError):
         Evaluation.remove("xxx")

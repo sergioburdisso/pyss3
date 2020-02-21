@@ -238,6 +238,7 @@ def train(
 
 
 def overwrite_model(model_path, model_name):
+    """Remove both, the model and cache file."""
     cache_file = path.join(model_path, model_name + EVAL_CACHE_EXT)
     if path.exists(cache_file):
         remove_file(cache_file)
@@ -284,14 +285,16 @@ def load_data(data_path, folder_label, cmd_name=STR_TEST):
 
 
 def evaluation_plot(open_browser=True):
-    if not Evaluation.plot(open_browser):
+    """Plot the interactive 3D evaluation plot."""
+    if not Evaluation.plot(open_browser=open_browser):
         Print.warn(
             "Suggestion: evaluate your model using one of the commands: "
             "'test', 'k-fold' or 'grid_search'"
         )
 
 
-def evaluations_remove(data_path, method, def_cat, hparams):
+def evaluation_remove(data_path, method, def_cat, hparams):
+    """Remove the evaluation results selected by the user."""
     try:
         count, count_details = Evaluation.remove(
             hparams["s"], hparams["l"], hparams["p"], hparams["a"],
@@ -561,7 +564,7 @@ class SS3Prompt(Cmd):
             s, l, p, a = CLF.get_hyperparameters()
             CLF.set_hyperparameters(hparams["s"], hparams["l"], hparams["p"], hparams["a"])
 
-            Evaluation.k_fold(
+            Evaluation.kfold_cross_validation(
                 CLF, x_data, y_data, k_fold, n_grams, def_cat, data_path, cache=cache
             )
 
@@ -810,7 +813,7 @@ class SS3Prompt(Cmd):
         elif cmd == STR_SAVE:
             evaluation_plot(open_browser=False)
         elif cmd == STR_REMOVE:
-            evaluations_remove(data_path, method, def_cat, hparams)
+            evaluation_remove(data_path, method, def_cat, hparams)
         else:
             Print.error(ERROR_UA % cmd)
 

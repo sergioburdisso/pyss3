@@ -33,8 +33,9 @@ def test_ss3prompt(mocker, monkeypatch):
     #     "tests/ss3_models/ss3_model_evaluation[%s].html"
     # )
     # replaced by:
+    html_file_original = pyss3.util.EVAL_HTML_OUT_FILE
     pyss3.cmd_line.STOPWORDS_FILE = "tests/ss3_models/ss3_stopwords[%s].txt"
-    pyss3.util.EVAL_HTML_OUT_FILE = "tests/ss3_models/ss3_model_evaluation[%s].html"
+    pyss3.util.EVAL_HTML_OUT_FILE = "tests/ss3_models/" + html_file_original
 
     Evaluation.__cache__ = None
     Evaluation.__cache_file__ = None
@@ -224,3 +225,5 @@ def test_ss3prompt(mocker, monkeypatch):
     cmd.complete_evaluations("", 0, 0, 0)
 
     main()
+
+    pyss3.util.EVAL_HTML_OUT_FILE = html_file_original
