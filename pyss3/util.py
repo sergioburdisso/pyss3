@@ -1348,10 +1348,12 @@ class Evaluation:
         lists of hyperparameters values. Once finished, it returns the best hyperparameter
         values found for the given metric.
 
-        If the argument ``k_fold`` is provided, the grid search will perform a stratified
-        k-fold cross validation for each combination of given hyperparameter values. If not
-        given, will use the ``x_data`` as if it were a test set (x_test) and will use this
-        test set to evaluate the classifier performance for each hyperparameter value.
+        If the argument ``k_fold`` is provided, the grid search will perform a
+        stratified k-fold cross validation for each combination of given
+        hyperparameter values. If ``k_fold`` is not given, will use the
+        ``x_data`` as if it were a test set (x_test) and will use this test
+        set to evaluate the classifier performance for each hyperparameter
+        value.
 
         Examples:
 
@@ -1372,7 +1374,7 @@ class Evaluation:
         >>> ...
         >>> # since this grid search performs the same computation than the above
         >>> # cached values will be used, instead of computing all over again.
-        >>> s, l, p, a = Evaluation.grid_search(clf,
+        >>> s, l, p, _ = Evaluation.grid_search(clf,
         >>>                                     x_test, y_test,
         >>>                                     s = [.3, .4, .5],
         >>>                                     l = [.5, 1, 1.5],
@@ -1382,7 +1384,7 @@ class Evaluation:
         >>>       "the value of s, l and p that obtained the best F1 score were, "
         >>>       "respectively:", s, l, p)
         >>> ...
-        >>> s, l, p, a = Evaluation.grid_search(clf,
+        >>> s, l, p, _ = Evaluation.grid_search(clf,
         >>>                                     x_train, y_train,
         >>>                                     s = [.3, .4, .5],
         >>>                                     l = [.5, 1, 1.5],
