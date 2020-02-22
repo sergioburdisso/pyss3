@@ -2059,12 +2059,16 @@ class SS3:
 
         Print.info("about to start training", offset=1)
         Print.verbosity_region_begin(VERBOSITY.NORMAL)
-        for i in tqdm(range(len(x_train)), desc="Training",
-                      leave=leave_pbar, disable=Print.is_quiet()):
+        progress_bar = tqdm(total=len(x_train), desc="Training",
+                            leave=leave_pbar, disable=Print.is_quiet())
+        for i in range(len(x_train)):
+            progress_bar.set_description_str("Training on '%s'" % str(y_train[i]))
             self.learn(
                 x_train[i], y_train[i],
                 n_grams=n_grams, prep=prep, update=False
             )
+            progress_bar.update(1)
+        progress_bar.close()
         self.__prune_tries__()
         Print.verbosity_region_end()
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
