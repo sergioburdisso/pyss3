@@ -451,8 +451,7 @@ class Evaluation:
         metric='accuracy', avg='macro'
     ):
         """Create the classification report for k-fold validations."""
-        verbosity = Print.get_verbosity()
-        Print.set_verbosity(VERBOSITY.VERBOSE)
+        Print.verbosity_region_begin(VERBOSITY.VERBOSE, force=True)
 
         s, l = round_fix(s), round_fix(l)
         p, a = round_fix(p), round_fix(a)
@@ -491,7 +490,7 @@ class Evaluation:
         )
 
         Print.show(report)
-        Print.set_verbosity(verbosity)
+        Print.verbosity_region_end()
 
         if plot:
             Evaluation.__plot_confusion_matrices__(
@@ -600,10 +599,8 @@ class Evaluation:
         import warnings
         from . import STR_UNKNOWN_CATEGORY, IDX_UNKNOWN_CATEGORY, STR_UNKNOWN
         warnings.filterwarnings('ignore')
-
-        verbosity = Print.get_verbosity()
         if force_show:
-            Print.set_verbosity(VERBOSITY.VERBOSE)
+            Print.verbosity_region_begin(VERBOSITY.VERBOSE, force=True)
 
         n_cats = len(categories)
         if def_cat == STR_UNKNOWN:
@@ -683,8 +680,9 @@ class Evaluation:
                 (s, l, p, a)
             )
 
-        Print.set_verbosity(verbosity)
         warnings.filterwarnings('default')
+        if force_show:
+            Print.verbosity_region_end()
 
         if metric == STR_ACCURACY:
             return accuracy
@@ -719,8 +717,7 @@ class Evaluation:
 
         method = Evaluation.__kfold2method__(k_fold)
 
-        verbosity = Print.get_verbosity()
-        Print.set_verbosity(VERBOSITY.QUIET)
+        Print.verbosity_region_begin(VERBOSITY.QUIET)
 
         for s, l, p in slp_list:
             clf.set_hyperparameters(s, l, p)
@@ -772,7 +769,7 @@ class Evaluation:
         progress_bar.close()
         progress_desc.close()
 
-        Print.set_verbosity(verbosity)
+        Print.verbosity_region_end()
 
     @staticmethod
     def set_classifier(clf):
@@ -1905,7 +1902,7 @@ class Print:
         return Print.__verbosity__ >= VERBOSITY.VERBOSE
 
     @staticmethod
-    def verbosity_region_begin(level):
+    def verbosity_region_begin(level, force=False):
         """
         Indicate that a region with different verbosity begins.
 
@@ -1927,7 +1924,7 @@ class Print:
         :type level: int
         """
         Print.__verbosity_region_stack__.append(Print.__verbosity__)
-        if not Print.is_quiet():
+        if force or not Print.is_quiet():
             Print.__verbosity__ = level
 
     @staticmethod
