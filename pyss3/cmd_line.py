@@ -727,7 +727,8 @@ class SS3Prompt(Cmd):
             Evaluation.grid_search(
                 CLF, x_data, y_data,
                 hparams["s"], hparams["l"], hparams["p"], hparams["a"],
-                k_fold, n_grams, def_cat, data_path, cache=cache
+                k_fold, n_grams, def_cat, data_path,
+                cache=cache, extended_pbar=True
             )
             Print.warn(
                 "Suggestion: use the command 'plot %s' to visualize the results"
