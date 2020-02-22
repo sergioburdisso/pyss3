@@ -719,9 +719,8 @@ class Evaluation:
             disable=not extended_pbar
         )
 
-        method = Evaluation.__kfold2method__(k_fold)
-
-        Print.verbosity_region_begin(VERBOSITY.QUIET)
+        verbosity = Print.get_verbosity()
+        Print.set_verbosity(VERBOSITY.QUIET)
 
         for s, l, p in slp_list:
             clf.set_hyperparameters(s, l, p)
