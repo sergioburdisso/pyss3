@@ -1535,11 +1535,15 @@ class Dataset:
         if not folder_label:
 
             files = listdir(data_path)
-            for file in tqdm(files, desc=" Category files",
-                             leave=True, disable=Print.is_quiet()):
+            progress_bar = tqdm(
+                total=len(files), desc="Loading documents",
+                disable=Print.is_quiet()
+            )
+            for file in files:
                 file_path = path.join(data_path, file)
                 if path.isfile(file_path):
                     cat = path.splitext(file)[0]
+                    progress_bar.set_description_str("Loading '%s' documents" % cat)
 
                     with open(file_path, "r", encoding=ENCODING) as fcat:
                         docs = (fcat.readlines()
@@ -1549,6 +1553,8 @@ class Dataset:
                     y_data.extend([cat] * len(docs))
 
                     cat_info[cat] = len(docs)
+                progress_bar.update(1)
+            progress_bar.close()
         else:
             folders = listdir(data_path)
             for icat, cat in enumerate(folders):
