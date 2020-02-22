@@ -696,18 +696,22 @@ class Evaluation:
     @staticmethod
     def __grid_search_loop__(
         clf, x_test, y_test, ss, ll, pp, aa, k_fold,
-        i_fold, def_cat, tag, categories, cache=True, leave_pbar=True, extended_pbar=False
+        i_fold, def_cat, tag, categories, cache=True,
+        leave_pbar=True, extended_pbar=False, desc_pbar=None
     ):
         """Grid search main loop."""
+        method = Evaluation.__kfold2method__(k_fold)
+
         ss = [round_fix(s) for s in list_by_force(ss)]
         ll = [round_fix(l) for l in list_by_force(ll)]
         pp = [round_fix(p) for p in list_by_force(pp)]
         aa = [round_fix(a) for a in list_by_force(aa)]
 
         slp_list = list(product(ss, ll, pp))
+        desc_pbar = desc_pbar or "Grid search"
         progress_bar = tqdm(
-            total=len(slp_list) * len(aa),
-            desc=" Grid Search", leave=leave_pbar
+            total=len(slp_list) * len(aa), desc=desc_pbar,
+            leave=leave_pbar or (method != 'test' and i_fold + 1 >= k_fold)
         )
         progress_desc = tqdm(
             total=0,
@@ -920,7 +924,6 @@ class Evaluation:
         """
         avg = Evaluation.__avg2avg__(avg)
 
-        print("Evaluation.__clf__", Evaluation.__clf__)
         if not Evaluation.__clf__:
             raise ValueError(ERROR_CNA)
 
@@ -1298,7 +1301,8 @@ class Evaluation:
         categories = clf.get_categories()
         x_train, y_train = np.array(x_train), np.array(y_train)
         skf = StratifiedKFold(n_splits=k)
-        progress_bar = tqdm(total=k, desc=" K-Fold Progress")
+        pbar_desc = "k-fold validation"
+        progress_bar = tqdm(total=k, desc=pbar_desc)
         for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_train, y_train)):
             if not cache or not Evaluation.__cache_is_in__(
                 tag, method, def_cat, s, l, p, a
@@ -1309,11 +1313,15 @@ class Evaluation:
 
                 clf_fold = SS3()
                 clf_fold.set_hyperparameters(s, l, p, a)
+                Print.set_verbosity(VERBOSITY.QUIET)
+                progress_bar.set_description_str(pbar_desc + " [training...]")
                 clf_fold.fit(x_train_fold, y_train_fold, n_grams, leave_pbar=False)
 
+                progress_bar.set_description_str(pbar_desc + " [classifying...]")
                 y_pred = clf_fold.predict(
                     x_test_fold, def_cat, labels=False, leave_pbar=False
                 )
+                Print.set_verbosity(VERBOSITY.NORMAL)
 
                 Evaluation.__evaluation_result__(
                     clf_fold, y_test_fold, y_pred,
@@ -1324,6 +1332,7 @@ class Evaluation:
 
             progress_bar.update(1)
 
+        progress_bar.set_description_str(pbar_desc + " [finished]")
         progress_bar.close()
         Print.verbosity_region_end()
 
@@ -1474,10 +1483,6 @@ class Evaluation:
 
             x_data, y_data = np.array(x_data), np.array(y_data)
             skf = StratifiedKFold(n_splits=k_fold)
-            progress_bar = tqdm(
-                position=0, total=k_fold,
-                desc=" K-Fold Progress"
-            )
 
             for i_fold, (train_ix, test_ix) in enumerate(
                 skf.split(x_data, y_data)
@@ -1493,14 +1498,11 @@ class Evaluation:
                 Evaluation.__grid_search_loop__(
                     clf_fold, x_test, y_test, s, l, p, a, k_fold, i_fold,
                     def_cat, tag, categories, cache,
-                    leave_pbar=False, extended_pbar=extended_pbar
+                    leave_pbar=False, extended_pbar=extended_pbar,
+                    desc_pbar="[fold %d/%d] Grid search" % (i_fold + 1, k_fold)
                 )
-
                 Evaluation.__cache_update__()
 
-                progress_bar.update(1)
-
-            progress_bar.close()
             Print.verbosity_region_end()
 
         return Evaluation.get_best_hyperparameters(metric, avg)
@@ -1536,7 +1538,7 @@ class Dataset:
 
             files = listdir(data_path)
             for file in tqdm(files, desc=" Category files",
-                             leave=False, disable=Print.is_quiet()):
+                             leave=True, disable=Print.is_quiet()):
                 file_path = path.join(data_path, file)
                 if path.isfile(file_path):
                     cat = path.splitext(file)[0]
@@ -1556,8 +1558,10 @@ class Dataset:
                 if not path.isfile(cat_path):
                     cat_info[cat] = 0
                     files = listdir(cat_path)
-                    pbar_desc = "Loading documents for '%s' [%d/%d]" % (cat, icat + 1, len(folders))
-                    for file in tqdm(files, desc=pbar_desc, disable=Print.is_quiet()):
+                    pbar_desc = "[%d/%d] Loading '%s' documents" % (icat + 1, len(folders), cat)
+                    for file in tqdm(files, desc=pbar_desc,
+                                     leave=icat + 1 >= len(folders),
+                                     disable=Print.is_quiet()):
                         file_path = path.join(cat_path, file)
                         if path.isfile(file_path):
                             with open(file_path, "r", encoding=ENCODING) as ffile:

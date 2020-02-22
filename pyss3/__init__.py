@@ -2058,16 +2058,15 @@ class SS3:
         y_train = list(cats)
 
         Print.info("about to start training", offset=1)
-        verbosity = Print.get_verbosity()
-        Print.set_verbosity(VERBOSITY.NORMAL)
-        for i in tqdm(range(len(x_train)), desc=" Training",
+        Print.verbosity_region_begin(VERBOSITY.NORMAL)
+        for i in tqdm(range(len(x_train)), desc="Training",
                       leave=leave_pbar, disable=Print.is_quiet()):
             self.learn(
                 x_train[i], y_train[i],
                 n_grams=n_grams, prep=prep, update=False
             )
         self.__prune_tries__()
-        Print.set_verbosity(verbosity)
+        Print.verbosity_region_end()
         Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
         self.update_values(force=True)
 
@@ -2092,7 +2091,7 @@ class SS3:
         classify = self.classify
         return [
             classify(x, sort=False)
-            for x in tqdm(x_test, desc=" Classification", disable=Print.is_quiet())
+            for x in tqdm(x_test, desc="Classification", disable=Print.is_quiet())
         ]
 
     def predict(
@@ -2151,7 +2150,7 @@ class SS3:
 
         y_pred = [
             classify(doc, def_cat=def_cat, labels=labels, prep=prep)
-            for doc in tqdm(x_test, desc=" Classification",
+            for doc in tqdm(x_test, desc="Classification",
                             leave=leave_pbar, disable=Print.is_quiet())
         ]
 
