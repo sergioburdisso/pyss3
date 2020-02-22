@@ -719,8 +719,7 @@ class Evaluation:
             disable=not extended_pbar
         )
 
-        verbosity = Print.get_verbosity()
-        Print.set_verbosity(VERBOSITY.QUIET)
+        Print.verbosity_region_begin(VERBOSITY.QUIET)
 
         for s, l, p in slp_list:
             clf.set_hyperparameters(s, l, p)
@@ -1312,7 +1311,7 @@ class Evaluation:
 
                 clf_fold = SS3()
                 clf_fold.set_hyperparameters(s, l, p, a)
-                Print.set_verbosity(VERBOSITY.QUIET)
+                Print.verbosity_region_begin(VERBOSITY.QUIET)
                 progress_bar.set_description_str(pbar_desc + " [training...]")
                 clf_fold.fit(x_train_fold, y_train_fold, n_grams, leave_pbar=False)
 
@@ -1320,7 +1319,7 @@ class Evaluation:
                 y_pred = clf_fold.predict(
                     x_test_fold, def_cat, labels=False, leave_pbar=False
                 )
-                Print.set_verbosity(VERBOSITY.NORMAL)
+                Print.verbosity_region_end()
 
                 Evaluation.__evaluation_result__(
                     clf_fold, y_test_fold, y_pred,
