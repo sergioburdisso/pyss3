@@ -1721,7 +1721,7 @@ class Print:
     style = Style
 
     __verbosity__ = VERBOSITY.NORMAL
-    __verbosity_old__ = None
+    __verbosity_region_stack__ = []
 
     @staticmethod
     def error(msg='', raises=None, offset=0, decorator=True):
@@ -1926,8 +1926,8 @@ class Print:
                       (see ``set_verbosity`` documentation for valid values)
         :type level: int
         """
+        Print.__verbosity_region_stack__.append(Print.__verbosity__)
         if not Print.is_quiet():
-            Print.__verbosity_old__ = Print.__verbosity__
             Print.__verbosity__ = level
 
     @staticmethod
@@ -1948,9 +1948,7 @@ class Print:
         >>> Print.verbosity_region_end()
         >>> # the verbosity level is restored to what it was before entering the region
         """
-        if Print.__verbosity_old__ is not None:
-            Print.__verbosity__ = Print.__verbosity_old__
-            Print.__verbosity_old__ = None
+        Print.__verbosity__ = Print.__verbosity_region_stack__.pop()
 
 
 def round_fix(v, precision=4):
