@@ -94,7 +94,8 @@ def test_evaluation(mocker):
     assert Evaluation.test(clf, x_data, y_data, plot=PY3) == 1
     assert Evaluation.test(clf, ['bla bla bla'], ['pos'], plot=PY3) == 0
     assert Evaluation.test(clf,
-                           ['bla bla bla', "I love this love movie!"], ['pos', 'pos'],
+                           ['bla bla bla', "I love this love movie!"],
+                           ['pos', 'pos'],
                            plot=PY3) == 0.5
     assert kfold_validation(clf, x_data, y_data, plot=PY3) > 0
     s, l, p, a = clf.get_hyperparameters()
@@ -114,14 +115,17 @@ def test_evaluation(mocker):
     assert Evaluation.test(clf, x_data, y_data, def_cat='unknown', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, def_cat='neg', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, metric="f1-score", plot=PY3) == 1
-    assert Evaluation.test(clf, x_data, y_data, metric="recall", avg="weighted", plot=PY3) == 1
+    assert Evaluation.test(clf, x_data, y_data, plot=PY3,
+                           metric="recall", metric_target="weighted avg") == 1
+    assert Evaluation.test(clf, x_data, y_data, plot=PY3,
+                           metric="recall", metric_target="neg") == 1
     #   Not OK
     with pytest.raises(InvalidCategoryError):
         Evaluation.test(clf, x_data, y_data, def_cat='xxx', plot=PY3)
     with pytest.raises(KeyError):
         Evaluation.test(clf, x_data, y_data, metric="xxx", plot=PY3)
     with pytest.raises(KeyError):
-        Evaluation.test(clf, x_data, y_data, metric="recall", avg="xxx", plot=PY3)
+        Evaluation.test(clf, x_data, y_data, metric="recall", metric_target="xxx", plot=PY3)
 
     # k-fold
     #   OK
@@ -130,7 +134,10 @@ def test_evaluation(mocker):
     assert kfold_validation(clf, x_data, y_data, k=10, def_cat='unknown', plot=PY3) > 0
     assert kfold_validation(clf, x_data, y_data, k=10, def_cat='neg', plot=PY3) > 0
     assert kfold_validation(clf, x_data, y_data, metric="f1-score", plot=PY3) > 0
-    assert kfold_validation(clf, x_data, y_data, metric="recall", avg="weighted", plot=PY3) > 0
+    assert kfold_validation(clf, x_data, y_data, plot=PY3,
+                            metric="recall", metric_target="weighted avg") > 0
+    assert kfold_validation(clf, x_data, y_data, plot=PY3,
+                            metric="recall", metric_target="neg") > 0
     #   Not OK
     with pytest.raises(ValueError):
         kfold_validation(clf, x_data, y_data, n_grams=-1, plot=PY3)
@@ -147,7 +154,7 @@ def test_evaluation(mocker):
     with pytest.raises(KeyError):
         kfold_validation(clf, x_data, y_data, metric="xxx", plot=PY3)
     with pytest.raises(KeyError):
-        kfold_validation(clf, x_data, y_data, metric="recall", avg="xxx", plot=PY3)
+        kfold_validation(clf, x_data, y_data, metric="recall", metric_target="xxx", plot=PY3)
 
     # grid_search
     #   OK
@@ -159,8 +166,10 @@ def test_evaluation(mocker):
     s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data, def_cat='neg', p=pp)
     assert s0 == s1 and l0 == l1 and p0 == p1 and a0 == a1
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data, metric="f1-score", p=pp)
-    s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data,
-                                            metric="recall", avg="weighted", p=pp)
+    s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data, p=pp,
+                                            metric="recall", metric_target="weighted avg")
+    s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data, p=pp,
+                                            metric="recall", metric_target="neg")
     assert s0 == s1 and l0 == l1 and p0 == p1 and a0 == a1
     #   Not OK
     with pytest.raises(TypeError):
@@ -176,12 +185,13 @@ def test_evaluation(mocker):
     with pytest.raises(KeyError):
         Evaluation.grid_search(clf, x_data, y_data, metric="xxx")
     with pytest.raises(KeyError):
-        Evaluation.grid_search(clf, x_data, y_data, metric="recall", avg="xxx")
+        Evaluation.grid_search(clf, x_data, y_data, metric="recall", metric_target="xxx")
 
     # get_best_hyperparameters
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters()
     s2, l2, p2, a2 = Evaluation.get_best_hyperparameters("recall")
-    s1, l1, p1, a1 = Evaluation.get_best_hyperparameters("recall", "weighted")
+    s1, l1, p1, a1 = Evaluation.get_best_hyperparameters("recall", "weighted avg")
+    s1, l1, p1, a1 = Evaluation.get_best_hyperparameters("recall", "pos")
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters(method="10-fold")
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters(method="10-fold", def_cat="neg")
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters(method="10-fold", def_cat="unknown")
@@ -223,7 +233,7 @@ def test_evaluation(mocker):
     Evaluation.show_best(method="test")
     Evaluation.show_best(def_cat="unknown")
     Evaluation.show_best(metric="f1-score")
-    Evaluation.show_best(metric="f1-score", avg="weighted")
+    Evaluation.show_best(metric="f1-score", avg="weighted avg")
 
     # different tag
 

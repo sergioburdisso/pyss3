@@ -62,9 +62,8 @@ STR_MOST_PROBABLE = "most-probable"
 ERROR_NAM = "'%s' is not a valid metric " + "(excepted: %s)" % (
     ", ".join(["'%s'" % m for m in [STR_ACCURACY] + METRICS])
 )
-ERROR_NAA = "'%s' is not a valid average " + "(excepted: %s)" % (
-    ", ".join(["'%s'" % a for a in AVGS])
-)
+ERROR_NAT = "'%s' is not a valid target "
+ERROR_NAT += "(excepted: %s or a category label)" % (", ".join(["'%s'" % a for a in AVGS]))
 ERROR_CNE = "the classifier has not been evaluated yet"
 ERROR_CNA = ("a classifier has not yet been assigned "
              "(try using `Evaluation.set_classifier (clf)`)")
@@ -102,9 +101,9 @@ class Evaluation:
     mechanism in which all the previously computed evaluation will be
     permanently stored for later use. This will prevent the user to waste time
     performing the same evaluation more than once, or, in case of computer
-    crashes or power failure during a long evaluation, once relunched, it
-    will skip previously computed values to continue from the point were the
-    crashed happened on.
+    crashes or power failure during a long evaluation, once relunched, it will
+    skip previously computed values and continue the evaluation from the point
+    were the crashed happened on.
 
     Usage:
 
@@ -125,12 +124,6 @@ class Evaluation:
     def __kfold2method__(k_fold):
         """Convert the k number to a proper method string."""
         return STR_TEST if not k_fold or k_fold <= 1 else str(k_fold) + '-' + STR_FOLD
-
-    @staticmethod
-    def __avg2avg__(avg):
-        """Convert the average string to its sklearn average string counterpart."""
-        pad = " avg"
-        return str(avg).strip() + pad if str(avg).strip()[-4:] != pad else avg
 
     @staticmethod
     def __set_last_evaluation__(tag, method, def_cat):
@@ -448,7 +441,7 @@ class Evaluation:
     @staticmethod
     def __classification_report_k_fold__(
         tag, method, def_cat, s, l, p, a, plot=True,
-        metric='accuracy', avg='macro'
+        metric='accuracy', metric_target='macro avg'
     ):
         """Create the classification report for k-fold validations."""
         Print.verbosity_region_begin(VERBOSITY.VERBOSE, force=True)
@@ -505,9 +498,11 @@ class Evaluation:
         else:
             if metric not in cache:
                 raise KeyError(ERROR_NAM % str(metric))
-            if avg not in cache[metric]:
-                raise KeyError(ERROR_NAA % str(avg))
-            return cache[metric][avg]["value"][s][l][p][a]
+            if metric_target in cache[metric]:
+                return cache[metric][metric_target]["value"][s][l][p][a]
+            elif metric_target in cache[metric]["categories"]:
+                return cache[metric]["categories"][metric_target]["value"][s][l][p][a]
+            raise KeyError(ERROR_NAT % str(metric_target))
 
     @staticmethod
     def __plot_confusion_matrices__(cms, classes, info='', max_colums=3):
@@ -593,7 +588,7 @@ class Evaluation:
     def __evaluation_result__(
         clf, y_true, y_pred, categories, def_cat, cache=True, method="test",
         tag=None, folder=False, plot=True, k_fold=1, i_fold=0, force_show=False,
-        metric='accuracy', avg='macro'
+        metric='accuracy', metric_target='macro avg'
     ):
         """Compute evaluation results and save them to disk (cache)."""
         import warnings
@@ -687,11 +682,12 @@ class Evaluation:
         if metric == STR_ACCURACY:
             return accuracy
         else:
-            if avg not in report:
-                raise KeyError(ERROR_NAA % str(avg))
-            if metric not in report[avg]:
+            if metric_target not in report:
+                raise KeyError(ERROR_NAT % str(metric_target))
+            if metric not in report[metric_target]:
                 raise KeyError(ERROR_NAM % str(metric))
-            return report[avg][metric]
+
+            return report[metric_target][metric]
 
     @staticmethod
     def __grid_search_loop__(
@@ -880,7 +876,7 @@ class Evaluation:
 
     @staticmethod
     def get_best_hyperparameters(
-        metric='accuracy', avg='macro', tag=None, method=None, def_cat=None
+        metric='accuracy', metric_target='macro avg', tag=None, method=None, def_cat=None
     ):
         """
         Return the best hyperparameter values for the given metric.
@@ -894,16 +890,19 @@ class Evaluation:
         Available metrics are: 'accuracy', 'f1-score', 'precision', and
         'recall'.
 
-        Except for accuracy, for the other metrics an average (``avg``) option
-        must also be supplied, average options are: 'macro', 'micro', and
-        'weighted'.
+        Except for accuracy, a ``metric_target`` option must also be supplied
+        along with the ``metric`` indicating the target we aim at measuring,
+        that is, whether we want to measure some averaging performance  or the
+        performance on a particular category.
 
         :param metric: the evaluation metric, options are: 'accuracy', 'f1-score',
-                       'precision', and 'recall' (default: 'accuracy').
+                       'precision', or 'recall' (default: 'accuracy').
         :type metric: str
-        :param avg: the averaging method to be used, options are: 'macro', 'micro',
-                    and 'weighted' (default 'macro').
-        :type avg: str
+        :param metric_target: the target we aim at measuring with the given
+                              metric. Options are: 'macro avg', 'micro avg',
+                              'weighted avg' or a category label (default
+                              'macro avg').
+        :type metric_target: str
         :param tag: the cache tag from where to look up the results
                      (by default it will automatically use the tag of the last
                      evaluation performed)
@@ -920,26 +919,28 @@ class Evaluation:
         :rtype: tuple
         :raises: ValueError, LookupError, KeyError
         """
-        avg = Evaluation.__avg2avg__(avg)
-
         if not Evaluation.__clf__:
             raise ValueError(ERROR_CNA)
 
         if metric != STR_ACCURACY and metric not in METRICS:
             raise KeyError(ERROR_NAM % str(metric))
 
-        if avg not in AVGS:
-            raise KeyError(ERROR_NAA % str(avg))
-
         l_tag, l_method, l_def_cat = Evaluation.__get_last_evaluation__()
         tag, method, def_cat = tag or l_tag, method or l_method, def_cat or l_def_cat
+        cache = Evaluation.__cache__[tag][method][def_cat]
 
-        c_metric = Evaluation.__cache__[tag][method][def_cat][metric]
+        if metric_target not in AVGS and metric_target not in cache["categories"]:
+            raise KeyError(ERROR_NAT % str(metric_target))
+
+        c_metric = cache[metric]
 
         if metric == STR_ACCURACY:
             best = c_metric["best"]
         else:
-            best = c_metric[avg]["best"]
+            if metric_target in AVGS:
+                best = c_metric[metric_target]["best"]
+            else:
+                best = c_metric["categories"][metric_target]["best"]
 
         if not best:
             raise LookupError(ERROR_CNE)
@@ -964,13 +965,11 @@ class Evaluation:
         :param metric: an evaluation metric, options are: 'accuracy', 'f1-score',
                        'precision', and 'recall' (optional).
         :type metric: str
-        :param avg: an averaging method, options are: 'macro', 'micro',
-                    and 'weighted' (optional).
+        :param avg: an averaging method, options are: 'macro avg', 'micro avg',
+                    and 'weighted avg' (optional).
         :type avg: str
         :raises: ValueError
         """
-        avg = Evaluation.__avg2avg__(avg)
-
         if not Evaluation.__clf__:
             raise ValueError(ERROR_CNA)
 
@@ -1132,7 +1131,7 @@ class Evaluation:
     @staticmethod
     def test(
         clf, x_test, y_test, def_cat=STR_MOST_PROBABLE,
-        tag=None, plot=True, metric='accuracy', avg='macro', cache=True
+        tag=None, plot=True, metric='accuracy', metric_target='macro avg', cache=True
     ):
         """
         Test the model using the given test set.
@@ -1170,9 +1169,11 @@ class Evaluation:
                         'accuracy', 'f1-score', 'precision', or 'recall'
                         (default: 'accuracy').
         :type metric: str
-        :param avg: the averaging method for the metric, options are:
-                    'macro', 'micro', and 'weighted' (default: 'macro').
-        :type avg: str
+        :param metric_target: the target we aim at measuring with the given
+                              metric. Options are: 'macro avg', 'micro avg',
+                              'weighted avg' or a category label (default
+                              'macro avg').
+        :type metric_target: str
         :param cache: whether to use cached values or not. Setting ``cache=False`` forces
                       to completely perform the evaluation ignoring cached values
                       (default: True).
@@ -1181,8 +1182,6 @@ class Evaluation:
         :rtype: float
         :raises: EmptyModelError, KeyError
         """
-        avg = Evaluation.__avg2avg__(avg)
-
         Evaluation.set_classifier(clf)
         tag = tag or Evaluation.__cache_get_default_tag__(clf, x_test)
         s, l, p, a = clf.get_hyperparameters()
@@ -1207,7 +1206,7 @@ class Evaluation:
         return Evaluation.__evaluation_result__(
             clf, y_test, y_pred, categories,
             def_cat, cache, STR_TEST, tag,
-            metric=metric, avg=avg,
+            metric=metric, metric_target=metric_target,
             plot=plot, force_show=True
         )
 
@@ -1215,7 +1214,7 @@ class Evaluation:
     def kfold_cross_validation(
         clf, x_train, y_train, k=4, n_grams=None,
         def_cat=STR_MOST_PROBABLE, tag=None, plot=True,
-        metric='accuracy', avg='macro', cache=True
+        metric='accuracy', metric_target='macro avg', cache=True
     ):
         """
         Perform a Stratified k-fold cross validation on the given training set.
@@ -1263,9 +1262,11 @@ class Evaluation:
                         'accuracy', 'f1-score', 'precision', or 'recall'
                         (default: 'accuracy').
         :type metric: str
-        :param avg: the averaging method for the metric, options are:
-                    'macro', 'micro', and 'weighted' (default: 'macro').
-        :type avg: str
+        :param metric_target: the target we aim at measuring with the given
+                              metric. Options are: 'macro avg', 'micro avg',
+                              'weighted avg' or a category label (default
+                              'macro avg').
+        :type metric_target: str
         :param cache: whether to use cached values or not. Setting ``cache=False`` forces
                       to completely perform the evaluation ignoring cached values
                       (default: True).
@@ -1275,7 +1276,6 @@ class Evaluation:
         :raises: InvalidCategoryError, EmptyModelError, ValueError, KeyError
         """
         from . import SS3, EmptyModelError
-        avg = Evaluation.__avg2avg__(avg)
 
         if not clf or not clf.__categories__:
             raise EmptyModelError
@@ -1337,14 +1337,14 @@ class Evaluation:
         Print.show()
         return Evaluation.__classification_report_k_fold__(
             tag, method, def_cat, s, l, p, a,
-            metric=metric, avg=avg, plot=plot
+            metric=metric, metric_target=metric_target, plot=plot
         )
 
     @staticmethod
     def grid_search(
         clf, x_data, y_data, s=None, l=None, p=None, a=None,
         k_fold=None, n_grams=None, def_cat=STR_MOST_PROBABLE, tag=None,
-        metric='accuracy', avg='macro', cache=True, extended_pbar=False
+        metric='accuracy', metric_target='macro avg', cache=True, extended_pbar=False
     ):
         """
         Perform a grid search using the provided hyperparameter values.
@@ -1435,9 +1435,11 @@ class Evaluation:
                         'accuracy', 'f1-score', 'precision', or 'recall'
                         (default: 'accuracy').
         :type metric: str
-        :param avg: the averaging method for the metric, options are:
-                    'macro', 'micro', and 'weighted' (default: 'macro').
-        :type avg: str
+        :param metric_target: the target we aim at measuring with the given
+                              metric. Options are: 'macro avg', 'micro avg',
+                              'weighted avg' or a category label (default
+                              'macro avg').
+        :type metric_target: str
         :param cache: whether to use cached values or not. Setting ``cache=False`` forces
                       to completely perform the evaluation ignoring cached values
                       (default: True).
@@ -1450,8 +1452,6 @@ class Evaluation:
         :rtype: tuple
         :raises: InvalidCategoryError, EmptyModelError, ValueError, TypeError
         """
-        avg = Evaluation.__avg2avg__(avg)
-
         if k_fold is not None and type(k_fold) is not int:
             raise TypeError(ERROR_IKT)
 
@@ -1503,7 +1503,7 @@ class Evaluation:
 
             Print.verbosity_region_end()
 
-        return Evaluation.get_best_hyperparameters(metric, avg)
+        return Evaluation.get_best_hyperparameters(metric, metric_target)
 
 
 class Dataset:
