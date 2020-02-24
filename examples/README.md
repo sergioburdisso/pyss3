@@ -2,7 +2,7 @@
 
 This folder contains files related tutorials, for instance, the following tutorials:
 
-:page_facing_up: [Movie Reviews (Sentiment Analysis)](https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html)
+:page_facing_up: [Sentiment Analysis on Movie Reviews](https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html)
 
 :page_facing_up: [Topic Categorization](https://pyss3.readthedocs.io/en/latest/tutorials/topic-categorization.html)
 
