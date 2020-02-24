@@ -58,7 +58,7 @@ related to these 8 different categories: *“art&photography”,
     x_train, y_train = Dataset.load_from_files("datasets/topic/train", folder_label=False)
     
     # Let the training begin...
-    clf.fit(x_train, y_train, n_grams=3)
+    clf.train(x_train, y_train, n_grams=3)
 
 
 .. parsed-literal::
@@ -452,14 +452,14 @@ was used for classifying the document as scientific:
 
     fragments = clf.extract_insight(document, cat="science&technology", level="paragraph")
     
-    print("The most cool paragraph is:\n\n", fragments[0][0])
+    print("The coolest paragraph is:\n\n", fragments[0][0])
     print()
     print("And its confidence value:", fragments[0][1])
 
 
 .. parsed-literal::
 
-    The most cool paragraph is:
+    The coolest paragraph is:
     
      Method: This study used a parallel randomized control group design to compare pre-test and post-test social cognition scores between depressed participants receiving ISTDP and those allocated to a wait-list control group. Participants were adults (19–40 years of age) who were diagnosed with depression. We recruited 32 individuals, with 16 participants allocated to the ISTDP and control groups, respectively. Both groups were similar in terms of age, sex and educational level.
     

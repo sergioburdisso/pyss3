@@ -51,71 +51,37 @@ As it is described in :ref:`workflow`, you can choose between two possible paths
 Classic Workflow
 ================
 
-Make sure you're in the PySS3's "examples" folder...
+Click :ref:`here <topic_categorization-notebook>` to go to the :ref:`tutorial notebook <topic_categorization-notebook>`.
 
-.. code:: console
+.. note:: Want to run this Jupyter Notebook on your computer?
 
-    cd your/path/to/pyss3/examples
+  1. Go to :ref:`tutorial-setup` and make sure you have everything we need.
 
-and that our conda environment is activated:
+  2. Make sure you're in the PySS3's "examples" folder...
 
-.. code:: console
+  .. code:: console
 
-    conda activate pyss3tutos
+      cd your/path/to/pyss3/examples
 
-Now, if you have Jupyter Notebook installed, lunch it and and run the "topic_categorization.ipynb" notebook (make sure to select the "pyss3tutos" kernel).
+  and that our conda environment is activated:
 
-.. code:: console
+  .. code:: console
 
-    jupyter notebook
+      conda activate pyss3tutos
 
+  3. Then, lunch Jupyter Notebook and and run the "movie_review.ipynb" notebook (make sure to select the "pyss3tutos" kernel).
 
-If you don't have Jupyter Notebook installed, you can either:
+  .. code:: console
 
-* Create an empty python file (.py) inside the "examples" folder and complete it step-by-step following the html version of the notebook available :ref:`here <topic_categorization-notebook>`.
-
-.. note:: the "examples" folder includes a file called "topic_categorization.py" which already contains all the needed code.
-
-* Or, try out the interactive online version of the notebook `here <https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples/topic_categorization.ipynb>`__.
-
-.. warning:: keep in mind that, by using this online notebook, you won't be able to manually (and visually) test your model through the interactive :ref:`live-test` tool.
-
-
-.. _topic_hyperparameter-optimization:
-
-Hyperparameter Optimization
-----------------------------
-
-Close to the end of notebook for this tutorial, we created a model called "topic_categorization_3grams" and save it so that we could load it later from the ``PySS3 Command Line`` to perform hyperparameter optimization. Hyperparameter optimization will allow us to find better :ref:`hyperparameter <ss3-hyperparameter>` values for our model. Well, here we'll learn how to do it.
-
-Make sure you're in the PySS3's "examples" folder and that our conda environment is activated:
-
-.. code:: console
-
-    your@user:~$ cd /your/path/to/pyss3/examples
-    your@user:/your/path/to/pyss3/examples$ conda activate pyss3tutos
-
-
-Now use the "pyss3" command to run the ``PySS3 Command Line`` tool:
-
-.. code:: console
-
-    your@user:/your/path/to/pyss3/examples$ pyss3
-
-First, we need to load our model (remember we called it "topic_categorization_3grams"):
-
-.. code:: console
-
-    (pyss3) >>> load topic_categorization_3grams
-
-
-Then follow the steps given :ref:`here <topic_hyperparameter-optimization-command-line>`, and that's it!
+      jupyter notebook
 
 
 .. _topic_command-line-workflow:
 
 Command-Line Workflow
 =====================
+
+.. note:: Before beginning, make sure you have everything ready by reading the :ref:`tutorial-setup` section.
 
 Make sure you're in the PySS3's "examples" folder and that our conda environment is activated:
 
@@ -233,7 +199,6 @@ Live test doesn't look bad, however, we will create a "more intelligent" version
 
     (pyss3) >>> new topic_categorization_3grams
 
-.. warning:: if you have previously done this tutorial following the :ref:`topic_classic-workflow` path, PySS3 Command Line will display **"This model already exists, do you really want to overwrite it? [Y/n]"** because you have already created a model called "topic_categorization_3grams" in the last part of the tutorial. Answer with 'Y' (**note it is capitalized**) and then press Enter to overwrite it.
 
 As we said above, we want this model to learn to recognize variable-length n-grams. Fortunately, as it was displayed with ``help train``, we know that the ``train`` command accepts an extra argument: *N*-grams (where *N* is any positive integer). This argument will allow us to do what we want, we will use ``3-grams`` to indicate we want SS3 to learn to recognize important words, bigrams, and 3-grams **(*)**
 

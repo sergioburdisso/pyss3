@@ -247,7 +247,7 @@
     </select>
     <span ng-show="c.mo && c.mc != 'accuracy'" class="show-left-right">
       <br>
-      Option:
+      Target:
       <select ng-model="c.mo" ng-change="update()">
         <option ng-repeat="(metric_op, _) in results[c.p][c.m][c.dc][c.mc]" ng-value="metric_op">{{metric_op}}</option>
       </select>

@@ -1351,14 +1351,13 @@ class Evaluation:
 
         Given a test or a training set, this method performs a grid search using the given
         lists of hyperparameters values. Once finished, it returns the best hyperparameter
-        values found for the given metric.
+        values found for the given ``metric``.
 
         If the argument ``k_fold`` is provided, the grid search will perform a
-        stratified k-fold cross validation for each combination of given
-        hyperparameter values. If ``k_fold`` is not given, will use the
-        ``x_data`` as if it were a test set (x_test) and will use this test
-        set to evaluate the classifier performance for each hyperparameter
-        value.
+        stratified k-fold cross validation for each hyperparameter value
+        combination. If ``k_fold`` is not given, will use the ``x_data`` as if
+        it were a test set (x_test) and will use this test set to evaluate the
+        classifier performance for each hyperparameter value combination.
 
         Examples:
 
