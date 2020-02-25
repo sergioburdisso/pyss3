@@ -862,6 +862,9 @@ class Evaluation:
                     json.dumps(Evaluation.__cache__).replace('"', r'\"')
                 )
                 fout.write(u'</script>\n')
+            elif "[[__version__]]" in line:
+                from pyss3 import __version__
+                fout.write(line.replace("[[__version__]]", __version__))
             else:
                 fout.write(line)
 
