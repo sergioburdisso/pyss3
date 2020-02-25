@@ -2,13 +2,32 @@
 
 All notable changes to PySS3 will be documented here.
 
+## [0.5.0] 2020-02-24
+
+### Added
+- A new ``Evaluation`` class to ``pyss3.util`` ([8feeef5](https://github.com/sergioburdisso/pyss3/commit/8feeef5a44ccc26e98f967fe470d0d0521d97f96)).
+    - Now the user can import the ``Evaluation`` class to perform model evaluation and hyperparameter optimization. This class not only provide methods to evaluate models but also keeps all the advantages previously provided only through the Command Line tool, such as an evaluation cache that automatically keeps track of the evaluation history and the generation of the interactive 3D evaluation plot.
+- ``set_name()`` to ``SS3`` ([5b1c355](https://github.com/sergioburdisso/pyss3/commit/5b1c355070ad66884f4360128cbf4f97d9b018b6)).
+- ``train()`` to ``SS3`` as a user-friendly alias of ``fit()`` ([74cb540](https://github.com/sergioburdisso/pyss3/commit/74cb54067e10dfeecf0bb52a05d20d2e84b3b34c)).
+- Print now supports nested verbosity regions ([78176ab](https://github.com/sergioburdisso/pyss3/commit/78176abb27f2b8a4e7233820ab93265f5c4ee5d5)).
+
+### Fixed
+
+- Compatibility of progress bars with Jupyter Notebooks ([7848b3e](https://github.com/sergioburdisso/pyss3/commit/7848b3e97d42dfb4121ddddbf3fcbae9e9e6736e), [8d163d9](https://github.com/sergioburdisso/pyss3/commit/8d163d9c1b6391fd32c0c5fc0b6d2190376d7f1f), [2029c37](https://github.com/sergioburdisso/pyss3/commit/2029c37af1e7739865402f4af194cd7fc122a2f8), [2a700d5](https://github.com/sergioburdisso/pyss3/commit/2a700d53c5d676c5bbba2cc21494f596d05fbfd2)).
+- Bug in SS3.fit when given an empty document ([31eccbc](https://github.com/sergioburdisso/pyss3/commit/31eccbcb193efd3c8ebdacbae12615f54528c37e)).
+- Non-string category labels support ([5b1c355](https://github.com/sergioburdisso/pyss3/commit/5b1c355070ad66884f4360128cbf4f97d9b018b6)).
+- Issue with verbosity level consistency ([b38d8b0](https://github.com/sergioburdisso/pyss3/commit/b38d8b0bc76c601931da45e8c2c96ff0ad95fda4)).
+- IndexError in classify_(multi)label ([fa91952](https://github.com/sergioburdisso/pyss3/commit/fa919523205ac9b49a8761734efc1766b44fe5f5)).
+- Python 2 UnicodeEncodeError issue ([867026e](https://github.com/sergioburdisso/pyss3/commit/867026e30ee0566ce02836132ffd4933e18e8e1c)).
+
+
 ## [0.4.1] 2020-02-16
 
 ### Added
 - Public methods for the SS3's ``cv``, ``gv``, ``lv``, ``sg`` and ``sn`` functions have been added to the ``SS3 class`` ([ef35b25](https://github.com/sergioburdisso/pyss3/commit/ef35b25d8e194569007e6274cbbde856941f5627)). These functions were originally defined in Section 3.2.2 of the [original paper](https://arxiv.org/pdf/1905.08772.pdf).
 - Slightly improving training time (due to previously disabled 'by-default' cache of "local value" function).
 
-### Fix
+### Fixed
 
 - A bug on the HTTP Live Test Server ([d106d68](https://github.com/sergioburdisso/pyss3/commit/d106d68bad782c3e5bab9376fc7c4ec52a97cc5c))
 - Some bug on the Command-Line tool ([cd42b61](https://github.com/sergioburdisso/pyss3/commit/cd42b61c5c3e163f3aa5e7410fbeb27bb2180363), [8745603](https://github.com/sergioburdisso/pyss3/commit/874560356b439985e676b2a239958f4cb226368a), [dfe8b95](https://github.com/sergioburdisso/pyss3/commit/dfe8b952fadd7082b83f529110dd5e31b0a3e075))

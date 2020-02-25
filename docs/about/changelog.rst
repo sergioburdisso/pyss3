@@ -6,6 +6,31 @@ Change Log
 
 All notable changes to PySS3 will be documented here.
 
+
+[0.5.0] 2020-02-24
+==================
+
+Added
+-----
+
+- A new ``Evaluation`` class to ``pyss3.util`` (`8feeef5 <https://github.com/sergioburdisso/pyss3/commit/8feeef5a44ccc26e98f967fe470d0d0521d97f96>`__): Now the user can import the ``Evaluation`` class to perform model evaluation and hyperparameter optimization. This class not only provide methods to evaluate models but also keeps all the advantages previously provided only through the Command Line tool, such as an evaluation cache that automatically keeps track of the evaluation history and the generation of the interactive 3D evaluation plot.
+- ``set_name()`` to ``SS3`` (`5b1c355 <https://github.com/sergioburdisso/pyss3/commit/5b1c355070ad66884f4360128cbf4f97d9b018b6>`__).
+- ``train()`` to ``SS3`` as a user-friendly alias of ``fit()`` (`74cb540 <https://github.com/sergioburdisso/pyss3/commit/74cb54067e10dfeecf0bb52a05d20d2e84b3b34c>`__).
+- Print now supports nested verbosity regions (`78176ab <https://github.com/sergioburdisso/pyss3/commit/78176abb27f2b8a4e7233820ab93265f5c4ee5d5>`__).
+
+Fixed
+-----
+
+- Compatibility of progress bars with Jupyter Notebooks (`7848b3e <https://github.com/sergioburdisso/pyss3/commit/7848b3e97d42dfb4121ddddbf3fcbae9e9e6736e>`__, `8d163d9 <https://github.com/sergioburdisso/pyss3/commit/8d163d9c1b6391fd32c0c5fc0b6d2190376d7f1f>`__, `2029c37 <https://github.com/sergioburdisso/pyss3/commit/2029c37af1e7739865402f4af194cd7fc122a2f8>`__, `2a700d5 <https://github.com/sergioburdisso/pyss3/commit/2a700d53c5d676c5bbba2cc21494f596d05fbfd2>`__).
+- Bug in SS3.fit when given an empty document (`31eccbc <https://github.com/sergioburdisso/pyss3/commit/31eccbcb193efd3c8ebdacbae12615f54528c37e>`__).
+- Non-string category labels support (`5b1c355 <https://github.com/sergioburdisso/pyss3/commit/5b1c355070ad66884f4360128cbf4f97d9b018b6>`__).
+- Issue with verbosity level consistency (`b38d8b0 <https://github.com/sergioburdisso/pyss3/commit/b38d8b0bc76c601931da45e8c2c96ff0ad95fda4>`__).
+- IndexError in classify_(multi)label (`fa91952 <https://github.com/sergioburdisso/pyss3/commit/fa919523205ac9b49a8761734efc1766b44fe5f5>`__).
+- Python 2 UnicodeEncodeError issue (`867026e <https://github.com/sergioburdisso/pyss3/commit/867026e30ee0566ce02836132ffd4933e18e8e1c>`__).
+
+
+
+
 [0.4.1] 2020-02-16
 ==================
 

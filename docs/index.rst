@@ -15,8 +15,7 @@ to help you developing your machine learning models in a clearer and
 faster way. These tools let you analyze, monitor and understand your
 models by allowing you to see what they have actually learned and why. To
 achieve this, PySS3 provides you with 3 main components: the ``SS3``
-class, the ``Live_Test`` class and the ``PySS3 Command Line`` tool, as
-pointed out below.
+class, the ``Live_Test`` class, and the ``Evaluation`` class, as pointed out below.
 
 
 The ``SS3`` class
@@ -27,13 +26,13 @@ of ``sklearn``):
 
 .. code:: python
 
-        from pyss3 import SS3
-        clf = SS3()
-        ...
-        clf.fit(x_train, y_train)
-        y_pred = clf.predict(x_test)
+    from pyss3 import SS3
+    clf = SS3()
+    ...
+    clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
 
-Also, this class provides a handful of other useful methods, such as, for instance, `classify_multilabel() <https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel>`__ to provide `multi-label classification <https://en.wikipedia.org/wiki/Multi-label_classification>`__ support: 
+Also, this class provides a handful of other useful methods, such as, for instance, `classify_multilabel() <api/index.html#pyss3.SS3.classify_multilabel>`__ to provide `multi-label classification <https://en.wikipedia.org/wiki/Multi-label_classification>`__ support: 
 
 .. code:: python
 
@@ -45,7 +44,7 @@ Also, this class provides a handful of other useful methods, such as, for instan
     # multi-label classification
     labels = clf.classify_multilabel(doc)  # ['business', 'sports']
 
-or `extract_insight() <https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight>`__ to allow you to :ref:`get the text fragments involved in the classification decision <extract-insight>`.
+or `extract_insight() <api/index.html#pyss3.SS3.extract_insight>`__ to allow you to :ref:`get the text fragments involved in the classification decision <extract-insight>`.
 
 
 The ``Live_Test`` class
@@ -56,13 +55,13 @@ reasons behind classification decisions, **with just one line of code**:
 
 .. code:: python
 
-        from pyss3.server import Live_Test
-        from pyss3 import SS3
+    from pyss3.server import Live_Test
+    from pyss3 import SS3
 
-        clf = SS3(name="my_model")
-        ...
-        clf.fit(x_train, y_train)
-        Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
+    clf = SS3(name="my_model")
+    ...
+    clf.fit(x_train, y_train)
+    Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
 
 As shown in the image below, this will open up, locally, an interactive
 tool in your browser which you can use to (live) test your models with
@@ -79,45 +78,33 @@ Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
 were obtained following the :ref:`tutorials`.
 
 
-And last but not least, the ``PySS3 Command Line`` tool
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+And last but not least, the ``Evaluation`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is probably the most useful component of PySS3. When you install
-the package (for instance by using ``pip install pyss3``) a new command
-``pyss3`` is automatically added to your environment's command line.
-This command allows you to access to the *PySS3 Command Line*, an
-interactive command-line query tool. This tool will let you interact
-with your SS3 models through special commands while assisting you during
-the whole machine learning pipeline (model selection, training, testing,
-etc.). Probably one of its most important features is the ability to
-automatically (and permanently) record the history of every evaluation
-result of any type (tests, k-fold cross-validations, grid searches,
-etc.) that you've performed. This will allow you (with a single command)
-to interactively visualize and analyze your classifier performance in
-terms of its different hyperparameters values (and select the best
-model according to your needs). For instance, let's perform a grid
-search with a 4-fold cross-validation on the three :ref:`hyperparameters <ss3-hyperparameter>`,
-smoothness(\ ``s``), significance(\ ``l``), and sanction(\ ``p``) as
-follows:
+This is probably one of the most useful components of PySS3. As the name may suggest, this class provides the user easy-to-use methods for model evaluation and hyperparameter optimization, like, for example, the `test() <api/index.html#pyss3.util.Evaluation.test>`__, `kfold_cross_validation() <api/index.html#pyss3.util.Evaluation.kfold_cross_validation>`__, `grid_search() <api/index.html#pyss3.util.Evaluation.grid_search>`__, and `plot() <api/index.html#pyss3.util.Evaluation.plot>`__ methods for performing tests, stratified k-fold cross validations, grid searches for hyperparameter optimization, and visualizing evaluation results using an interactive 3D plot, respectively. Probably one of its most important features is the ability to automatically (and permanently) record the history of evaluations that you've performed. This will save you a lot of time and will allow you to interactively visualize and analyze your classifier performance in terms of its different hyper-parameters values (and select the best model according to your needs). For instance, let's perform a grid search with a 4-fold cross-validation on the three :ref:`hyperparameters <ss3-hyperparameter>`, smoothness(`s`), significance(`l`), and sanction(`p`):
 
-.. code:: console
+.. code:: python
 
-    your@user:/your/project/path$ pyss3
-    (pyss3) >>> load my_model
-    (pyss3) >>> grid_search path/to/dataset 4-fold -s r(.2,.8,6) -l r(.1,2,6) -p r(.5,2,6)
+    from pyss3.util import Evaluation
+    ...
+    best_s, best_l, best_p, _ = Evaluation.grid_search(
+        clf, x_train, y_train,
+        s=[0.2 , 0.32, 0.44, 0.56, 0.68, 0.8],
+        l=[0.1 , 0.48, 0.86, 1.24, 1.62, 2],
+        p=[0.5, 0.8, 1.1, 1.4, 1.7, 2],
+        k_fold=4
+    )
 
-In this illustrative example, ``s`` will take 6 different values between
-0.2 and 0.8, ``l`` between 0.1 and 2, and ``p`` between 0.5 and 2. After the
-grid search finishes, we can use the following command to open up an
-interactive 3D plot in the browser:
+In this illustrative example, `s`, `l`, and `p` will take those 6 different values each, and once the search is over, this function will return (by default) the hyperparameter values that obtained the best accuracy.
+Now, we could also use the ``plot`` function to analyze the results obtained in our grid search using the interactive 3D evaluation plot:
 
-.. code:: console
+.. code:: python
 
-    (pyss3) >>> plot evaluations
+    Evaluation.plot()
 
 .. image:: _static/plot_evaluations.gif
 
-Each point represents an experiment/evaluation performed using that
+In this 3D plot, each point represents an experiment/evaluation performed using that
 particular combination of values (s, l, and p). Also, these points are painted
 proportional to how good the performance was using that configuration of
 the model. Researchers can interactively change the evaluation metrics
