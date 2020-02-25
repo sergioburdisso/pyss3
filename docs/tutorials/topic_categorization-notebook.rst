@@ -152,13 +152,11 @@ follows:
 
 
 The advantage of using this built-in function is that with just a single
-line of code we get: \* The performance measured in terms of all the
-well-known metrics ('accuracy', 'precision', 'recall', and 'f1-score').
-\* A plot showing the obtained confusion matrix, and... \* Since all the
-evaluations performed using the ``Evaluation`` class are permanently
-cached, if we ever perform this test again, the evaluation will be
-skipped and values will be retrieved from the cache storage (saving us a
-lot of time! especially when performing long evaluations).
+line of code we get:
+
+* The performance measured in terms of all the well-known metrics ('accuracy', 'precision', 'recall', and 'f1-score').
+* A plot showing the obtained confusion matrix, and... 
+* Since all the evaluations performed using the ``Evaluation`` class are permanently cached, if we ever perform this test again, the evaluation will be skipped and values will be retrieved from the cache storage (saving us a lot of time! especially when performing long evaluations).
 
 As we can see, the performance doesn't look bad using the default
 `hyperparameter <../user_guide/ss3-classifier.html#hyperparameters>`__
@@ -193,13 +191,13 @@ what degree, is making classification decisions)
 
 Live test doesn't look bad, however, we will create a "more intelligent"
 version of this model, a version that can recognize variable-length word
-n-grams "on the fly". Thus, when calling the ``fit`` we will pass an
+n-grams "on the fly". Thus, when calling the ``train`` we will pass an
 extra argument ``n_grams=3`` to indicate we want SS3 to learn to
 recognize important words, bigrams, and 3-grams *(If you're curious and
 want to know how this is actually done by SS3, read the paper "t-SS3: a
 text classifier with dynamic n-grams for early risk detection over text
-streams", preprint available
-`here <https://arxiv.org/abs/1911.06147>`__)*.
+streams", preprint available* 
+`here <https://arxiv.org/abs/1911.06147>`__ *)*.
 
 .. code:: python
 
@@ -208,7 +206,7 @@ streams", preprint available
     # for the (optional) last section
     clf = SS3(name="topics_3grams")
     
-    clf.fit(x_train, y_train, n_grams=3)  # <-- note the n_grams=3 argument here
+    clf.train(x_train, y_train, n_grams=3)  # <-- note the n_grams=3 argument here
 
 
 .. parsed-literal::
