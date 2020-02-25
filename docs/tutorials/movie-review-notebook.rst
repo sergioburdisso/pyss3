@@ -169,7 +169,7 @@ what degree, is making classification decisions)
 
 Live test doesn't look bad, however, we will create a "more intelligent"
 model, a version of the model that can recognize variable-length word
-n-grams "on the fly". Thus, when calling the ``fit`` we will pass an
+n-grams "on the fly". Thus, when calling the ``train`` we will pass an
 extra argument ``n_grams=3`` to indicate we want SS3 to learn to
 recognize important words, bigrams, and 3-grams *(If you're curious and
 want to know how this is actually done by SS3, read the paper "t-SS3: a
