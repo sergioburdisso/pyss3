@@ -62,7 +62,7 @@ which allows you to interactively test your model and visually see the reasons b
     from pyss3.server import Live_Test
     from pyss3 import SS3
 
-    clf = SS3(name="my_model")
+    clf = SS3()
     ...
     clf.fit(x_train, y_train)
     Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
