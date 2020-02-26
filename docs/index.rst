@@ -104,24 +104,9 @@ Now, we could also use the ``plot`` function to analyze the results obtained in 
 
 .. image:: _static/plot_evaluations.gif
 
-In this 3D plot, each point represents an experiment/evaluation performed using that
-particular combination of values (s, l, and p). Also, these points are painted
-proportional to how good the performance was using that configuration of
-the model. Researchers can interactively change the evaluation metrics
-to be used (accuracy, precision, recall, f1, etc.) and plots will update
-"on the fly". Additionally, when the cursor is moved over a data point,
-useful information is shown (including a "compact" representation of the
-confusion matrix obtained in that experiment). Finally, it is worth
-mentioning that, before showing the 3D plots, PySS3 creates a
-single and portable HTML file in your project folder containing the
-interactive plots. This allows researchers to store, send or upload the
-plots to another place using this single HTML file (or even provide a
-link to this file in their own papers, which would be nicer for readers,
-plus it would increase experimentation transparency). For example, we
-have uploaded two of these files for you to see: `"Movie Review (Sentiment Analysis)" <_static/ss3_model_evaluation[movie_review_3grams].html>`__
-and `"Topic
-Categorization" <_static/ss3_model_evaluation[topic_categorization_3grams].html>`__,
-both evaluation plots were obtained following the :ref:`tutorials`.
+
+In this 3D plot, each point represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, these points are painted proportional to how good the performance was according to the selected metric; the plot will update "on the fly" when the user select a different evaluation metric (accuracy, precision, recall, f1, etc.). Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file in your project folder containing the interactive plots. This allows users to store, send or upload the plots to another place using this single HTML file. For example, we have uploaded two of these files for you to see: `"Sentiment Analysis (Movie Reviews)" <_static/ss3_model_evaluation[movie_review_3grams].html>`__ and `"Topic Categorization" <_static/ss3_model_evaluation[topic_categorization_3grams].html>`__, both evaluation plots were obtained following the :ref:`tutorials`.
+
 
 
 Want to give PySS3 a try?
