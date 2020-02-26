@@ -1,6 +1,6 @@
 # Examples
 
-This folder contains files related tutorials, for instance, the following tutorials:
+This folder contains files related to tutorials, for instance, the following tutorials:
 
 :page_facing_up: [Sentiment Analysis on Movie Reviews](https://pyss3.readthedocs.io/en/latest/tutorials/movie-review.html)
 
