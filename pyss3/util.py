@@ -1283,10 +1283,10 @@ class Evaluation:
         if not clf or not clf.__categories__:
             raise EmptyModelError
 
-        if type(k) is not int or k < 2:
+        if not isinstance(k, int) or k < 2:
             raise ValueError(ERROR_IKV)
 
-        if n_grams is not None and (type(n_grams) is not int or n_grams < 1):
+        if n_grams is not None and (not isinstance(n_grams, int) or n_grams < 1):
             raise ValueError(ERROR_INGV)
 
         Evaluation.set_classifier(clf)
@@ -1454,7 +1454,7 @@ class Evaluation:
         :rtype: tuple
         :raises: InvalidCategoryError, EmptyModelError, ValueError, TypeError
         """
-        if k_fold is not None and type(k_fold) is not int:
+        if k_fold is not None and not isinstance(k_fold, int):
             raise TypeError(ERROR_IKT)
 
         from . import SS3
