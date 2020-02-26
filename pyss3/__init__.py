@@ -2044,6 +2044,8 @@ class SS3:
         cats = sorted(list(set(y_train)))
         stime = time()
 
+        x_train, y_train = list(x_train), list(y_train)
+
         x_train = [
             "".join([
                 x_train[i]
@@ -2092,6 +2094,7 @@ class SS3:
         if not self.__categories__:
             raise EmptyModelError
 
+        x_test = list(x_test)
         classify = self.classify
         return [
             classify(x, sort=False)
@@ -2151,7 +2154,7 @@ class SS3:
         stime = time()
         Print.info("about to start classifying test documents", offset=1)
         classify = self.classify_label if not multilabel else self.classify_multilabel
-
+        x_test = list(x_test)
         y_pred = [
             classify(doc, def_cat=def_cat, labels=labels, prep=prep)
             for doc in tqdm(x_test, desc="Classification",
