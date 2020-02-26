@@ -48,7 +48,7 @@ or `extract_insight() <api/index.html#pyss3.SS3.extract_insight>`__ to allow you
 
 
 The ``Live_Test`` class
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 which allows you to interactively test your model and visually see the
 reasons behind classification decisions, **with just one line of code**:
@@ -121,6 +121,19 @@ Want to contribute to this Open Source project?
 
 Thanks for your interest in the project, you're awesome! Take a look at the `project Githug repository <https://github.com/sergioburdisso/pyss3>`__, any kind of help is very welcome (Code, Bug reports, Content, Data, Documentation, Design, Examples, Ideas, Feedback, etc.),  Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to new features, help us make PySS3 better.
 
+Also, if you star the repo, you would be helping PySS3 to gain more visibility and reach the hands of people who may find it useful since repository lists and search results are usually ordered by the total number of stars.
+
+
+.. raw:: html
+
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <div style="text-align: right">
+  <a class="github-button" href="https://github.com/sergioburdisso/pyss3/subscription" data-icon="octicon-eye" data-size="large" data-show-count="true" aria-label="Watch sergioburdisso/pyss3 on GitHub">Watch</a>
+  <a class="github-button" href="https://github.com/sergioburdisso/pyss3" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star sergioburdisso/pyss3 on GitHub">Star</a>
+  <a class="github-button" href="https://github.com/sergioburdisso/pyss3/fork" data-icon="octicon-repo-forked" data-size="large" data-show-count="true" aria-label="Fork sergioburdisso/pyss3 on GitHub">Fork</a>
+  </span>
+
+----
 
 Further Readings
 ================
