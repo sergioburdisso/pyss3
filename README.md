@@ -106,7 +106,7 @@ PySS3 provides two main types of workflow: classic and "command-line". Both work
 
 ### Classic
 
-As usual, importing the needed classes and functions from the package, the user writes a python script to train and test the classifiers. In this workflow, user can use the `PySS3 Command Line` tool to perform model selection (though hyperparameter optimization). 
+As usual, importing the needed classes and functions from the package, the user writes a python script to train and test the classifiers.
 
 ### Command-Line
 
