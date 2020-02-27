@@ -7,7 +7,6 @@
 [![PyPI version](https://badge.fury.io/py/pyss3.svg)](https://badge.fury.io/py/pyss3)
 [![codecov](https://codecov.io/gh/sergioburdisso/pyss3/branch/master/graph/badge.svg)](https://codecov.io/gh/sergioburdisso/pyss3)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples)
-[![MIT License](https://img.shields.io/github/license/boyney123/performance-budgets.svg)](LICENSE.txt)
 
 ---
 
