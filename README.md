@@ -4,9 +4,9 @@
 [![Build Status](https://travis-ci.org/sergioburdisso/pyss3.svg?branch=master)](https://travis-ci.org/sergioburdisso/pyss3)
 [![Requirements Status](https://requires.io/github/sergioburdisso/pyss3/requirements.svg?branch=master)](https://requires.io/github/sergioburdisso/pyss3/requirements/?branch=master)
 [![PyPI version](https://badge.fury.io/py/pyss3.svg)](https://badge.fury.io/py/pyss3)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e6ffcddd4fe84bbcaefeae09027943b7)](https://www.codacy.com/manual/sergioburdisso/pyss3?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sergioburdisso/pyss3&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/sergioburdisso/pyss3/branch/master/graph/badge.svg)](https://codecov.io/gh/sergioburdisso/pyss3)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples)
-[![MIT License](https://img.shields.io/github/license/boyney123/performance-budgets.svg)](LICENSE.txt)
 
 ---
 
