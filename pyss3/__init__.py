@@ -1806,7 +1806,7 @@ class SS3:
         Print.info("learning...", offset=1)
         tips = []
         for word in doc:
-            if word != ".":
+            if word and word != '.':
                 self.__prun_counter__ += 1
                 # if word doesn't exist yet, then...
                 try:
