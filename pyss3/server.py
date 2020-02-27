@@ -262,7 +262,7 @@ class Server:
                     doc = fdoc.readline()
                     line += 1
         elif ":x_test:" in file:
-            if Server.__x_test__:
+            if Server.__x_test__ is not None:
                 idoc = int(file.split(":x_test:")[1])
                 doc = Server.__x_test__[idoc]
         else:
@@ -492,8 +492,8 @@ class Server:
         if Server.__server_socket__ is None:
             Server.start_listening(port)
 
-        if x_test:
-            if y_test and len(y_test) == len(x_test):
+        if x_test is not None:
+            if y_test is not None and len(y_test) == len(x_test):
                 Server.set_testset(x_test, y_test)
             else:
                 Print.error("y_test must have the same length as x_test")
