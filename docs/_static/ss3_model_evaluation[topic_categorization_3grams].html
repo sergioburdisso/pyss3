@@ -1,5 +1,6 @@
 <html>
 <head>
+  <title>Model Evaluation Plot (PySS3 v0.5.1)</title>
   <meta charset="utf-8" />
   <style type="text/css">
     body {
@@ -49,7 +50,7 @@
       color: #e91e63
     }
     .subtitle {
-      text-shadow: #1976d27a 0px 10px 10px;
+      /*text-shadow: #1976d27a 0px 10px 10px;*/
       color: #1976D2;
     }
     .desciption {
@@ -132,7 +133,7 @@
       right: 100px;
       box-shadow: 0px 0px 19px -5px #e91e636b;
       border-radius: 5px 5px 0 0;
-      height: 300px;
+      height: 320px;
       width: 600px;
       z-index: 1000;
       border-radius: 5px;
@@ -455,9 +456,9 @@ window.angular);</script>
   <h3 ng-cloak>
     <span class="title">{{title|uppercase}}</span><span class="subtitle">{{subtitle}}</span><br>
     <span class="desciption" style="font-weight: normal">
-      (*) The Global Best is <b style="color:#e91e63">{{global_best["value"]}}</b><span ng-if="single_global_best"> (σ={{global_best["s"]}}, λ={{global_best["l"]}}, ρ={{global_best["p"]}} and α={{global_best["a"]}})</span>
+      <b style="color:#e91e63">{{global_best["value"]}}</b> is the global best <span ng-if="single_global_best"> (σ={{global_best["s"]}}, λ={{global_best["l"]}}, ρ={{global_best["p"]}} and α={{global_best["a"]}})</span>
       <br>
-      <span ng-show="local_best['value'] != global_best['value']">(*) Local Best is <b style="color:#6c1ee9">{{local_best["value"]}}</b><span ng-if="single_local_best"> (σ={{local_best["s"]}}, λ={{local_best["l"]}}, ρ={{local_best["p"]}})</span></span>
+      <span ng-show="local_best['value'] != global_best['value']"><b style="color:#6c1ee9">{{local_best["value"]}}</b> is the local best<span ng-if="single_local_best"> (σ={{local_best["s"]}}, λ={{local_best["l"]}}, ρ={{local_best["p"]}})</span></span>
       <br>
     </span>
   </h3>
@@ -525,8 +526,12 @@ window.angular);</script>
   </span>
   <div id="point-info" ng-class="{'point-info-hidden' : !point_info.visible}" ng-cloak>
     <div class="title" style="padding: 10px">
-      <b>Useful commands</b>
+      <b>Useful Snippets</b>
       <small style="color:black">(σ={{point_info.s}}, λ={{point_info.l}}, ρ={{point_info.p}}, α={{point_info.a}})</small>
+      <select ng-model="point_info.current" ng-change="update_point_info()" style="float: right;">
+        <option value="code">Python</option>
+        <option value="cmd">Command-Line Tool</option>
+      </select>
     </div>
     <div style="padding: 10px">
       <span class="info-label">● Interactively test this configuration:</span>
@@ -547,6 +552,7 @@ window.angular);</script>
     <circle id="info-circle" cx="-100" cy="-100" r="5" stroke-width="0" fill="rgba(0,0,0,.5)" />
     <line id="info-line" x1="0" y1="0" x2="0" y2="0" style="stroke:rgba(0,0,0,.5);stroke-width:2" stroke-dasharray="5,5"/>
   </svg>
+  <span style="position: absolute; right: 3px; bottom: 3px; z-index: 9; font-size: small;"><a href="https://github.com/sergioburdisso/pyss3" target="_blank" style="color: #039be5; text-decoration: none;">pyss3 v0.5.1</a></span>
   <div id="plot" class="plotly-graph-div" style="height:100%; width:100%;"></div>
   <div id="confusion-matrix">
     <span ng-show="cfg.hover_conf_matrix" ng-repeat="cm_fold in confusion_matrix">
@@ -580,6 +586,7 @@ window.angular);</script>
     m: null,   // method
     dc: null   // default category
   };
+  var PI = {cmd: {}, code: {}};
   var app = angular.module("ss3", ["ngAnimate"]);
   window.PLOTLYENV=window.PLOTLYENV || {};
 
@@ -639,7 +646,8 @@ window.angular);</script>
     $scope.point_info = {
       s: null, l: null, p: null, a: null,
       cmd_set: null, cmd_eval: null,
-      cmd_remove: null, visible: false
+      cmd_remove: null, visible: false,
+      current: 'code'
     }
     $scope.c = {// current plot
       p: null,   // path
@@ -737,6 +745,14 @@ window.angular);</script>
     }
 
 
+    $scope.update_point_info = function(){
+      var info = ($scope.point_info.current == 'code')? PI.code : PI.cmd;
+      $scope.point_info.cmd_set = info.cmd_set;
+      $scope.point_info.cmd_eval = info.cmd_eval;
+      $scope.point_info.cmd_remove = info.cmd_remove;
+    }
+
+
     function set_default_data_options(){
       var C = $scope.c, best_size = 0;
 
@@ -808,12 +824,16 @@ window.angular);</script>
     function select_point(x, y, z, point_x, point_y){
       let C = $scope.c;
       let info = $scope.point_info;
-      let cmd_eval = '', cmd_path;
+      let cmd_eval = '', code_eval = '', cmd_path;
       let m_x, m_y;
       let def_cat = C.dc != 'most-probable'? ' ' + C.dc : ''
+      let def_cat_code = C.dc != 'most-probable'? `, def_cat="${C.dc}"` : ''
       let info_panel_x = DOM_INFO_PANEL.offsetLeft;
       let info_panel_y = DOM_INFO_PANEL.offsetTop;
       let hparams = `s ${x} l ${y} p ${z} a ${C.a}`;
+      let hparams_code = `${x}, ${y}, ${z}, ${C.a}`;
+      let code_set = `clf.set_hyperparameters(${x}, ${y}, ${z}, ${C.a})\n`;
+      let k = C.m.split("-")[0]
 
       if ($scope.point_info.visible){
         return;
@@ -823,14 +843,20 @@ window.angular);</script>
 
       if (C.m != 'test'){
         cmd_eval = `k_fold ${C.p} ${C.m}${def_cat} `;
+        code_eval = `Evaluation.kfold_cross_validation(clf, x_train, y_train, k=${k}${def_cat_code}, tag="${C.p}")`;
       }else{
         cmd_eval = `test ${C.p}${def_cat} `;
+        code_eval = `Evaluation.test(clf, x_test, y_test${def_cat_code}, tag="${C.p}")`;
       }
       cmd_eval += hparams;
 
-      info.cmd_set = 'set ' + hparams;
-      info.cmd_eval = cmd_eval;
-      info.cmd_remove = `evaluations remove ${C.p} ${C.m}${def_cat} ` + hparams;
+      PI.cmd.cmd_set = 'set ' + hparams;
+      PI.code.cmd_set = code_set + "Live_test.run(clf, x_test, y_test)";
+      PI.cmd.cmd_eval = cmd_eval;
+      PI.code.cmd_eval = code_set + code_eval;
+      PI.cmd.cmd_remove = `evaluations remove ${C.p} ${C.m}${def_cat} ` + hparams;
+      PI.code.cmd_remove = `Evaluation.remove(${hparams_code}, "${C.m}", "${C.dc}", "${C.p}")`;
+
       info.s = x;
       info.l = y;
       info.p = z;
@@ -838,7 +864,9 @@ window.angular);</script>
 
       $scope.copy_to_clipboard(hparams);
       cmd_path = C.p.indexOf(' ') != -1? ` "${C.p}"` : ` ${C.p}`;
-      info.cmd_set += "\nlive_test" + (C.m == "test"? cmd_path : '')
+      PI.cmd.cmd_set += "\nlive_test" + (C.m == "test"? cmd_path : '')
+
+      $scope.update_point_info();
 
       DOM_INFO_CIRC.setAttributeNS(null, 'cx', point_x);
       DOM_INFO_CIRC.setAttributeNS(null, 'cy', point_y);
@@ -1062,7 +1090,6 @@ window.angular);</script>
       if (local_best != global_best){
         x_best = [], y_best = [], z_best = [];
         hoverinfo_best = [];
-        $scope.single_local_best = x_best.length == 1;
         $scope.single_global_best = true;
         name = "Local"
         marker = {
@@ -1086,6 +1113,7 @@ window.angular);</script>
             })
           })
         });
+        $scope.single_local_best = x_best.length == 1;
       }else{
         name = "Global"
         marker = {
