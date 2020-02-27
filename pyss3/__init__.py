@@ -20,7 +20,7 @@ from .util import Print, VERBOSITY, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 
 ENCODING = "utf-8"
 
