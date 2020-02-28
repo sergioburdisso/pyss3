@@ -119,7 +119,7 @@ Just go to the :ref:`getting-started` page :D
 Want to contribute to this Open Source project?
 ===============================================
 
-Thanks for your interest in the project, you're awesome! Take a look at the `project Githug repository <https://github.com/sergioburdisso/pyss3>`__, any kind of help is very welcome (Code, Bug reports, Content, Data, Documentation, Design, Examples, Ideas, Feedback, etc.),  Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to new features, help us make PySS3 better.
+Thanks for your interest in the project, you're awesome! Take a look at the `project Github repository <https://github.com/sergioburdisso/pyss3>`__, any kind of help is very welcome (Code, Bug reports, Content, Data, Documentation, Design, Examples, Ideas, Feedback, etc.),  Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to new features, help us make PySS3 better.
 
 Also, if you star the repo, you would be helping PySS3 to gain more visibility and reach the hands of people who may find it useful since repository lists and search results are usually ordered by the total number of stars.
 
