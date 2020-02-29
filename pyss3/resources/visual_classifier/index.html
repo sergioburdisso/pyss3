@@ -269,11 +269,11 @@
                 <span ng-show="ss3.cvns[0][2] < .75" class="grey-text">
                   [ more evidence is required <span ng-show="ss3.cvns[0][2] > .25">but if I had to guess, I would say <span class="pink-text">{{ss3.ci[ss3.cvns[0][0]]}}</span></span> ]
                 </span>
-                <span style="display:inline-block" ng-if="ss3 && is_cat_active(ss3.cvns[0])">
+                <span style="display:inline-block" ng-if="ss3 && is_cat_active(ss3.cvns[0]) && ss3.cvns[0][2] >= .75">
                   <span class="pointer pulse" ng-style="{'opacity': ss3.cvns[0][1]}" ng-click="select_cat(ss3.cvns[0][0])">{{ss3.ci[ss3.cvns[0][0]]}}</span>
                 </span>
               </h5>
-              <h5 ng-if="ss3 && ncats > 2 && is_cat_active(ss3.cvns[1])">
+              <h5 ng-if="ss3 && ncats > 2 && is_cat_active(ss3.cvns[1]) && ss3.cvns[0][1]">
                 <span style="color: black">
                   <span ng-show="ss3.cvns[1][1] < .25">Hmmm...Just Guessing...</span>
                   <span ng-show="ss3.cvns[1][1] < .5">Maybe </span>

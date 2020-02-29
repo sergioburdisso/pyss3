@@ -277,8 +277,10 @@ app.controller("mainCtrl", function($scope) {
           active_cats.push(cats[i][0]);
         }
       }
-      new_cent_neg = clust.neg.reduce((a,b) => a + b, 0) / clust.neg.length;
-      new_cent_pos = clust.pos.reduce((a,b) => a + b, 0) / clust.pos.length;
+      if (clust.neg.length > 0)
+        new_cent_neg = clust.neg.reduce((a,b) => a + b, 0) / clust.neg.length;
+      if (clust.pos.length > 0)
+        new_cent_pos = clust.pos.reduce((a,b) => a + b, 0) / clust.pos.length;
     }
     return active_cats;
   }

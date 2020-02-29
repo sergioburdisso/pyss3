@@ -2330,8 +2330,10 @@ def kmean_multilabel_size(res):
                 clust["neg"].append(cat_cv)
             else:
                 clust["pos"].append(cat_cv)
-        new_cent_neg = sum(clust["neg"]) / len(clust["neg"])
-        new_cent_pos = sum(clust["pos"]) / len(clust["pos"])
+        if len(clust["neg"]) > 0:
+            new_cent_neg = sum(clust["neg"]) / len(clust["neg"])
+        if len(clust["pos"]) > 0:
+            new_cent_pos = sum(clust["pos"]) / len(clust["pos"])
     return len(clust["pos"])
 
 
