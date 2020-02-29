@@ -234,8 +234,7 @@ def test_pyss3_functions():
     r = [(6, 8.1), (7, 5.6), (2, 5.5), (4, 1.5),
          (5, 1.3), (3, 1.2), (0, 1.1), (1, 0.4)]
     assert pyss3.kmean_multilabel_size(r) == 3
-    with pytest.raises(ZeroDivisionError):
-        pyss3.kmean_multilabel_size([(0, 0), (1, 0)])
+    assert pyss3.kmean_multilabel_size([(0, 0), (1, 0)]) == 2
 
     with pytest.raises(IndexError):
         pyss3.mad([], 0)
