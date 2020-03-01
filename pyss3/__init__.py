@@ -1066,6 +1066,15 @@ class SS3:
         """
         return self.get_category_name(self.__get_most_probable_category__())
 
+    def get_ngrams_length(self):
+        """
+        Return the length of longest learned n-gram.
+
+        :returns: the length of longest learned n-gram.
+        :rtype: int
+        """
+        return len(self.__max_fr__[0]) if len(self.__max_fr__) > 0 else 0
+
     def get_category_index(self, name):
         """
         Given its name, return the category index.

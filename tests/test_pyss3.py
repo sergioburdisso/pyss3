@@ -253,6 +253,7 @@ def test_pyss3_ss3(mockers):
     assert clf.get_category_index("a_category") == IDX_UNKNOWN_CATEGORY
     assert clf.get_category_name(0) == STR_UNKNOWN_CATEGORY
     assert clf.get_category_name(-1) == STR_UNKNOWN_CATEGORY
+    assert clf.get_ngrams_length() == 0
 
     with pytest.raises(pyss3.EmptyModelError):
         clf.predict(x_test)
@@ -262,6 +263,8 @@ def test_pyss3_ss3(mockers):
     # train and predict/classify tests (model: terms are single words)
     # cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
     clf.fit(x_train, y_train)
+
+    assert clf.get_ngrams_length() == 1
 
     perform_tests_with(clf, [.00114, .00295, 0, 0, 0, .00016, .01894, 8.47741])
     perform_tests_on(clf.cv, 0.4307)
@@ -308,6 +311,8 @@ def test_pyss3_ss3(mockers):
     )
 
     clf.fit(x_train, y_train, n_grams=3)
+
+    assert clf.get_ngrams_length() == 3
 
     # update_values
     clf.set_l(.3)
