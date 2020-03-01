@@ -22,18 +22,6 @@ import re
 
 ENCODING = "utf-8"
 
-RE_URL_NOISE = "(?P<url_noise>%s|%s|%s|%s)" % (
-    r"(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}"
-    r"\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)",
-    r"(?:\.[a-zA-Z]{2,5}\?[^\s]+ )",
-    r"(?:/[a-zA-Z0-9_]+==)",
-    r"(?:(([a-zA-Z]+://)?([a-zA-Z]+\.)?([a-zA-Z]{1,7}\.[a-zA-Z]{2,7})?"
-    r"/[a-zA-Z0-9]*[A-Z0-9][a-zA-Z0-9]*(\?[a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*)?)|"
-    r"((\?[a-zA-Z0-9]+=[a-zA-Z0-9./:=?#_-]*)"
-    r"(&[a-zA-Z0-9]+=[a-zA-Z0-9./:=?#_-]*)*) )"
-)
-REGEX_REMOVE_URL_NOISE = re.compile(RE_URL_NOISE)
-REGEX_CAMELCASE = re.compile(r"#(?P<camel>[A-Z][a-z]+|[A-Z][A-Z]+)")
 REGEX_DATE = re.compile(
     r"(?:\d+([.,]\d+)?[-/\\]\d+([.,]\d+)?[-/\\]\d+([.,]\d+)?)"
 )
@@ -1617,12 +1605,6 @@ class Preproc:
                 c for c in unicodedata.normalize('NFKD', text)
                 if unicodedata.category(c) != 'Mn'
             ).replace("'", '')
-
-        # removing tweets links, noisy parameters in urls, etc.
-        text = REGEX_REMOVE_URL_NOISE.sub(".", text)
-
-        # resolving camel-cased words (e.g. #ThisTypeOfHashTags)
-        text = REGEX_CAMELCASE.sub(r" \1 ", text)
 
         # tokenizing terms related to numbers
         text = REGEX_NUMBER.sub(
