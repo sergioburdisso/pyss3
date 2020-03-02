@@ -254,7 +254,7 @@ values will improve our classification performance:
 
 .. code:: python
 
-    clf.set_hyperparameters(s=0.32, l=1.24, p=1.1)
+    clf.set_hyperparameters(s=0.32, l=1.62, p=2.55)
 
 Let's see if it's true...
 
@@ -313,6 +313,20 @@ using the
 `Evaluation.grid\_search() <../api/index.html#pyss3.util.Evaluation.grid_search>`__
 function.
 
+
+Let's create a new (standard) instance of the SS3 classifier. This will speed things up because the model we currently have in ``clf`` recognize variable-length word n-grams, the grid search won't run as fast as with a (standard) model that recognize only words (and the same "best" hyperparameter values usually work for both of them).
+
+.. note::
+
+    Just ignore the (optional) ``name`` argument below, we're giving our model the name "topics" only to make things clearer when we create the interactive 3D evaluation plot.
+
+.. code:: python
+
+    clf = SS3(name="topics")
+
+    clf.train(x_train, y_train)
+
+
 The
 `Evaluation.grid\_search() <../api/index.html#pyss3.util.Evaluation.grid_search>`__
 takes, for each hyperparameter, the list of values to use in the search,
@@ -343,7 +357,7 @@ hyperparameters:
 
     s_vals=span(0.2, 0.8, 6)  # [0.2 , 0.32, 0.44, 0.56, 0.68, 0.8]
     l_vals=span(0.1, 2, 6)    # [0.1 , 0.48, 0.86, 1.24, 1.62, 2]
-    p_vals=span(0.5, 2, 6)    # [0.5, 0.8, 1.1, 1.4, 1.7, 2]
+    p_vals=span(1.75, 2.75, 6)    # [1.75, 1.95, 2.15, 2.35, 2.55, 2.75]
 
 To speed things up, unlike in the :ref:`"Movie Reviews (Sentiment
 Analysis)" <movie-reviews>`
@@ -354,7 +368,7 @@ obtained the best accuracy for us.
 
 .. code:: python
 
-    # the search should take about 20 minutes
+    # the search should take about 15 minutes
     best_s, best_l, best_p, _ = Evaluation.grid_search(
         clf, x_test, y_test,
         s=s_vals, l=l_vals, p=p_vals
@@ -363,7 +377,7 @@ obtained the best accuracy for us.
 
 .. parsed-literal::
 
-    Grid search: 100%|██████████| 216/216 [21:36<00:00,  6.00s/it]
+    Grid search: 100%|██████████| 216/216 [15:04<00:00,  6.00s/it]
 
 
 .. code:: python
@@ -378,12 +392,12 @@ obtained the best accuracy for us.
 
     The hyperparameter values that obtained the best Accuracy are:
     Smoothness(s): 0.32
-    Significance(l): 1.24
-    Sanction(p): 1.1
+    Significance(l): 1.62
+    Sanction(p): 2.55
 
 
 And that's how we found out that these hyperparameter values
-(``s=0.32, l=1.24, p=1.1``) were going to improve our classifier
+(``s=0.32, l=1.62, p=2.55``) were going to improve our classifier
 accuracy.
 
 .. note::
@@ -403,7 +417,7 @@ accuracy.
 
     .. parsed-literal::
 
-        s=0.44, l=0.86, and p=1.70
+        s=0.44, l=0.86, and p=1.75
 
 
     Or the macro averaged f1 score?
@@ -417,7 +431,7 @@ accuracy.
 
     .. parsed-literal::
 
-        s=0.32, l=1.24, and p=1.10
+       s=0.32, l=1.62, and p=2.55
 
 
     Alternatively, we could have also added these 2 arguments, metric and

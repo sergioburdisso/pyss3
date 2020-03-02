@@ -792,7 +792,7 @@ class SS3:
             self.__last_x_test__ = None  # could have learned a new word (in `learn`)
         cv_cache = self.__cv_cache__
 
-        x_test_hash = hash(x_test)
+        x_test_hash = list_hash(x_test)
         if x_test_hash == self.__last_x_test__:
             x_test_idx = self.__last_x_test_idx__
         else:
@@ -2518,7 +2518,7 @@ def re_split_keep(regex, string):
     return re.split(regex, string)
 
 
-def hash(str_list):
+def list_hash(str_list):
     """
     Return a hash value for a given list of string.
 

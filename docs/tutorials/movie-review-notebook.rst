@@ -178,9 +178,6 @@ streams", preprint available* `here <https://arxiv.org/abs/1911.06147>`__ *)*.
 
 .. code:: python
 
-    # ignore the (optional) "name" argument here, we're giving our
-    # model the name "reviews-3grams" only to make things clearer
-    # for the (also optional) last section
     clf = SS3(name="reviews-3grams")
     
     clf.train(x_train, y_train, n_grams=3)  # <-- note the n_grams=3 argument here
@@ -203,14 +200,8 @@ Now let's see if the performance has improved...
 
     Classification: 100%|██████████| 1000/1000 [00:04<00:00, 243.31it/s]
 
-.. parsed-literal::
-
     Accuracy: 0.856
 
-
-.. parsed-literal::
-
-    
 
 
 Yeah, the accuracy slightly improved but more importantly, we should now
@@ -238,19 +229,12 @@ Let's see if it's true...
 .. code:: python
 
     y_pred = clf.predict(x_test)
+    print("Accuracy:", accuracy_score(y_pred, y_test))
 
 
 .. parsed-literal::
 
     Classification: 100%|██████████| 1000/1000 [00:05<00:00, 179.46it/s]
-
-
-.. code:: python
-
-    print("Accuracy:", accuracy_score(y_pred, y_test))
-
-
-.. parsed-literal::
 
     Accuracy: 0.861
 
@@ -283,6 +267,21 @@ searches <https://en.wikipedia.org/wiki/Hyperparameter_optimization#Grid_search>
 using the
 `Evaluation.grid\_search() <../api/index.html#pyss3.util.Evaluation.grid_search>`__
 function.
+
+
+Let's create a new (standard) instance of the SS3 classifier. This will speed things up because the model we currently have in ``clf`` recognize variable-length word n-grams, the grid search won't run as fast as with a (standard) model that recognize only words (and the same "best" hyperparameter values usually work for both of them).
+
+.. note::
+
+    Just ignore the (optional) ``name`` argument below, we're giving our model the name "movie-reviews" only to make things clearer when we create the interactive 3D evaluation plot.
+
+
+.. code:: python
+
+    clf = SS3(name="movie-reviews")
+
+    clf.train(x_train, y_train)
+
 
 The
 `Evaluation.grid\_search() <../api/index.html#pyss3.util.Evaluation.grid_search>`__
@@ -323,15 +322,17 @@ First, we will perform a grid search using the test set. Once the search
 is over, ``Evaluation.grid_search`` will return the hyperparamter values
 that obtained the best accuracy.
 
-**Note:** just ignore the ``tag`` argument below, do not worry about it,
-it is optional. We are using it here just to give this search a name
-(``"grid search (test)"``) because it will make identification of each
-individual search clearer and easier for us in the last section
-("Interactive 3D Evaluation Plot") when we need it.
+.. note::
+
+    Just ignore the ``tag`` argument below, do not worry about it,
+    it is optional. We are using it here just to give this search a name
+    (``"grid search (test)"``) because it will make identification of each
+    individual search clearer and easier for us in the last section
+    ("Interactive 3D Evaluation Plot") when we need it.
 
 .. code:: python
 
-    # the search should take 15-20 minutes
+    # the search should take 2-3 minutes
     best_s, best_l, best_p, _ = Evaluation.grid_search(
         clf, x_test, y_test,
         s=s_vals, l=l_vals, p=p_vals,
@@ -341,7 +342,7 @@ individual search clearer and easier for us in the last section
 
 .. parsed-literal::
 
-    Grid search: 100%|██████████| 216/216 [17:05<00:00,  4.75s/it]
+    Grid search: 100%|██████████| 216/216 [02:43<00:00,  4.75s/it]
 
 
 .. code:: python
@@ -373,7 +374,7 @@ argument of ``Evaluation.grid_search()`` to indicate we want to use
 
 .. code:: python
 
-    # the search should take 20-30 minutes
+    # the search should take 5-8 minutes
     best_s, best_l, best_p, _ = Evaluation.grid_search(
         clf, x_train, y_train,
         k_fold=10,
@@ -384,7 +385,7 @@ argument of ``Evaluation.grid_search()`` to indicate we want to use
 
 .. parsed-literal::
 
-    [fold 10/10] Grid search: 100%|██████████| 36/36 [02:52<00:00,  4.78s/it]
+    [fold 10/10] Grid search: 100%|██████████| 36/36 [00:36<00:00,  4.78s/it]
 
 
 .. code:: python
