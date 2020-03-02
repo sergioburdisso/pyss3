@@ -2,6 +2,20 @@
 
 All notable changes to PySS3 will be documented here.
 
+
+## [0.5.5] 2020-03-02
+
+### Added
+
+- The ``predict`` method was optimized. Now it is 10x to 200x faster! This improvement also has a positive impact on other methods that use ``predict`` such as ``grid_search`` ([37202d8](https://github.com/sergioburdisso/pyss3/commit/37202d8)).
+- A new `get_ngrams_length` method was added to ``SS3`` class. It can be used to get the length of longest learned n-gram ([b4f8827](https://github.com/sergioburdisso/pyss3/commit/b4f8827)).
+- The Evaluation 3D Plot's GUI was improved ([1bb1e5a](https://github.com/sergioburdisso/pyss3/commit/1bb1e5a)).
+
+### Fixed
+
+- Some bugs and error were fixed ([bc5c4ed](https://github.com/sergioburdisso/pyss3/commit/bc5c4ed), [0d3d7e1](https://github.com/sergioburdisso/pyss3/commit/0d3d7e1), [86a0189](https://github.com/sergioburdisso/pyss3/commit/86a0189), [b0b3eaa](https://github.com/sergioburdisso/pyss3/commit/b0b3eaa), [5dbdc3a](https://github.com/sergioburdisso/pyss3/commit/5dbdc3a))
+
+
 ## [0.5.0] 2020-02-24
 
 ### Added
