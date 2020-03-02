@@ -97,6 +97,14 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     # predict
     y_pred = clf.predict(x_test)
     assert y_pred == y_test
+    clf.set_a(.1)
+    y_pred = clf.predict(x_test)
+    assert y_pred == y_test
+    clf.set_a(0)
+    y_pred = clf.predict(x_test, multilabel=True)
+    assert y_pred == [[y] for y in y_test]
+    y_pred = clf.predict(x_test, multilabel=True, labels=False)
+    assert y_pred == [[clf.get_category_index(y)] for y in y_test]
 
     y_pred = clf.predict(x_test, labels=False)
     y_pred = [clf.get_category_name(ic) for ic in y_pred]
@@ -104,6 +112,10 @@ def perform_tests_with(clf, cv_test, stopwords=True):
 
     y_pred = clf.predict([doc_unknown], def_cat=STR_UNKNOWN)
     assert y_pred[0] == STR_UNKNOWN_CATEGORY
+    y_pred = clf.predict([doc_unknown], multilabel=True)
+    assert y_pred[0] == [most_prob_cat]
+    y_pred = clf.predict([doc_unknown], def_cat=STR_UNKNOWN, multilabel=True, labels=False)
+    assert y_pred[0] == [IDX_UNKNOWN_CATEGORY]
 
     y_pred = clf.predict([doc_unknown], def_cat=STR_MOST_PROBABLE)
     assert y_pred[0] == most_prob_cat

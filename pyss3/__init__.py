@@ -9,6 +9,7 @@ import os
 import re
 import json
 import errno
+import numpy as np
 
 from io import open
 from time import time
@@ -97,6 +98,10 @@ class SS3:
     __s_update__ = None
     __p_update__ = None
 
+    __cv_cache__ = None
+    __last_x_test__ = None
+    __last_x_test_idx__ = None
+
     __prun_floor__ = 10
     __prun_trigger__ = 1000000
     __prun_counter__ = 0
@@ -163,6 +168,10 @@ class SS3:
 
         self.__cv_mode__ = cv_m
         self.__sn_mode__ = sn_m
+
+        self.original_sumop_ngrams = self.summary_op_ngrams
+        self.original_sumop_sentences = self.summary_op_sentences
+        self.original_sumop_paragraphs = self.summary_op_paragraphs
 
     def __lv__(self, ngram, icat, cache=True):
         """Local value function."""
@@ -336,6 +345,12 @@ class SS3:
                  for w in re.split(self.__word_delimiter__, ngram)
                  if w]
         return fn(ngram, icat) if IDX_UNKNOWN_WORD not in ngram else 0
+
+    def __summary_ops_are_pristine__(self):
+        """Return True if summary operators haven't changed."""
+        return self.original_sumop_ngrams == self.summary_op_ngrams and \
+            self.original_sumop_sentences == self.summary_op_sentences and \
+            self.original_sumop_paragraphs == self.summary_op_paragraphs
 
     def __classify_ngram__(self, ngram):
         """Classify the given n-gram."""
@@ -742,6 +757,105 @@ class SS3:
                     f.write(u"%s,%d,%f,%f\n" % tuple(trans))
                 f.close()
                 Print.info("\t[ %s stored in '%s'" % (term, voc_path))
+
+    def __update_cv_cache__(self):
+        """Update numpy darray confidence values cache."""
+        if self.__cv_cache__ is None:
+            self.__cv_cache__ = np.zeros((len(self.__index_to_word__), len(self.__categories__)))
+        cv = self.__cv__
+        for term_idx, cv_vec in enumerate(self.__cv_cache__):
+            for cat_idx, _ in enumerate(cv_vec):
+                try:
+                    cv_vec[cat_idx] = cv([term_idx], cat_idx)
+                except KeyError:
+                    cv_vec[cat_idx] = 0
+
+    def __predict_fast__(
+        self, x_test, def_cat=STR_MOST_PROBABLE, labels=True,
+        multilabel=False, proba=False, prep=True, leave_pbar=True
+    ):
+        """A faster version of the `predict` method (using numpy)."""
+        if not def_cat or def_cat == STR_UNKNOWN:
+            def_cat = IDX_UNKNOWN_CATEGORY
+        elif def_cat == STR_MOST_PROBABLE:
+            def_cat = self.__get_most_probable_category__()
+        else:
+            def_cat = self.get_category_index(def_cat)
+            if def_cat == IDX_UNKNOWN_CATEGORY:
+                raise InvalidCategoryError
+
+        if self.__update_needed__():
+            self.update_values()
+
+        if self.__cv_cache__ is None:
+            self.__update_cv_cache__()
+            self.__last_x_test__ = None  # could have learned a new word (in `learn`)
+        cv_cache = self.__cv_cache__
+
+        x_test_hash = hash(x_test)
+        if x_test_hash == self.__last_x_test__:
+            x_test_idx = self.__last_x_test_idx__
+        else:
+            self.__last_x_test__ = x_test_hash
+            self.__last_x_test_idx__ = [None] * len(x_test)
+            x_test_idx = self.__last_x_test_idx__
+            word_index = self.get_word_index
+            for doc_idx, doc in enumerate(tqdm(x_test, desc="Caching documents",
+                                               leave=False, disable=Print.is_quiet())):
+                x_test_idx[doc_idx] = [
+                    word_index(w)
+                    for w
+                    in re.split(self.__word_delimiter__, Pp.clean_and_ready(doc) if prep else doc)
+                    if word_index(w) != IDX_UNKNOWN_WORD
+                ]
+
+        y_pred = [None] * len(x_test)
+        for doc_idx, doc in enumerate(tqdm(x_test_idx, desc="Classification",
+                                           leave=leave_pbar, disable=Print.is_quiet())):
+            if self.__a__ > 0:
+                doc_cvs = cv_cache[doc]
+                doc_cvs[doc_cvs <= self.__a__] = 0
+                pred_cv = np.add.reduce(doc_cvs, 0)
+            else:
+                pred_cv = np.add.reduce(cv_cache[doc], 0)
+
+            if proba:
+                y_pred[doc_idx] = list(pred_cv)
+                continue
+
+            if not multilabel:
+                if pred_cv.sum() == 0:
+                    y_pred[doc_idx] = def_cat
+                else:
+                    y_pred[doc_idx] = np.argmax(pred_cv)
+
+                if labels:
+                    if y_pred[doc_idx] != IDX_UNKNOWN_CATEGORY:
+                        y_pred[doc_idx] = self.__categories__[y_pred[doc_idx]][NAME]
+                    else:
+                        y_pred[doc_idx] = STR_UNKNOWN_CATEGORY
+            else:
+                if pred_cv.sum() == 0:
+                    if def_cat == IDX_UNKNOWN_CATEGORY:
+                        y_pred[doc_idx] = [STR_UNKNOWN_CATEGORY if labels else def_cat]
+                    else:
+                        y_pred[doc_idx] = [self.get_category_name(def_cat) if labels else def_cat]
+                else:
+                    r = sorted(
+                        [
+                            (i, pred_cv[i])
+                            for i in range(pred_cv.size)
+                        ],
+                        key=lambda e: -e[1]
+                    )
+                    if labels:
+                        y_pred[doc_idx] = [
+                            self.get_category_name(cat_i)
+                            for cat_i, _ in r[:kmean_multilabel_size(r)]
+                        ]
+                    else:
+                        y_pred[doc_idx] = [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
+        return y_pred
 
     def summary_op_ngrams(self, cvs):
         """
@@ -1438,6 +1552,9 @@ class SS3:
         self.__l_update__ = self.__l__
         self.__p_update__ = self.__p__
 
+        if self.__cv_cache__ is not None:
+            self.__update_cv_cache__()
+
     def print_model_info(self):
         """Print information regarding the model."""
         print()
@@ -1779,6 +1896,8 @@ class SS3:
         :param update: enables model auto-update after learning (default: True)
         :type update: bool
         """
+        self.__cv_cache__ = None
+
         try:
             doc = doc.decode(ENCODING)
         except UnicodeEncodeError:  # for python 2 compatibility
@@ -2103,6 +2222,10 @@ class SS3:
         if not self.__categories__:
             raise EmptyModelError
 
+        if self.get_ngrams_length() == 1 and self.__summary_ops_are_pristine__():
+            return self.__predict_fast__(x_test, prep=prep,
+                                         leave_pbar=leave_pbar, proba=True)
+
         x_test = list(x_test)
         classify = self.classify
         return [
@@ -2159,6 +2282,11 @@ class SS3:
                 Print.info("default category was set to '%s'" % def_cat, offset=1)
                 if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
                     raise InvalidCategoryError
+
+        if self.get_ngrams_length() == 1 and self.__summary_ops_are_pristine__():
+            return self.__predict_fast__(x_test, def_cat=def_cat, labels=labels,
+                                         multilabel=multilabel, prep=prep,
+                                         leave_pbar=leave_pbar)
 
         stime = time()
         Print.info("about to start classifying test documents", offset=1)
@@ -2388,6 +2516,25 @@ def re_split_keep(regex, string):
     if not re.match(r"\(.*\)", regex):
         regex = "(%s)" % regex
     return re.split(regex, string)
+
+
+def hash(str_list):
+    """
+    Return a hash value for a given list of string.
+
+    :param str_list: a list of strings (e.g. x_test)
+    :type str_list: list (of str)
+    :returns: an MD5 hash value
+    :rtype: str
+    """
+    import hashlib
+    m = hashlib.md5()
+    for doc in str_list:
+        try:
+            m.update(doc)
+        except (TypeError, UnicodeEncodeError):
+            m.update(doc.encode('ascii', 'ignore'))
+    return m.hexdigest()
 
 
 def vsum(v0, v1):
