@@ -2597,3 +2597,6 @@ SS3.set_alpha = SS3.set_a
 SS3.get_alpha = SS3.get_a
 SS3.get_alpha = SS3.get_a
 SS3.train = SS3.fit
+SS3.save = SS3.save_model
+SS3.load = SS3.load_model
+SS3.update = SS3.update_values
