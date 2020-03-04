@@ -1904,11 +1904,8 @@ class SS3:
             doc = doc.encode(ENCODING).decode(ENCODING)
         except AttributeError:
             pass
-        try:
-            icat = self.__get_category__(cat)
-        except AttributeError:
-            icat = self.__get_category__(cat)
 
+        icat = self.__get_category__(cat)
         cat = self.__categories__[icat]
         word_to_index = self.__word_to_index__
 
