@@ -130,7 +130,7 @@ pip install pyss3
 ```
 Or, if you already have installed an old version, update it with:
 ```console
-pip install --upgrade pyss3
+pip install -U pyss3
 ```
 
 ## Want to contribute to this Open Source project? :sparkles::octocat::sparkles:
