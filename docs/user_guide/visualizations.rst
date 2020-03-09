@@ -30,8 +30,8 @@ The Live Test tool is an interactive visualization tool that allows you to activ
 
 .. _evaluation-plot:
 
-Evaluation Plot
-===============
+Interactive 3D Evaluation Plot
+==============================
 
 The evaluation plot can be automatically generated with the `Evaluation.plot() <../api/index.html#pyss3.util.Evaluation.plot>`__ function from the ``pyss3.util``'s ``Evaluation`` class, or with the ``PySS3 Command Line`` tool using any of the following commands:
 
