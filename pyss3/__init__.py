@@ -752,7 +752,7 @@ class SS3:
                 )
                 f = open(voc_path, "w+", encoding=ENCODING)
                 vocabularies_out[ilen].sort(key=lambda k: -k[-1])
-                f.write(u"%s,%s,%s,%s\n" % ("term", "fr", "gv", "norm_gv"))
+                f.write(u"%s,%s,%s,%s\n" % ("term", "fr", "gv", "cv"))
                 for trans in vocabularies_out[ilen]:
                     f.write(u"%s,%d,%f,%f\n" % tuple(trans))
                 f.close()
