@@ -109,7 +109,7 @@ In this 3D plot, each point represents an experiment/evaluation performed using 
 
 
 
-Want to give PySS3 a try?
+Want to give PySS3 a shot?
 =========================
 
 Just go to the :ref:`getting-started` page :D

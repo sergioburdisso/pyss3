@@ -117,7 +117,7 @@ Note: [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-star
 
 
 
-## Want to give PySS3 a try? :eyeglasses: :coffee:
+## Want to give PySS3 a shot? :eyeglasses: :coffee:
 
 Just go to the [Getting Started](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html) page :D
 
