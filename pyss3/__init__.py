@@ -2004,13 +2004,15 @@ class SS3:
                   If ``sort`` is True, a list of pairs
                   (category index, confidence value) ordered by confidence value.
         :rtype: list
+        :raises: EmptyModelError
         """
-        if not self.__categories__ or not doc:
-            return []
+        if not self.__categories__:
+            raise EmptyModelError
 
         if self.__update_needed__():
             self.update_values()
 
+        doc = doc or ''
         try:
             doc = doc.decode(ENCODING)
         except UnicodeEncodeError:  # for python 2 compatibility

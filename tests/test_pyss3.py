@@ -132,7 +132,8 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     assert y_pred[0] == [0] * len(clf.get_categories())
 
     # classify
-    assert clf.classify("") == []
+    assert clf.classify(None)[0][1] == 0
+    assert clf.classify("")[0][1] == 0
 
     pred = clf.classify(doc_unknown, sort=False, prep=False)
     assert pred == [0] * len(clf.get_categories())
@@ -267,6 +268,8 @@ def test_pyss3_ss3(mockers):
     assert clf.get_category_name(-1) == STR_UNKNOWN_CATEGORY
     assert clf.get_ngrams_length() == 0
 
+    with pytest.raises(pyss3.EmptyModelError):
+        clf.classify(x_test[0])
     with pytest.raises(pyss3.EmptyModelError):
         clf.predict(x_test)
     with pytest.raises(pyss3.EmptyModelError):
