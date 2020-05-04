@@ -28,6 +28,7 @@ ENCODING = "utf-8"
 PARA_DELTR = "\n"
 SENT_DELTR = r"\."
 WORD_DELTR = r"\s"
+WORD_REGEX = r"\w+"
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[unknown]"
@@ -111,6 +112,7 @@ class SS3:
     __parag_delimiter__ = PARA_DELTR
     __sent_delimiter__ = SENT_DELTR
     __word_delimiter__ = WORD_DELTR
+    __word_regex__ = WORD_REGEX
 
     def __init__(
         self, s=None, l=None, p=None, a=None,
@@ -367,25 +369,28 @@ class SS3:
         cats = xrange(len(self.__categories__))
         word_index = self.get_word_index
         word_delimiter = self.__word_delimiter__
+        word_regex = self.__word_regex__
+
         if not json:
+            regex = "%s|[^%s]+" % (word_regex, word_delimiter)
             if prep:
                 sent = Pp.clean_and_ready(sent)
             sent_words = [
                 (w, w)
-                for w in re.split(word_delimiter, sent)
+                for w in re.findall(regex, sent)
                 if w
             ]
         else:
             if prep:
                 sent_words = [
                     (w, Pp.clean_and_ready(w, dots=False))
-                    for w in re_split_keep(word_delimiter, sent)
+                    for w in re_split_keep(word_regex, sent)
                     if w
                 ]
             else:
                 sent_words = [
                     (w, w)
-                    for w in re_split_keep(word_delimiter, sent)
+                    for w in re_split_keep(word_regex, sent)
                     if w
                 ]
 
@@ -409,13 +414,10 @@ class SS3:
                 if iw == len(words) - 1:
                     word_iend = len(raw_seq)
                 else:
-                    if not word.startswith("nnbrr"):
-                        try:
-                            word_iend = re.search(word, raw_seq, re.I).end()
-                        except AttributeError:
-                            word_iend = len(word)
-                    else:
-                        word_iend = re.search(r"\d+", raw_seq).end()
+                    try:
+                        word_iend = re.search(word, raw_seq, re.I).end()
+                    except AttributeError:
+                        word_iend = len(word)
 
                 flat_sent.append(wordi)
                 flat_raw_sent.append(raw_seq[:word_iend])
@@ -1908,13 +1910,14 @@ class SS3:
         icat = self.__get_category__(cat)
         cat = self.__categories__[icat]
         word_to_index = self.__word_to_index__
+        word_regex = self.__word_regex__
 
         if prep:
             Print.info("preprocessing document...", offset=1)
             stime = time()
             doc = Pp.clean_and_ready(doc)
             Print.info("finished --time: %.1fs" % (time() - stime), offset=1)
-        doc = doc.replace("\n", "").split(" ")
+        doc = re.findall("%s|[^%s]+" % (word_regex, self.__word_delimiter__), doc)
 
         text_len = len(doc)
         Print.info(
@@ -1931,7 +1934,7 @@ class SS3:
         Print.info("learning...", offset=1)
         tips = []
         for word in doc:
-            if word and word != '.':
+            if re.match(word_regex, word):
                 self.__prun_counter__ += 1
                 # if word doesn't exist yet, then...
                 try:

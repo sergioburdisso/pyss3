@@ -310,7 +310,7 @@ app.controller("mainCtrl", function($scope) {
         else
           crow_pars = par.cv.clone();
         $chart.pars.push(
-          [par.sents[0].words[0].lexeme + "..."].concat(crow_pars)
+          [__get_sent_beginning__(par.sents[0]) + "..."].concat(crow_pars)
         );
         $chart.parsi.push(par);
       }
@@ -324,8 +324,9 @@ app.controller("mainCtrl", function($scope) {
             crow_sents.add(sent.cv);
           else
             crow_sents = sent.cv.clone();
+
           $chart.sents.push(
-            [sent.words[0].lexeme + "..."].concat(crow_sents)
+            [__get_sent_beginning__(sent) + "..."].concat(crow_sents)
           );
           $chart.sentsi.push(sent);
         }
@@ -515,4 +516,15 @@ function __update_textarea__(){
   __delayed_call__(function(){M.textareaAutoResize($('#document'));});
   $('#document').height("10px");
   $('#document').focus();
+}
+
+function __get_sent_beginning__(sent){
+  var sent_beginning = sent.words[0].lexeme;
+  for (var i=0; i < sent.words.length; i++)
+    if (sent.words[i].token != ""){
+      sent_beginning = sent.words[i].lexeme;
+      if (i + 1 < sent.words.length)
+        sent_beginning += " " + sent.words[i + 1].lexeme;
+      return sent_beginning;
+    }
 }
