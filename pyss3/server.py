@@ -144,6 +144,7 @@ class Server:
     __x_test__ = None
     __test_path__ = None
     __folder_label__ = None
+    __preprocess__ = None
 
     @staticmethod
     def __send_as_json__(sock, data):
@@ -229,7 +230,10 @@ class Server:
             Print.show("\t%s[...]" % doc[:50])
             Server.__send_as_json__(
                 sock,
-                Server.__clf__.classify(doc, json=True)
+                Server.__clf__.classify(
+                    doc,
+                    prep_func=Server.__preprocess__,
+                    json=True)
             )
             Print.info("sending classification result...")
         except Exception as e:
@@ -331,7 +335,7 @@ class Server:
                             with open(
                                 file_path, "r", encoding=ENCODING
                             ) as fdoc:
-                                r = classify(fdoc.read())
+                                r = classify(fdoc.read(), prep_func=Server.__preprocess__)
                                 Server.__docs__[cat]["clf_result"].append(
                                     r[0][0] if r[0][1] else unkwon_cat_i
                                 )
@@ -387,7 +391,7 @@ class Server:
             Server.__docs__[cat]["file"].append(doc_name)
             Server.__docs__[cat]["path"].append(":x_test:%d" % idoc)
 
-            r = classify(doc)
+            r = classify(doc, prep_func=Server.__preprocess__)
             Server.__docs__[cat]["clf_result"].append(
                 r[0][0] if r[0][1] else unkwon_cat_i
             )
@@ -463,7 +467,7 @@ class Server:
 
     @staticmethod
     def serve(
-        clf=None, x_test=None, y_test=None, port=0, browser=True, quiet=True
+        clf=None, x_test=None, y_test=None, port=0, browser=True, quiet=True, prep_func=None
     ):
         """
         Wait for classification requests and serve them.
@@ -482,8 +486,14 @@ class Server:
         :param quiet: if True, use quiet mode. Otherwise use verbose mode
                       (default: False)
         :type quiet: bool
+        :param prep_func: the custom preprocessing function to be applied to
+                  the given document before classifying it.
+                  If not given, the default preprocessing function will
+                  be used
+        :type prep_func: function
         """
         Server.__clf__ = clf or Server.__clf__
+        Server.__preprocess__ = prep_func
 
         if not Server.__clf__:
             Print.error("a model must be given before serving")

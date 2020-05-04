@@ -363,7 +363,7 @@ class SS3:
         cv[:] = [(v if v > self.__a__ else 0) for v in cv]
         return cv
 
-    def __classify_sentence__(self, sent, prep, json=False):
+    def __classify_sentence__(self, sent, prep, json=False, prep_func=None):
         """Classify the given sentence."""
         classify_trans = self.__classify_ngram__
         cats = xrange(len(self.__categories__))
@@ -374,7 +374,8 @@ class SS3:
         if not json:
             regex = "%s|[^%s]+" % (word_regex, word_delimiter)
             if prep:
-                sent = Pp.clean_and_ready(sent)
+                prep_func = prep_func or Pp.clean_and_ready
+                sent = prep_func(sent)
             sent_words = [
                 (w, w)
                 for w in re.findall(regex, sent)
@@ -383,7 +384,7 @@ class SS3:
         else:
             if prep:
                 sent_words = [
-                    (w, Pp.clean_and_ready(w, dots=False))
+                    (w, Pp.clean_and_ready(w, dots=False) if prep_func is None else prep_func(w))
                     for w in re_split_keep(word_regex, sent)
                     if w
                 ]
@@ -499,11 +500,11 @@ class SS3:
                 "wmv": reduce(vmax, [v["cv"] for v in info])  # word max value
             }
 
-    def __classify_paragraph__(self, parag, prep, json=False):
+    def __classify_paragraph__(self, parag, prep, json=False, prep_func=None):
         """Classify the given paragraph."""
         if not json:
             sents_cvs = [
-                self.__classify_sentence__(sent, prep=prep)
+                self.__classify_sentence__(sent, prep=prep, prep_func=prep_func)
                 for sent in re.split(self.__sent_delimiter__, parag)
                 if sent
             ]
@@ -512,7 +513,7 @@ class SS3:
             return self.__zero_cv__
         else:
             info = [
-                self.__classify_sentence__(sent, prep=prep, json=True)
+                self.__classify_sentence__(sent, prep=prep, prep_func=prep_func, json=True)
                 for sent in re_split_keep(self.__sent_delimiter__, parag)
                 if sent
             ]
@@ -1807,6 +1808,7 @@ class SS3:
         :raises: InvalidCategoryError, ValueError
         """
         r = self.classify(doc, json=True)
+        word_regex = self.__word_regex__
 
         if cat == 'auto':
             c_i = r["cvns"][0][0]
@@ -1861,7 +1863,7 @@ class SS3:
                             if words[w_i]["cv"][c_i] > min_cv:
                                 ww_left += min(ww_size, (len(words) - 1) - w_i)
 
-                            if re.search(r"[\w\d]+", words[w_i]["lexeme"]):
+                            if re.search(word_regex, words[w_i]["lexeme"]):
                                 ww_left -= 1
 
                             w_i += 1
@@ -1991,7 +1993,7 @@ class SS3:
         if update:
             self.update_values(force=True)
 
-    def classify(self, doc, prep=True, sort=True, json=False):
+    def classify(self, doc, prep=True, sort=True, json=False, prep_func=None):
         """
         Classify a given document.
 
@@ -2003,6 +2005,11 @@ class SS3:
         :type sort: bool
         :param json: return a debugging version of the result in JSON format.
         :type json: bool
+        :param prep_func: the custom preprocessing function to be applied to
+                          the given document before classifying it.
+                          If not given, the default preprocessing function will
+                          be used (as long as ``prep=True``)
+        :type prep_func: function
         :returns: the document confidence vector if ``sort`` is False.
                   If ``sort`` is True, a list of pairs
                   (category index, confidence value) ordered by confidence value.
@@ -2025,7 +2032,7 @@ class SS3:
 
         if not json:
             paragraphs_cvs = [
-                self.__classify_paragraph__(parag, prep=prep)
+                self.__classify_paragraph__(parag, prep=prep, prep_func=prep_func)
                 for parag in re.split(self.__parag_delimiter__, doc)
                 if parag
             ]
@@ -2044,7 +2051,7 @@ class SS3:
             return cv
         else:
             info = [
-                self.__classify_paragraph__(parag, prep=prep, json=True)
+                self.__classify_paragraph__(parag, prep=prep, prep_func=prep_func, json=True)
                 for parag in re_split_keep(self.__parag_delimiter__, doc)
                 if parag
             ]
@@ -2316,10 +2323,11 @@ class SS3:
         [*] the gv function is defined in Section 3.2.2 of the original paper:
          https://arxiv.org/pdf/1905.08772.pdf
 
-        Example
-        >>> clf.cv("chicken", "food")
-        >>> clf.cv("roast chicken", "food")
-        >>> clf.cv("chicken", "sports")
+        Examples:
+
+            >>> clf.cv("chicken", "food")
+            >>> clf.cv("roast chicken", "food")
+            >>> clf.cv("chicken", "sports")
 
         :param ngram: the word or word n-gram
         :type ngram: str
@@ -2338,10 +2346,11 @@ class SS3:
         (gv function is defined in Section 3.2.2 of the original paper:
          https://arxiv.org/pdf/1905.08772.pdf)
 
-        Example
-        >>> clf.gv("chicken", "food")
-        >>> clf.gv("roast chicken", "food")
-        >>> clf.gv("chicken", "sports")
+        Examples:
+
+            >>> clf.gv("chicken", "food")
+            >>> clf.gv("roast chicken", "food")
+            >>> clf.gv("chicken", "sports")
 
         :param ngram: the word or word n-gram
         :type ngram: str
@@ -2360,10 +2369,11 @@ class SS3:
         (lv function is defined in Section 3.2.2 of the original paper:
          https://arxiv.org/pdf/1905.08772.pdf)
 
-        Example
-        >>> clf.lv("chicken", "food")
-        >>> clf.lv("roast chicken", "food")
-        >>> clf.lv("chicken", "sports")
+        Examples:
+
+            >>> clf.lv("chicken", "food")
+            >>> clf.lv("roast chicken", "food")
+            >>> clf.lv("chicken", "sports")
 
         :param ngram: the word or word n-gram
         :type ngram: str
@@ -2382,10 +2392,11 @@ class SS3:
         (sg function is defined in Section 3.2.2 of the original paper:
          https://arxiv.org/pdf/1905.08772.pdf)
 
-        Example
-        >>> clf.sg("chicken", "food")
-        >>> clf.sg("roast chicken", "food")
-        >>> clf.sg("chicken", "sports")
+        Examples:
+
+            >>> clf.sg("chicken", "food")
+            >>> clf.sg("roast chicken", "food")
+            >>> clf.sg("chicken", "sports")
 
         :param ngram: the word or word n-gram
         :type ngram: str
@@ -2404,10 +2415,11 @@ class SS3:
         (sn function is defined in Section 3.2.2 of the original paper:
          https://arxiv.org/pdf/1905.08772.pdf)
 
-        Example
-        >>> clf.sn("chicken", "food")
-        >>> clf.sn("roast chicken", "food")
-        >>> clf.sn("chicken", "sports")
+        Examples:
+
+            >>> clf.sn("chicken", "food")
+            >>> clf.sn("roast chicken", "food")
+            >>> clf.sn("chicken", "sports")
 
         :param ngram: the word or word n-gram
         :type ngram: str
