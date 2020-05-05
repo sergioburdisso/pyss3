@@ -199,7 +199,7 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     # set_block_delimiters
     pred = clf.classify(doc_blocks0, json=True)
     assert len(pred["pars"]) == 1 and len(pred["pars"][0]["sents"]) == 1
-    assert len(pred["pars"][0]["sents"][0]["words"]) == 8
+    assert len(pred["pars"][0]["sents"][0]["words"]) == 10
 
     clf.set_block_delimiters(parag="!", sent=r"\?")
     pred = clf.classify(doc_blocks0, json=True)
@@ -281,7 +281,7 @@ def test_pyss3_ss3(mockers):
 
     assert clf.get_ngrams_length() == 1
 
-    perform_tests_with(clf, [.00114, .00295, 0, 0, 0, .00016, .01894, 8.47741])
+    perform_tests_with(clf, [.00114, .00294, 0, 0, 0, .00016, .01878, 8.43969])
     perform_tests_on(clf.cv, 0.4307)
     perform_tests_on(clf.gv, 0.2148)
     perform_tests_on(clf.lv, 0.2148)
@@ -297,7 +297,7 @@ def test_pyss3_ss3(mockers):
     )
     clf.fit(x_train, y_train)
 
-    perform_tests_with(clf, [0.00114, 0.00295, 0, 0, 0, 0.00016, 0.01894, 8.47741])
+    perform_tests_with(clf, [.00114, .00294, 0, 0, 0, .00016, .01878, 8.43969])
     perform_tests_on(clf.cv, 0.4307)
 
     # cv_m=STR_GV, sn_m=STR_XAI
@@ -307,7 +307,7 @@ def test_pyss3_ss3(mockers):
     )
     clf.fit(x_train, y_train)
 
-    perform_tests_with(clf, [0.00062, 0.00109, 0, 0, 0, 0.00014, 0.01894, 6.31228])
+    perform_tests_with(clf, [.00062, .00109, 0, 0, 0, .00014, .01878, 6.31605])
     assert clf.cv("chicken", "food") == clf.gv("chicken", "food")
 
     # cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
@@ -317,7 +317,7 @@ def test_pyss3_ss3(mockers):
     )
     clf.fit(x_train, y_train)
 
-    perform_tests_with(clf, [0.00114, 0.00295, 0, 0, 0, 0.00016, 0.01894, 8.47741], stopwords=False)
+    perform_tests_with(clf, [.00114, .00294, 0, 0, 0, .00016, .01878, 8.43969], stopwords=False)
 
     # train and predict/classify tests (model: terms are word n-grams)
     clf = SS3(
@@ -338,8 +338,8 @@ def test_pyss3_ss3(mockers):
     clf.update_values()
     clf.update_values()
 
-    perform_tests_with(clf, [.00074, .00124, 0, 0, 0, .00028, .00202, 9.19105])
-    perform_tests_on(clf.cv, 1.5664, "video games", "science&technology")
+    perform_tests_with(clf, [.00074, .00124, 0, 0, 0, .00028, .00202, 9.17139])
+    perform_tests_on(clf.cv, 1.5681, "video games", "science&technology")
     perform_tests_on(clf.gv, 0.6697, "video games", "science&technology")
     perform_tests_on(clf.lv, 0.6697, "video games", "science&technology")
     perform_tests_on(clf.sg, 1, "video games", "science&technology")
@@ -350,7 +350,7 @@ def test_pyss3_ss3(mockers):
     assert pred["pars"][0]["sents"][0]["words"][0]["lexeme"] == "android mobile "
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "video games"
     assert argmax(pred["cv"]) == clf.get_category_index("science&technology")
-    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 4.3789, 0, 0]
+    assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 4.38069, 0, 0]
 
     pred = clf.classify("playing football soccer", json=True)
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "football soccer"
@@ -363,7 +363,7 @@ def test_pyss3_ss3(mockers):
     t = clf.extract_insight(doc_insight, window_size=1)
     assert len(t) == 1 and t[0] == ('about sports. Football soccer, you ', 2.8670788645841605)
     t = clf.extract_insight(doc_insight, window_size=0)
-    assert t == [('Football soccer, ', 1.8670788645841605), ('sports', 1.0)]
+    assert t == [('Football soccer', 1.8670788645841605), ('sports', 1.0)]
     assert clf.extract_insight(doc_insight, cat="music") == []
     assert len(clf.extract_insight(doc_insight, min_cv=1)) == 1
     t = clf.extract_insight(doc_insight, level="sentence")
