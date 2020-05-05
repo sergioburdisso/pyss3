@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "enthussb",
+      "name": "Saurabh Bora",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/29205181?v=4",
+      "profile": "https://www.saurabhbora.com",
+      "contributions": [
+        "ideas",
+        "projectManagement"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pyss3",
+  "projectOwner": "sergioburdisso",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
