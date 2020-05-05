@@ -145,6 +145,7 @@ class Server:
     __test_path__ = None
     __folder_label__ = None
     __preprocess__ = None
+    __default_prep__ = None
 
     @staticmethod
     def __send_as_json__(sock, data):
@@ -232,6 +233,7 @@ class Server:
                 sock,
                 Server.__clf__.classify(
                     doc,
+                    prep=Server.__default_prep__,
                     prep_func=Server.__preprocess__,
                     json=True)
             )
@@ -467,7 +469,8 @@ class Server:
 
     @staticmethod
     def serve(
-        clf=None, x_test=None, y_test=None, port=0, browser=True, quiet=True, prep_func=None
+        clf=None, x_test=None, y_test=None, port=0, browser=True,
+        quiet=True, prep=True, prep_func=None
     ):
         """
         Wait for classification requests and serve them.
@@ -486,6 +489,9 @@ class Server:
         :param quiet: if True, use quiet mode. Otherwise use verbose mode
                       (default: False)
         :type quiet: bool
+        :param prep: enables the default input preprocessing when classifying
+                     (default: True)
+        :type prep: bool
         :param prep_func: the custom preprocessing function to be applied to
                   the given document before classifying it.
                   If not given, the default preprocessing function will
@@ -494,6 +500,7 @@ class Server:
         """
         Server.__clf__ = clf or Server.__clf__
         Server.__preprocess__ = prep_func
+        Server.__default_prep__ = prep
 
         if not Server.__clf__:
             Print.error("a model must be given before serving")

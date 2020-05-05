@@ -373,7 +373,7 @@ class SS3:
         word_regex = self.__word_regex__
 
         if not json:
-            if prep:
+            if prep or prep_func is not None:
                 prep_func = prep_func or Pp.clean_and_ready
                 sent = prep_func(sent)
             sent_words = [
@@ -382,7 +382,7 @@ class SS3:
                 if w
             ]
         else:
-            if prep:
+            if prep or prep_func is not None:
                 sent_words = [
                     (w, Pp.clean_and_ready(w, dots=False) if prep_func is None else prep_func(w))
                     for w in re_split_keep(word_regex, sent)
@@ -1902,7 +1902,7 @@ class SS3:
                         ``2`` means 1-grams and 2-grams,
                         ``3``, 1-grams, 2-grams and 3-grams, and so on.
         :type n_grams: int
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :param update: enables model auto-update after learning (default: True)
         :type update: bool
@@ -2006,7 +2006,7 @@ class SS3:
 
         :param doc: the content of the document
         :type doc: str
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :param sort: sort the classification result (from best to worst)
         :type sort: bool
@@ -2099,7 +2099,7 @@ class SS3:
         :param labels: whether to return the category label or just the
                        category index (default: True)
         :type labels: bool
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing process (default: True)
         :type prep: bool
         :returns: the category label or the category index.
         :rtype: str or int
@@ -2139,7 +2139,7 @@ class SS3:
         :param labels: whether to return the category labels or just the
                        category indexes (default: True)
         :type labels: bool
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :returns: the list of category labels (or indexes).
         :rtype: list (of str or int)
@@ -2179,7 +2179,7 @@ class SS3:
                         ``2`` means 1-grams and 2-grams,
                         ``3``, 1-grams, 2-grams and 3-grams, and so on.
         :type n_grams: int
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :param leave_pbar: controls whether to leave the progress bar or
                            remove it after finishing.
@@ -2226,7 +2226,7 @@ class SS3:
 
         :param x_test: the list of documents to be classified
         :type x_test: list (of str)
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :param leave_pbar: controls whether to leave the progress bar after
                            finishing or remove it.
@@ -2269,7 +2269,7 @@ class SS3:
                            if enabled, for each document returns a ``list`` of labels
                            instead of a single label (``str``).
         :type multilabel: bool
-        :param prep: enables input preprocessing (default: True)
+        :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
         :param leave_pbar: controls whether to leave the progress bar or
                            remove it after finishing.
