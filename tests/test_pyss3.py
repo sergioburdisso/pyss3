@@ -199,18 +199,18 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     # set_block_delimiters
     pred = clf.classify(doc_blocks0, json=True)
     assert len(pred["pars"]) == 1 and len(pred["pars"][0]["sents"]) == 1
-    assert len(pred["pars"][0]["sents"][0]["words"]) == 10
+    assert len(pred["pars"][0]["sents"][0]["words"]) == 15  # spaces and symbols included
 
     clf.set_block_delimiters(parag="!", sent=r"\?")
     pred = clf.classify(doc_blocks0, json=True)
-    assert len(pred["pars"]) == 2 + 1  # two paragraphs plus one delimiter
+    assert len(pred["pars"]) == 2 + 1  # 2 paragraphs + 1 delimiter
     assert len(pred["pars"][0]["sents"]) == 4
     clf.set_block_delimiters(sent=r"(\?)")
     assert len(pred["pars"][0]["sents"]) == 4
 
     clf.set_block_delimiters(word="-")
     pred = clf.classify(doc_blocks1, json=True)
-    assert len(pred["pars"][0]["sents"][0]["words"]) == 3
+    assert len(pred["pars"][0]["sents"][0]["words"]) == 5  # 3 words + 2 delimiters
     clf.set_block_delimiters(parag=PARA_DELTR, sent=SENT_DELTR, word=WORD_DELTR)
 
 
@@ -347,7 +347,7 @@ def test_pyss3_ss3(mockers):
 
     # n-gram recognition tests
     pred = clf.classify("android mobile and video games", json=True)
-    assert pred["pars"][0]["sents"][0]["words"][0]["lexeme"] == "android mobile "
+    assert pred["pars"][0]["sents"][0]["words"][0]["lexeme"] == "android mobile"
     assert pred["pars"][0]["sents"][0]["words"][-1]["lexeme"] == "video games"
     assert argmax(pred["cv"]) == clf.get_category_index("science&technology")
     assert [round(p, 5) for p in pred["cv"]] == [0, 0, 0, 0, 0, 0, 4.38069, 0, 0]
@@ -359,9 +359,9 @@ def test_pyss3_ss3(mockers):
 
     # extract_insight
     t = clf.extract_insight(doc_insight)
-    assert len(t) == 1 and t[0][0] == 'text is about sports. Football soccer, you know!'
+    assert len(t) == 1 and t[0][0] == ' about sports. Football soccer, you know!'
     t = clf.extract_insight(doc_insight, window_size=1)
-    assert len(t) == 1 and t[0] == ('about sports. Football soccer, you ', 2.8670788645841605)
+    assert len(t) == 1 and t[0] == (' sports. Football soccer, you know', 2.8670788645841605)
     t = clf.extract_insight(doc_insight, window_size=0)
     assert t == [('Football soccer', 1.8670788645841605), ('sports', 1.0)]
     assert clf.extract_insight(doc_insight, cat="music") == []
