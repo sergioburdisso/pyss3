@@ -28,7 +28,7 @@ ENCODING = "utf-8"
 PARA_DELTR = "\n"
 SENT_DELTR = r"\."
 WORD_DELTR = r"\s"
-WORD_REGEX = r"\w+"
+WORD_REGEX = r"\w+(?:'\w+)?"
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
 STR_UNKNOWN_CATEGORY = "[unknown]"
@@ -373,13 +373,12 @@ class SS3:
         word_regex = self.__word_regex__
 
         if not json:
-            regex = "%s|[^%s]+" % (word_regex, word_delimiter)
             if prep:
                 prep_func = prep_func or Pp.clean_and_ready
                 sent = prep_func(sent)
             sent_words = [
                 (w, w)
-                for w in re.findall(regex, sent)
+                for w in re_split_keep(word_regex, sent)
                 if w
             ]
         else:
