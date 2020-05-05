@@ -146,9 +146,9 @@ Finally, in case you're planning to create a **new Pull Request**, for committin
 
 (please do not hesitate to send me an email to sergio.burdisso@gmail.com for anything)
 
-<!-- ### Contributors :blue_heart:
+### Contributors :blue_heart:
 
-Thanks goes to these awesome people ([emoji key](https://allcontributors.org/docs/en/emoji-key -->
+Thanks goes to these awesome people ([emoji key](https://allcontributors.org/docs/en/emoji-key
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
