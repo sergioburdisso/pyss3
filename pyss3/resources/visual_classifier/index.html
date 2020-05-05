@@ -48,7 +48,7 @@
     .sidenav li>a {
       /*color: #009688;*/
     }
-    .missclass {
+    .misclass {
       color: #FF5722 !important;
     }
     .sidenav .collapsible-body>ul:not(.collapsible)>li.active i,
@@ -203,7 +203,7 @@
               <li ng-repeat="f in info.docs[c].file track by $index" ng-class="{'active': $index == i_doc && c == c_doc}">
                 <a class="waves-effect" href="#" ng-click="get_doc(c, $index)">
                   {{f}} 
-                  <i class="material-icons right missclass" ng-if="info.categories.indexOf(c) != -1 && get_clf_result(c, $index) != c" title="missclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
+                  <i class="material-icons right misclass" ng-if="info.categories.indexOf(c) != -1 && get_clf_result(c, $index) != c" title="misclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
                 </a>
               </li>
             </ul>
