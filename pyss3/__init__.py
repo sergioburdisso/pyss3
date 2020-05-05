@@ -366,7 +366,8 @@ class SS3:
     def __classify_sentence__(self, sent, prep, json=False, prep_func=None):
         """Classify the given sentence."""
         classify_trans = self.__classify_ngram__
-        cats = xrange(len(self.__categories__))
+        categories = self.__categories__
+        cats = xrange(len(categories))
         word_index = self.get_word_index
         word_delimiter = self.__word_delimiter__
         word_regex = self.__word_regex__
@@ -398,86 +399,93 @@ class SS3:
         if not sent_words:
             sent_words = [(u'.', u'.')]
 
-        flat_sent = []
-        flat_raw_sent = []
-        for raw_seq, seq in sent_words:
-            words = re.split(word_delimiter, seq)
-            for iw in xrange(len(words)):
-                word = words[iw]
-
-                if json and re.match(self.__word_delimiter__, raw_seq):
-                    if len(flat_raw_sent):
-                        flat_raw_sent[-1] += raw_seq
-                        continue
-
-                wordi = word_index(word)
-
-                if iw == len(words) - 1:
-                    word_iend = len(raw_seq)
-                else:
-                    try:
-                        word_iend = re.search(word, raw_seq, re.I).end()
-                    except AttributeError:
-                        word_iend = len(word)
-
-                flat_sent.append(wordi)
-                flat_raw_sent.append(raw_seq[:word_iend])
-                raw_seq = raw_seq[word_iend:]
-
-        sent = []
-        fs_len = len(flat_sent)
+        sent_iwords = [word_index(w) for _, w in sent_words]
+        sent_len = len(sent_iwords)
+        sent_parsed = []
         wcur = 0
-        while wcur < fs_len:
+        while wcur < sent_len:
+            cats_ngrams_cv = [[0] for icat in cats]
+            cats_ngrams_offset = [[0] for icat in cats]
+            cats_ngrams_iword = [[-1] for icat in cats]
+            cats_max_cv = [.0 for icat in cats]
 
-            cats_ngrams = [[] for icat in cats]
-            cats_max = [.0 for icat in cats]
             for icat in cats:
                 woffset = 0
-                word = flat_sent[wcur]
-                word_info = self.__categories__[icat][VOCAB]
-                while word in word_info:
-                    cats_ngrams[icat].append(word_info[word][CV])
-                    word_info = word_info[word][NEXT]
-                    woffset += 1
-                    if wcur + woffset >= fs_len:
-                        break
-                    word = flat_sent[wcur + woffset]
+                word_raw = sent_words[wcur + woffset][0]
+                wordi = sent_iwords[wcur + woffset]
+                word_info = categories[icat][VOCAB]
 
-                cats_max[icat] = (max(cats_ngrams[icat])
-                                  if cats_ngrams[icat] else .0)
+                if wordi in word_info:
+                    cats_ngrams_cv[icat][0] = word_info[wordi][CV]
+                    word_info = word_info[wordi][NEXT]
+                cats_ngrams_iword[icat][0] = wordi
+                cats_ngrams_offset[icat][0] = woffset
 
-            max_gv = max(cats_max)
+                # if it is a learned word (not unknown and seen for this category),
+                # then try to recognize learned n-grams too
+                if wordi != IDX_UNKNOWN_WORD and wordi in categories[icat][VOCAB]:
+                    # while word or word delimiter (e.g. space)
+                    while wordi != IDX_UNKNOWN_WORD or re.match(word_delimiter, word_raw):
+                        woffset += 1
+                        if wcur + woffset >= sent_len:
+                            break
+
+                        word_raw = sent_words[wcur + woffset][0]
+                        wordi = sent_iwords[wcur + woffset]
+
+                        # if word is a word:
+                        if wordi != IDX_UNKNOWN_WORD:
+                            # if this word belongs to this category
+                            if wordi in word_info:
+                                cats_ngrams_cv[icat].append(word_info[wordi][CV])
+                                cats_ngrams_iword[icat].append(wordi)
+                                cats_ngrams_offset[icat].append(woffset)
+                                word_info = word_info[wordi][NEXT]
+                            else:
+                                break
+
+                    cats_max_cv[icat] = (max(cats_ngrams_cv[icat])
+                                         if cats_ngrams_cv[icat] else .0)
+
+            max_gv = max(cats_max_cv)
+            use_ngram = True
             if (max_gv > self.__a__):
-                cat_max_gv = cats_max.index(max_gv)
-                ngram_len = cats_ngrams[cat_max_gv].index(max_gv) + 1
+                icat_max_gv = cats_max_cv.index(max_gv)
+                ngram_max_gv = cats_ngrams_cv[icat_max_gv].index(max_gv)
+                offset_max_gv = cats_ngrams_offset[icat_max_gv][ngram_max_gv] + 1
 
                 max_gv_sum_1_grams = max([
                     sum([
-                        self.__categories__[ic][VOCAB][w][CV]
-                        if w in self.__categories__[ic][VOCAB]
-                        else 0
-                        for w
-                        in flat_sent[wcur:wcur + ngram_len]
+                        (categories[ic][VOCAB][wi][CV]
+                         if wi in categories[ic][VOCAB]
+                         else 0)
+                        for wi
+                        in cats_ngrams_iword[ic]
                     ])
                     for ic in cats
                 ])
 
                 if (max_gv_sum_1_grams > max_gv):
-                    ngram_len = 1
+                    use_ngram = False
             else:
-                ngram_len = 1
+                use_ngram = False
 
-            sent.append(
+            if not use_ngram:
+                offset_max_gv = 1
+                icat_max_gv = 0
+                ngram_max_gv = 0
+
+            sent_parsed.append(
                 (
-                    flat_raw_sent[wcur:wcur + ngram_len],
-                    flat_sent[wcur:wcur + ngram_len]
+                    u"".join([raw_word for raw_word, _ in sent_words[wcur:wcur + offset_max_gv]]),
+                    cats_ngrams_iword[icat_max_gv][:ngram_max_gv + 1]
                 )
             )
-            wcur += ngram_len
+            wcur += offset_max_gv
 
         get_word = self.get_word
         if not json:
-            words_cvs = [classify_trans(seq) for _, seq in sent]
+            words_cvs = [classify_trans(seq) for _, seq in sent_parsed]
             if words_cvs:
                 return self.summary_op_ngrams(words_cvs)
             return self.__zero_cv__
@@ -487,12 +495,12 @@ class SS3:
             info = [
                 {
                     "token": u"→".join(map(get_word, sequence)),
-                    "lexeme": u"".join(raw_sequence),
+                    "lexeme": raw_sequence,
                     "cv": classify_trans(sequence),
                     "lv": [local_value(sequence, ic) for ic in cats],
                     "fr": [get_tip(sequence, ic)[FR] for ic in cats]
                 }
-                for raw_sequence, sequence in sent
+                for raw_sequence, sequence in sent_parsed
             ]
             return {
                 "words": info,
