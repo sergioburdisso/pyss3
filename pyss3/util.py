@@ -681,7 +681,7 @@ class Evaluation:
     def __grid_search_loop__(
         clf, x_test, y_test, ss, ll, pp, aa, k_fold,
         i_fold, def_cat, tag, categories, cache=True,
-        leave_pbar=True, extended_pbar=False, desc_pbar=None
+        leave_pbar=True, extended_pbar=False, desc_pbar=None, prep=True
     ):
         """Grid search main loop."""
         method = Evaluation.__kfold2method__(k_fold)
@@ -731,7 +731,8 @@ class Evaluation:
                     )
 
                     y_pred = clf.predict(
-                        x_test, def_cat, labels=False, leave_pbar=False
+                        x_test, def_cat,
+                        labels=False, leave_pbar=False, prep=prep
                     )
 
                     Evaluation.__evaluation_result__(
@@ -1121,7 +1122,7 @@ class Evaluation:
 
     @staticmethod
     def test(
-        clf, x_test, y_test, def_cat=STR_MOST_PROBABLE,
+        clf, x_test, y_test, def_cat=STR_MOST_PROBABLE, prep=True,
         tag=None, plot=True, metric='accuracy', metric_target='macro avg', cache=True
     ):
         """
@@ -1150,6 +1151,9 @@ class Evaluation:
                         'most-probable', 'unknown' or a given category name.
                         (default: 'most-probable')
         :type def_cat: str
+        :param prep: enables the default input preprocessing when classifying
+                     (default: True)
+        :type prep: bool
         :param tag: the cache tag to be used, i.e. a string to identify this evaluation
                     inside the cache storage (optional)
         :type tag: str
@@ -1188,7 +1192,7 @@ class Evaluation:
         # if not cached
         if not y_pred:
             clf.set_hyperparameters(s, l, p, a)
-            y_pred = clf.predict(x_test, def_cat, labels=False)
+            y_pred = clf.predict(x_test, def_cat, prep=prep, labels=False)
             categories = clf.get_categories()
             y_test = [clf.get_category_index(y) for y in y_test]
         else:
@@ -1203,9 +1207,8 @@ class Evaluation:
 
     @staticmethod
     def kfold_cross_validation(
-        clf, x_train, y_train, k=4, n_grams=None,
-        def_cat=STR_MOST_PROBABLE, tag=None, plot=True,
-        metric='accuracy', metric_target='macro avg', cache=True
+        clf, x_train, y_train, k=4, n_grams=None, def_cat=STR_MOST_PROBABLE, prep=True,
+        tag=None, plot=True, metric='accuracy', metric_target='macro avg', cache=True
     ):
         """
         Perform a Stratified k-fold cross validation on the given training set.
@@ -1243,6 +1246,9 @@ class Evaluation:
                         'most-probable', 'unknown' or a given category name.
                         (default: 'most-probable')
         :type def_cat: str
+        :param prep: enables the default input preprocessing when classifying
+                     (default: True)
+        :type prep: bool
         :param tag: the cache tag to be used, i.e. a string to identify this evaluation
                     inside the cache storage (optional)
         :type tag: str
@@ -1304,12 +1310,12 @@ class Evaluation:
                 clf_fold.set_hyperparameters(s, l, p, a)
                 Print.verbosity_region_begin(VERBOSITY.QUIET)
                 progress_bar.set_description_str(pbar_desc + " [training...]")
-                clf_fold.fit(x_train_fold, y_train_fold, n_grams, leave_pbar=False)
+                clf_fold.fit(x_train_fold, y_train_fold, n_grams,
+                             prep=prep, leave_pbar=False)
 
                 progress_bar.set_description_str(pbar_desc + " [classifying...]")
-                y_pred = clf_fold.predict(
-                    x_test_fold, def_cat, labels=False, leave_pbar=False
-                )
+                y_pred = clf_fold.predict(x_test_fold, def_cat,
+                                          prep=prep, labels=False, leave_pbar=False)
                 Print.verbosity_region_end()
 
                 Evaluation.__evaluation_result__(
@@ -1334,8 +1340,8 @@ class Evaluation:
     @staticmethod
     def grid_search(
         clf, x_data, y_data, s=None, l=None, p=None, a=None,
-        k_fold=None, n_grams=None, def_cat=STR_MOST_PROBABLE, tag=None,
-        metric='accuracy', metric_target='macro avg', cache=True, extended_pbar=False
+        k_fold=None, n_grams=None, def_cat=STR_MOST_PROBABLE, prep=True,
+        tag=None, metric='accuracy', metric_target='macro avg', cache=True, extended_pbar=False
     ):
         """
         Perform a grid search using the provided hyperparameter values.
@@ -1418,6 +1424,9 @@ class Evaluation:
                         'most-probable', 'unknown' or a given category name.
                         (default: 'most-probable')
         :type def_cat: str
+        :param prep: enables the default input preprocessing when classifying
+                     (default: True)
+        :type prep: bool
         :param tag: the cache tag to be used, i.e. a string to identify this evaluation
                     inside the cache storage (optional)
         :type tag: str
@@ -1464,7 +1473,7 @@ class Evaluation:
             Evaluation.__grid_search_loop__(
                 clf, x_test, y_test, s, l, p, a, 1, 0,
                 def_cat, tag, clf.get_categories(), cache,
-                extended_pbar=extended_pbar
+                extended_pbar=extended_pbar, prep=prep
             )
         else:  # if k-fold
             Print.verbosity_region_begin(VERBOSITY.NORMAL)
@@ -1481,13 +1490,13 @@ class Evaluation:
                 categories = clf.get_categories()
 
                 clf_fold = SS3()
-                clf_fold.fit(x_train, y_train, n_grams, leave_pbar=False)
+                clf_fold.fit(x_train, y_train, n_grams, prep=prep, leave_pbar=False)
 
                 Evaluation.__grid_search_loop__(
                     clf_fold, x_test, y_test, s, l, p, a, k_fold, i_fold,
                     def_cat, tag, categories, cache,
                     leave_pbar=False, extended_pbar=extended_pbar,
-                    desc_pbar="[fold %d/%d] Grid search" % (i_fold + 1, k_fold)
+                    desc_pbar="[fold %d/%d] Grid search" % (i_fold + 1, k_fold), prep=prep
                 )
                 Evaluation.__cache_update__()
 
