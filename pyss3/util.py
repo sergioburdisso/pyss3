@@ -1509,7 +1509,7 @@ class Dataset:
     """A helper class with methods to read/write datasets."""
 
     @staticmethod
-    def load_from_files(data_path, folder_label=True, as_single_doc=False):
+    def load_from_files(data_path, folder_label=True, as_single_doc=False, sep_doc="\n"):
         """
         Load category documents from disk.
 
@@ -1545,7 +1545,7 @@ class Dataset:
                     progress_bar.set_description_str("Loading '%s' documents" % cat)
 
                     with open(file_path, "r", encoding=ENCODING) as fcat:
-                        docs = (fcat.readlines()
+                        docs = (fcat.read().split(sep_doc)
                                 if not as_single_doc else [fcat.read()])
 
                     x_data.extend(docs)
