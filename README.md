@@ -156,8 +156,8 @@ Thanks goes to these awesome people ([emoji key](https://allcontributors.org/doc
 <table>
   <tr>
     <td align="center"><a href="https://www.saurabhbora.com"><img src="https://avatars2.githubusercontent.com/u/29205181?v=4" width="100px;" alt=""/><br /><sub><b>Saurabh Bora</b></sub></a><br /><a href="#ideas-enthussb" title="Ideas & Feedback">🤔</a></td>
-    <td align="center"><a href="http://angermeir.me/"><img src="https://avatars3.githubusercontent.com/u/16398152?v=4" width="100px;" alt=""/><br /><sub><b>Florian Angermeir</b></sub></a><br /><a href="#ideas-Florian" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-Florian" title="Data">🔣</a></td>
-    <td align="center"><a href="https://www.linkedin.com/in/muneebvaiyani/"><img src="https://avatars3.githubusercontent.com/u/36028992?v=4" width="100px;" alt=""/><br /><sub><b>Muneeb Vaiyani</b></sub></a><br /><a href="#ideas-Vaiyani" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-Florian" title="Data">🔣</a></td>
+    <td align="center"><a href="http://angermeir.me/"><img src="https://avatars3.githubusercontent.com/u/16398152?v=4" width="100px;" alt=""/><br /><sub><b>Florian Angermeir</b></sub></a><br /><a href="#ideas-angrymeir" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-angrymeir" title="Data">🔣</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/muneebvaiyani/"><img src="https://avatars3.githubusercontent.com/u/36028992?v=4" width="100px;" alt=""/><br /><sub><b>Muneeb Vaiyani</b></sub></a><br /><a href="#ideas-Vaiyani" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-Vaiyani" title="Data">🔣</a></td>
   </tr>
 </table>
 
