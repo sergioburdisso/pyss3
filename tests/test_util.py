@@ -3,15 +3,17 @@
 from os import path
 from pyss3 import SS3, InvalidCategoryError
 from shutil import rmtree
-from pyss3.util import Evaluation, Dataset, RecursiveDefaultDict, Print, VERBOSITY
+from pyss3.util import Dataset, Evaluation, RecursiveDefaultDict, Print, VERBOSITY
 
 import sys
 import pytest
 import pyss3
 
 DATASET_FOLDER = "dataset_mr"
+DATASET_MULTILABEL_FOLDER = "dataset_ml"
 PY3 = sys.version_info[0] >= 3
 DATASET_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
+DATASET_MULTILABEL_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
 TMP_FOLDER = "tests/ss3_models/"
 
 
@@ -238,3 +240,25 @@ def test_evaluation(mocker):
     # different tag
 
     rmtree("./tests/ss3_models", ignore_errors=True)
+
+
+def test_dataset():
+    """Test Dataset class."""
+    x_train, y_train = Dataset.load_from_files_multilabel(
+        path.join(DATASET_MULTILABEL_PATH, "train_files"),
+        path.join(DATASET_MULTILABEL_PATH, "file_labels.tsv")
+    )
+
+    assert x_train == ['this is the first document!!\n\n:)', 'and this is the\n\nSECOND!!']
+    assert y_train == [['catA', 'catB', 'catC'], ['catA']]
+
+    x_train, y_train = Dataset.load_from_files_multilabel(
+        path.join(DATASET_MULTILABEL_PATH, "train/docs.txt"),
+        path.join(DATASET_MULTILABEL_PATH, "train/labels.txt"),
+        sep_label=",",
+        sep_doc="\n>>>>>\n"
+    )
+
+    assert len(y_train) == len(y_train) and len(y_train) == 8
+    assert y_train == [[], ['toxic', 'severe_toxic', 'obscene', 'insult'],
+                       [], [], [], [], [], ['toxic']]

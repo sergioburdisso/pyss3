@@ -2,13 +2,13 @@
 """This is a helper module with utility classes and functions."""
 from __future__ import print_function
 from io import open
-from os import listdir, makedirs, path
+from os import listdir, makedirs, path, remove as remove_file
 from tqdm import tqdm
-
 from math import ceil
-from numpy import mean, linspace, arange
 from itertools import product
-from os import remove as remove_file
+from collections import defaultdict
+
+from numpy import mean, linspace, arange
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
@@ -1506,12 +1506,12 @@ class Evaluation:
 
 
 class Dataset:
-    """A helper class with methods to read/write datasets."""
+    """A helper class with methods to read datasets from disk."""
 
     @staticmethod
-    def load_from_files(data_path, folder_label=True, as_single_doc=False, sep_doc="\n"):
-        """
-        Load category documents from disk.
+    def load_from_files(data_path, folder_label=True, as_single_doc=False, sep_doc='\n'):
+        r"""
+        Load training/test documents and category labels from disk.
 
         :param data_path: the training or the test set path
         :type data_path: str
@@ -1521,8 +1521,12 @@ class Dataset:
         :type folder_label: bool
         :param as_single_doc: read the documents as a single (and big) document
                               (default: False)
-        :type folder_label: bool
-        :returns: the (x_train, y_train) or the (x_test, y_test) pairs.
+        :type as_single_doc: bool
+        :param sep_doc: the separator/delimiter used to separate each document
+                        when loading training/test documents from single file. Valid
+                        only when ``folder_label=False``. (default: ``'\n'``)
+        :type sep_doc: str
+        :returns: the (x_train, y_train) or (x_test, y_test) pairs.
         :rtype: tuple
         """
         x_data = []
@@ -1581,6 +1585,128 @@ class Dataset:
                     cat,
                     '' if as_single_doc else " (%d documents)" % cat_info[cat]
                 ),
+                offset=4
+            )
+
+        return x_data, y_data
+
+    @staticmethod
+    def load_from_files_multilabel(docs_path, labels_path, sep_label=None, sep_doc='\n'):
+        r"""
+        Multilabel version of the ``Dataset.load_from_files()`` function.
+
+        Load training/test documents and category labels from disk.
+
+        :param docs_path: the file or the folder containing the training/test
+                          documents.
+        :type docs_path: str
+        :param labels_path: the file containing the labels for each document.
+
+                            * if ``docs_path`` is a file, then the ``labels_path`` file
+                            should contain a line with the corresponding list of category
+                            labels for each document in ``docs_path``. For
+                            instance, if ``sep_doc='\n'`` and the the content
+                            of ``docs_path`` is:
+
+                            .. parsed-literal::
+                                this is document 1
+                                this is document 2
+                                this is document 3
+
+                            then, if ``sep_label=';'``, the ``labels_path``
+                            file should contain the labels for each document
+                            (in order) separated by ;, as follows:
+
+                            .. parsed-literal::
+                                labelA;labelB
+                                labelA
+                                labelB;labelC
+
+                            * if ``docs_path`` is a folder containing the documents, then
+                            the ``labels_path`` file should contain a line for each document and
+                            category label. Each line should have the following format:
+                            ``document_name<the sep_label>label``. For instance, if the
+                            ``docs_path`` folder contains the following 3 documents:
+
+                            .. parsed-literal::
+                                doc1.txt
+                                doc2.txt
+                                doc3.txt
+
+                            Then, following the above example, the ``labels_path`` file should be:
+
+                            .. parsed-literal::
+                                doc1    labelA
+                                doc1    labelB
+                                doc2    labelA
+                                doc3    labelB
+                                doc3    labelC
+
+        :type labels_path: str
+        :param sep_label: the separator/delimiter used to separate either each label (if
+                          ``docs_path`` is a file) or the document name from its category
+                          (if ``docs_path`` is a folder).
+                          (default: ``';'`` when ``docs_path`` is a file, the ``'\s+'`` regular
+                          expression otherwise).
+        :type sep_label: str
+        :param sep_doc: the separator/delimiter used to separate each document
+                        when loading training/test documents from single file. Valid
+                        only when ``folder_label=False``. (default: ``\n'``)
+        :type sep_doc: str
+        :returns: the (x_train, y_train) or (x_test, y_test) pairs.
+        :rtype: tuple
+        """
+        x_data = []
+        y_data = []
+        cat_info = defaultdict(int)
+
+        Print.info("reading files...")
+
+        if path.isdir(docs_path):
+            sep_label = sep_label or r'\s+'  # default separator
+
+            with open(labels_path, "r", encoding=ENCODING) as flabels:
+                doc_labels_raw = [re.split(sep_label, l.rstrip())
+                                  for l in flabels.read().split('\n')]
+                doc_labels = {}
+
+                for doc_name, label in doc_labels_raw:
+                    if doc_name not in doc_labels:
+                        doc_labels[doc_name] = [label]
+                    else:
+                        doc_labels[doc_name].append(label)
+                    cat_info[label] += 1
+
+                for doc_name in tqdm(doc_labels, desc="Loading documents"):
+                    file_name = doc_name + ".txt" if '.' not in doc_name else doc_name
+                    with open(path.join(docs_path, file_name), "r", encoding=ENCODING) as fdoc:
+                        x_data.append(fdoc.read())
+                    y_data.append(doc_labels[doc_name])
+
+        else:
+            sep_label = sep_label or ';'
+
+            with open(labels_path, "r", encoding=ENCODING) as flabels:
+                y_data = [re.split(sep_label, l) if l else []
+                          for l in tqdm(flabels.read().split('\n'))]
+            with open(docs_path, "r", encoding=ENCODING) as fdocs:
+                x_data = fdocs.read().split(sep_doc)
+
+            if len(x_data) != len(y_data):
+                x_data = x_data[:len(y_data)]
+
+            for labels in y_data:
+                for i, label in enumerate(labels):
+                    label = label.strip()
+                    labels[i] = label
+                    cat_info[label] += 1
+
+        Print.info("%d categories found" % len(cat_info))
+        for cat in cat_info:
+            Print.info(
+                "'%s'%s"
+                %
+                (cat, " (%d documents)" % cat_info[cat]),
                 offset=4
             )
 
