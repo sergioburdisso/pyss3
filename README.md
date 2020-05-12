@@ -155,7 +155,8 @@ Thanks goes to these awesome people ([emoji key](https://allcontributors.org/doc
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://www.saurabhbora.com"><img src="https://avatars2.githubusercontent.com/u/29205181?v=4" width="100px;" alt=""/><br /><sub><b>Saurabh Bora</b></sub></a><br /><a href="#ideas-enthussb" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://www.saurabhbora.com"><img src="https://avatars2.githubusercontent.com/u/29205181?v=4" width="100px;" alt=""/><br /><sub><b>Saurabh Bora</b></sub></a><br /><a href="#ideas-enthussb" title="Ideas, Planning, & Feedback">🤔</a> <a href="#projectManagement-enthussb" title="Project Management">📆</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/muneebvaiyani/"><img src="https://avatars3.githubusercontent.com/u/36028992?v=4" width="100px;" alt=""/><br /><sub><b>Muneeb Vaiyani</b></sub></a><br /><a href="#ideas-Vaiyani" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
