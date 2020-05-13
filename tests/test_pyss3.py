@@ -16,8 +16,10 @@ import pytest
 pyss3.set_verbosity(VERBOSITY.QUIET)
 
 DATASET_FOLDER = "dataset"
+DATASET_MULTILABEL_FOLDER = "dataset_ml"
 
 dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
+dataset_multilabel_path = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
 
 x_train, y_train = Dataset.load_from_files(dataset_path, folder_label=False)
 x_test = [
@@ -253,6 +255,22 @@ def test_pyss3_functions():
         pyss3.mad([], 0)
 
 
+def test_multilabel():
+    """Test multilabel support."""
+    x_train, y_train = Dataset.load_from_files_multilabel(
+        path.join(dataset_multilabel_path, "train/docs.txt"),
+        path.join(dataset_multilabel_path, "train/labels.txt"),
+        sep_label=",",
+        sep_doc="\n>>>>>\n"
+    )
+
+    clf = SS3()
+    clf.fit(x_train, y_train)
+
+    assert sorted(clf.get_categories()) == ['[unknown]', 'insult', 'obscene',
+                                            'severe_toxic', 'toxic']
+
+
 def test_pyss3_ss3(mockers):
     """Test SS3."""
     clf = SS3(
@@ -274,6 +292,10 @@ def test_pyss3_ss3(mockers):
         clf.predict(x_test)
     with pytest.raises(pyss3.EmptyModelError):
         clf.predict_proba(x_test)
+    with pytest.raises(ValueError):
+        clf.train(x_train, [])
+    with pytest.raises(ValueError):
+        clf.train([], [])
 
     # train and predict/classify tests (model: terms are single words)
     # cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI

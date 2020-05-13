@@ -2173,7 +2173,8 @@ class SS3:
         :param x_train: the list of documents
         :type x_train: list (of str)
         :param y_train: the list of document labels
-        :type y_train: list (of str)
+        :type y_train: list of str for singlelabel classification;
+                        list of list of str for multilabel classification.
         :param n_grams:  indicates the maximum ``n``-grams to be learned
                         (e.g. a value of ``1`` means only 1-grams (words),
                         ``2`` means 1-grams and 2-grams,
@@ -2184,36 +2185,64 @@ class SS3:
         :param leave_pbar: controls whether to leave the progress bar or
                            remove it after finishing.
         :type leave_pbar: bool
+        :raises: ValueError
         """
-        cats = sorted(list(set(y_train)))
         stime = time()
-
         x_train, y_train = list(x_train), list(y_train)
 
-        x_train = [
-            "".join([
-                x_train[i]
-                if x_train[i] and x_train[i][-1] == '\n'
-                else
-                x_train[i] + '\n'
-                for i in xrange(len(x_train))
-                if y_train[i] == cat
-            ])
-            for cat in cats
-        ]
-        y_train = list(cats)
+        if len(x_train) != len(y_train):
+            raise ValueError("`x_train` and `y_train` must have the same length")
+
+        if len(y_train) == 0:
+            raise ValueError("`x_train` and `y_train` are empty")
+
+        # if it's a multi-label classification problem
+        if is_a_collection(y_train[0]):
+            # flattening y_train
+            labels = [l for y in y_train for l in y]
+        else:
+            labels = y_train
+
+        cats = sorted(list(set(labels)))
+
+        # if it's a single-label classification problem
+        if not is_a_collection(y_train[0]):
+            x_train = [
+                "".join([
+                    x_train[i]
+                    if x_train[i] and x_train[i][-1] == '\n'
+                    else
+                    x_train[i] + '\n'
+                    for i in xrange(len(x_train))
+                    if y_train[i] == cat
+                ])
+                for cat in cats
+            ]
+            y_train = list(cats)
 
         Print.info("about to start training", offset=1)
         Print.verbosity_region_begin(VERBOSITY.NORMAL)
         progress_bar = tqdm(total=len(x_train), desc="Training",
                             leave=leave_pbar, disable=Print.is_quiet())
-        for i in range(len(x_train)):
-            progress_bar.set_description_str("Training on '%s'" % str(y_train[i]))
-            self.learn(
-                x_train[i], y_train[i],
-                n_grams=n_grams, prep=prep, update=False
-            )
-            progress_bar.update(1)
+
+        # if it's a multi-label classification problem
+        if is_a_collection(y_train[0]):
+            __unknown__ = [STR_UNKNOWN_CATEGORY]
+            for i in range(len(x_train)):
+                for label in (y_train[i] if y_train[i] else __unknown__):
+                    self.learn(
+                        x_train[i], label,
+                        n_grams=n_grams, prep=prep, update=False
+                    )
+                progress_bar.update(1)
+        else:
+            for i in range(len(x_train)):
+                progress_bar.set_description_str("Training on '%s'" % str(y_train[i]))
+                self.learn(
+                    x_train[i], y_train[i],
+                    n_grams=n_grams, prep=prep, update=False
+                )
+                progress_bar.update(1)
         progress_bar.close()
         self.__prune_tries__()
         Print.verbosity_region_end()
@@ -2556,6 +2585,14 @@ def list_hash(str_list):
         except (TypeError, UnicodeEncodeError):
             m.update(doc.encode('ascii', 'ignore'))
     return m.hexdigest()
+
+
+def is_a_collection(o):
+    """Return True when the object ``o`` is a collection."""
+    from sys import version_info
+    py2 = version_info[0] == 2
+    return hasattr(o, "__getitem__") and ((py2 and not isinstance(o, basestring)) or
+                                          (not py2 and not isinstance(o, (str, bytes))))
 
 
 def vsum(v0, v1):

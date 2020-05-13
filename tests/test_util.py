@@ -9,9 +9,9 @@ import sys
 import pytest
 import pyss3
 
+PY3 = sys.version_info[0] >= 3
 DATASET_FOLDER = "dataset_mr"
 DATASET_MULTILABEL_FOLDER = "dataset_ml"
-PY3 = sys.version_info[0] >= 3
 DATASET_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 DATASET_MULTILABEL_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
 TMP_FOLDER = "tests/ss3_models/"
