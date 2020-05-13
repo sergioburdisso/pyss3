@@ -12,6 +12,7 @@ import errno
 import numpy as np
 
 from io import open
+from sys import version_info
 from time import time
 from tqdm import tqdm
 from math import pow, tanh
@@ -56,6 +57,10 @@ EMPTY_WORD_INFO = [0, 0, 0, 0, 0, 0]
 
 NOISE_FR = 1
 MIN_MAD_SD = .03
+
+PY2 = version_info[0] == 2
+if not PY2:
+    basestring = None  # to avoid the Flake8 "F821 undefined name" error
 
 
 class SS3:
@@ -2589,12 +2594,8 @@ def list_hash(str_list):
 
 def is_a_collection(o):
     """Return True when the object ``o`` is a collection."""
-    from sys import version_info
-    py2 = version_info[0] == 2
-    if not py2:
-        basestring = None  # to avoid the Flake8 "F821 undefined name" error
-    return hasattr(o, "__getitem__") and ((py2 and not isinstance(o, basestring)) or
-                                          (not py2 and not isinstance(o, (str, bytes))))
+    return hasattr(o, "__getitem__") and ((PY2 and not isinstance(o, basestring)) or
+                                          (not PY2 and not isinstance(o, (str, bytes))))
 
 
 def vsum(v0, v1):
