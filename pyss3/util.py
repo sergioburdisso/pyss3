@@ -2090,3 +2090,56 @@ def list_by_force(v):
         return v
     except TypeError:
         return [v]
+
+
+def membership_matrix(clf, y_data):
+    """
+    Transform a list of (multiple) labels into a "membership matrix".
+
+    The membership matrix consists converting each list of category labels
+    (i.e., each *y* in ``y_data``) into a vector in which there's a fixed
+    position associated to each learned category, having the value 1 for each
+    label in *y*, and 0 otherwise.
+
+    When working with multi-label classification problems, this representation
+    enables measuring the performance using common evaluation metrics such
+    as Hamming loss, exact match ratio, accuracy, precision, recall, F1, etc.
+
+    For instance, suppose ``y_data = [[], ['labelA'], ['labelB'], ['labelA', 'labelC']]``
+    and that the classifier ``clf`` has been trained on 3 categories whose labels are
+    'labelA', 'labelB', and 'labelC', then, we would have that:
+
+    >>> labels2membership(clf, [[], ['labelA'], ['labelB'], ['labelA', 'labelC']])
+
+    returns the following membership matrix:
+
+    >>> [[0, 0, 0],  # []
+    >>>  [1, 0, 0],  # ['labelA']
+    >>>  [0, 1, 0],  # ['labelB']
+    >>>  [1, 0, 1]]  # ['labelA', 'labelC']
+
+    :param clf: the trained classifier
+    :type clf: SS3
+    :param y_data: the list of document labels
+    :type y_data: list of list of str
+    :returns: a (sparse) matrix in which each row is the membership vector of
+              each element (labels) in ``y_data``.
+    :rtype: scipy.sparse.lil.lil_matrix
+    :raises: ValueError
+    """
+    if not clf.__categories__:
+        raise ValueError("The `clf` classifier has not been trained yet!")
+
+    from scipy import sparse
+
+    labels2index = dict([(c, i) for i, c in enumerate(clf.get_categories())])
+    y_data_matrix = sparse.lil_matrix((len(y_data), len(labels2index)), dtype="b")
+
+    try:
+        for i, labels in enumerate(y_data):
+            labels = [labels2index[l] for l in labels]
+            y_data_matrix[i, labels] = 1
+    except KeyError as e:
+        raise ValueError("The `y_data` contains an unknown label (%s)" % str(e))
+
+    return y_data_matrix

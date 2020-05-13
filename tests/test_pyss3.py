@@ -2,7 +2,7 @@
 """Tests for pyss3."""
 from os import path
 from shutil import rmtree
-from pyss3.util import Dataset
+from pyss3.util import Dataset, membership_matrix
 from pyss3 import \
     SS3, STR_NORM_GV_XAI, STR_NORM_GV, STR_GV, \
     STR_XAI, STR_VANILLA, STR_MOST_PROBABLE, \
@@ -265,10 +265,27 @@ def test_multilabel():
     )
 
     clf = SS3()
+
+    with pytest.raises(ValueError):
+        membership_matrix(clf, [])
+
     clf.fit(x_train, y_train)
 
     assert sorted(clf.get_categories()) == ['insult', 'obscene', 'severe_toxic', 'toxic']
     assert clf.classify_multilabel("this is a unknown document!") == []
+
+    y_pred = [[], ['toxic'], ['severe_toxic'], ['obscene'], ['insult'], ['toxic', 'insult']]
+
+    with pytest.raises(ValueError):
+        membership_matrix(clf, y_pred + [["xxx"]])
+
+    y_pred_memmatrix = membership_matrix(clf, y_pred).todense().tolist()
+    assert y_pred_memmatrix == [[0, 0, 0, 0],  # []
+                                [1, 0, 0, 0],  # ['toxic']
+                                [0, 1, 0, 0],  # ['severe_toxic']
+                                [0, 0, 1, 0],  # ['obscene']
+                                [0, 0, 0, 1],  # ['insult']
+                                [1, 0, 0, 1]]  # ['toxic', 'insult']
 
 
 def test_pyss3_ss3(mockers):
