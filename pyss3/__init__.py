@@ -2591,6 +2591,8 @@ def is_a_collection(o):
     """Return True when the object ``o`` is a collection."""
     from sys import version_info
     py2 = version_info[0] == 2
+    if not py2:
+        basestring = None  # to avoid the Flake8 "F821 undefined name" error
     return hasattr(o, "__getitem__") and ((py2 and not isinstance(o, basestring)) or
                                           (not py2 and not isinstance(o, (str, bytes))))
 
