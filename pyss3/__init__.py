@@ -800,6 +800,9 @@ class SS3:
             if def_cat == IDX_UNKNOWN_CATEGORY:
                 raise InvalidCategoryError
 
+        # does the special "[others]" category exist? (only used in multilabel classification)
+        __other_idx__ = self.get_category_index(STR_OTHERS_CATEGORY)
+
         if self.__update_needed__():
             self.update_values()
 
@@ -871,6 +874,17 @@ class SS3:
                         ]
                     else:
                         y_pred[doc_idx] = [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
+
+                # if the special "[others]" category exists
+                if __other_idx__ != IDX_UNKNOWN_CATEGORY:
+                    # if its among the predicted labels, remove (hide) it
+                    if labels:
+                        if STR_OTHERS_CATEGORY in y_pred[doc_idx]:
+                            y_pred[doc_idx].remove(STR_OTHERS_CATEGORY)
+                    else:
+                        if __other_idx__ in y_pred[doc_idx]:
+                            y_pred[doc_idx].remove(__other_idx__)
+
         return y_pred
 
     def summary_op_ngrams(self, cvs):
