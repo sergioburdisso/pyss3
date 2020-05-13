@@ -32,6 +32,7 @@ WORD_DELTR = r"\s"
 WORD_REGEX = r"\w+(?:'\w+)?"
 
 STR_UNKNOWN, STR_MOST_PROBABLE = "unknown", "most-probable"
+STR_OTHERS_CATEGORY = "[others]"
 STR_UNKNOWN_CATEGORY = "[unknown]"
 IDX_UNKNOWN_CATEGORY = -1
 STR_UNKNOWN_WORD = ''
@@ -1184,6 +1185,7 @@ class SS3:
         return [
             self.get_category_name(ci)
             for ci in range(len(self.__categories__))
+            if self.get_category_name(ci) != STR_OTHERS_CATEGORY
         ]
 
     def get_most_probable_category(self):
@@ -2161,15 +2163,26 @@ class SS3:
                 if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
                     raise InvalidCategoryError
                 cat = def_cat
-            return [cat] if labels else [self.get_category_index(cat)]
+            if cat != STR_OTHERS_CATEGORY:
+                return [cat] if labels else [self.get_category_index(cat)]
+            else:
+                return []
         else:
+            __other_idx__ = self.get_category_index(STR_OTHERS_CATEGORY)
             if labels:
-                return [
+                result = [
                     self.get_category_name(cat_i)
                     for cat_i, _ in r[:kmean_multilabel_size(r)]
                 ]
+                # removing "hidden" special category ("[other]")
+                if __other_idx__ != IDX_UNKNOWN_CATEGORY and STR_OTHERS_CATEGORY in result:
+                    result.remove(STR_OTHERS_CATEGORY)
             else:
-                return [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
+                result = [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
+                # removing "hidden" special category ("[other]")
+                if __other_idx__ != IDX_UNKNOWN_CATEGORY and __other_idx__ in result:
+                    result.remove(__other_idx__)
+            return result
 
     def fit(self, x_train, y_train, n_grams=1, prep=True, leave_pbar=True):
         """
@@ -2232,9 +2245,9 @@ class SS3:
 
         # if it's a multi-label classification problem
         if is_a_collection(y_train[0]):
-            __unknown__ = [STR_UNKNOWN_CATEGORY]
+            __others__ = [STR_OTHERS_CATEGORY]
             for i in range(len(x_train)):
-                for label in (y_train[i] if y_train[i] else __unknown__):
+                for label in (y_train[i] if y_train[i] else __others__):
                     self.learn(
                         x_train[i], label,
                         n_grams=n_grams, prep=prep, update=False

@@ -267,8 +267,8 @@ def test_multilabel():
     clf = SS3()
     clf.fit(x_train, y_train)
 
-    assert sorted(clf.get_categories()) == ['[unknown]', 'insult', 'obscene',
-                                            'severe_toxic', 'toxic']
+    assert sorted(clf.get_categories()) == ['insult', 'obscene', 'severe_toxic', 'toxic']
+    assert clf.classify_multilabel("this is a unknown document!") == []
 
 
 def test_pyss3_ss3(mockers):
