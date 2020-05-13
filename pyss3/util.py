@@ -2094,7 +2094,7 @@ def list_by_force(v):
         return [v]
 
 
-def membership_matrix(clf, y_data):
+def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     """
     Transform a list of (multiple) labels into a "membership matrix".
 
@@ -2124,6 +2124,11 @@ def membership_matrix(clf, y_data):
     :type clf: SS3
     :param y_data: the list of document labels
     :type y_data: list of list of str
+    :param labels: whether the `y_data` list contains category labels or
+                   category indexes (default: True)
+    :type labels: bool
+    :param show_pbar: whether to show the progress bar or not (default: True)
+    :type show_pbar: bool
     :returns: a (sparse) matrix in which each row is the membership vector of
               each element (labels) in ``y_data``.
     :rtype: scipy.sparse.lil.lil_matrix
@@ -2134,11 +2139,16 @@ def membership_matrix(clf, y_data):
 
     from scipy import sparse
 
-    labels2index = dict([(c, i) for i, c in enumerate(clf.get_categories())])
+    labels2index = dict([(c if labels else clf.get_category_index(c), i)
+                         for i, c in enumerate(clf.get_categories())])
     y_data_matrix = sparse.lil_matrix((len(y_data), len(labels2index)), dtype="b")
 
     try:
-        for i, labels in enumerate(y_data):
+        y_data = enumerate(y_data)
+        if show_pbar:
+            y_data = tqdm(list(y_data), desc="Building membership matrix")
+
+        for i, labels in y_data:
             labels = [labels2index[l] for l in labels]
             y_data_matrix[i, labels] = 1
     except KeyError as e:
