@@ -101,6 +101,8 @@ class SS3:
     __p__ = 1
     __a__ = .0
 
+    __multilabel__ = False
+
     __l_update__ = None
     __s_update__ = None
     __p_update__ = None
@@ -1393,7 +1395,8 @@ class SS3:
             "__index_to_word__": self.__index_to_word__,
             "__word_to_index__": self.__word_to_index__,
             "__cv_mode__": self.__cv_mode__,
-            "__sn_mode__": self.__sn_mode__
+            "__sn_mode__": self.__sn_mode__,
+            "__multilabel__": self.__multilabel__
         }
 
         try:
@@ -1448,21 +1451,22 @@ class SS3:
                 STR_MODEL_EXT
             ), "r", encoding=ENCODING
         )
-        json_file_format = json.loads(json_file.read(), object_hook=key_as_int)
+        jmodel = json.loads(json_file.read(), object_hook=key_as_int)
         json_file.close()
 
-        self.__max_fr__ = json_file_format["__max_fr__"]
-        self.__max_gv__ = json_file_format["__max_gv__"]
-        self.__l__ = json_file_format["__l__"]
-        self.__p__ = json_file_format["__p__"]
-        self.__s__ = json_file_format["__s__"]
-        self.__a__ = json_file_format["__a__"]
-        self.__categories__ = json_file_format["__categories__"]
-        self.__categories_index__ = json_file_format["__categories_index__"]
-        self.__index_to_word__ = json_file_format["__index_to_word__"]
-        self.__word_to_index__ = json_file_format["__word_to_index__"]
-        self.__cv_mode__ = json_file_format["__cv_mode__"]
-        self.__sn_mode__ = json_file_format["__sn_mode__"]
+        self.__max_fr__ = jmodel["__max_fr__"]
+        self.__max_gv__ = jmodel["__max_gv__"]
+        self.__l__ = jmodel["__l__"]
+        self.__p__ = jmodel["__p__"]
+        self.__s__ = jmodel["__s__"]
+        self.__a__ = jmodel["__a__"]
+        self.__categories__ = jmodel["__categories__"]
+        self.__categories_index__ = jmodel["__categories_index__"]
+        self.__index_to_word__ = jmodel["__index_to_word__"]
+        self.__word_to_index__ = jmodel["__word_to_index__"]
+        self.__cv_mode__ = jmodel["__cv_mode__"]
+        self.__sn_mode__ = jmodel["__sn_mode__"]
+        self.__multilabel__ = jmodel["__multilabel__"] if "__multilabel__" in jmodel else False
 
         self.__zero_cv__ = (0,) * len(self.__categories__)
         self.__s_update__ = self.__s__
@@ -2232,6 +2236,7 @@ class SS3:
         if is_a_collection(y_train[0]):
             # flattening y_train
             labels = [l for y in y_train for l in y]
+            self.__multilabel__ = True
         else:
             labels = y_train
 
@@ -2329,6 +2334,8 @@ class SS3:
         :param multilabel: whether to perform multi-label classification or not.
                            if enabled, for each document returns a ``list`` of labels
                            instead of a single label (``str``).
+                           If the model was trained using multilabeled data, then this
+                           argument will be ignored and set to True.
         :type multilabel: bool
         :param prep: enables the default input preprocessing (default: True)
         :type prep: bool
@@ -2359,6 +2366,8 @@ class SS3:
                 Print.info("default category was set to '%s'" % def_cat, offset=1)
                 if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
                     raise InvalidCategoryError
+
+        multilabel = multilabel or self.__multilabel__
 
         if self.get_ngrams_length() == 1 and self.__summary_ops_are_pristine__():
             return self.__predict_fast__(x_test, def_cat=def_cat, labels=labels,
