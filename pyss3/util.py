@@ -1669,15 +1669,17 @@ class Dataset:
                 doc_labels_raw = [re.split(sep_label, l.rstrip())
                                   for l in flabels.read().split('\n')]
                 doc_labels = {}
+                doc_names = []
 
                 for doc_name, label in doc_labels_raw:
                     if doc_name not in doc_labels:
                         doc_labels[doc_name] = [label]
+                        doc_names.append(doc_name)
                     else:
                         doc_labels[doc_name].append(label)
                     cat_info[label] += 1
 
-                for doc_name in tqdm(doc_labels, desc="Loading documents"):
+                for doc_name in tqdm(doc_names, desc="Loading documents"):
                     file_name = doc_name + ".txt" if '.' not in doc_name else doc_name
                     with open(path.join(docs_path, file_name), "r", encoding=ENCODING) as fdoc:
                         x_data.append(fdoc.read())
