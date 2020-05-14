@@ -2144,13 +2144,8 @@ def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     y_data_matrix = sparse.lil_matrix((len(y_data), len(labels2index)), dtype="b")
 
     try:
-        y_data = enumerate(y_data)
-        if show_pbar:
-            y_data = tqdm(list(y_data), desc="Building membership matrix")
-
-        for i, labels in y_data:
-            labels = [labels2index[l] for l in labels]
-            y_data_matrix[i, labels] = 1
+        li = np.array([[i, labels2index[l]] for i, ll in enumerate(y_data) for l in ll])
+        y_data_matrix[li[:, 0], li[:, 1]] = 1
     except KeyError as e:
         raise ValueError("The `y_data` contains an unknown label (%s)" % str(e))
 
