@@ -122,8 +122,8 @@ def test_evaluation(mocker):
 
     # test
     #   OK
-    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml) == 1 / 3.
-    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, metric='exact-match') == .5
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, plot=PY3) == 1 / 3.
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, metric='exact-match', plot=PY3) == .5
     assert Evaluation.test(clf, x_data, y_data, def_cat='unknown', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, def_cat='neg', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, metric="f1-score", plot=PY3) == 1
