@@ -290,6 +290,9 @@ def test_multilabel():
 
 def test_pyss3_ss3(mockers):
     """Test SS3."""
+    with pytest.raises(ValueError):
+        clf = SS3("hyperparameter")
+
     clf = SS3(
         s=.45, l=.5, p=1, a=0,
         cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI

@@ -148,6 +148,7 @@ class SS3:
         :param sn_m: method used to compute the sanction (sn) function, options
                      are: "vanilla" and "xai" (default: "xai")
         :type sn_m: str
+        :raises: ValueError
         """
         self.__name__ = (name or self.__name__).lower()
 
@@ -155,6 +156,11 @@ class SS3:
         self.__l__ = l or self.__l__
         self.__p__ = p or self.__p__
         self.__a__ = a or self.__a__
+
+        try:
+            float(self.__s__ + self.__l__ + self.__p__ + self.__a__)
+        except BaseException:
+            raise ValueError("hyperparameter values must be numbers")
 
         self.__categories_index__ = {}
         self.__categories__ = []

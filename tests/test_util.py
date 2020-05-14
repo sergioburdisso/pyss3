@@ -59,9 +59,16 @@ def test_evaluation(mocker):
     ll = [0, 1.5]
     pp = [0, 2]
     x_data, y_data = Dataset.load_from_files(DATASET_PATH)
+    x_data_ml, y_data_ml = Dataset.load_from_files_multilabel(
+        path.join(DATASET_MULTILABEL_PATH, "train_files"),
+        path.join(DATASET_MULTILABEL_PATH, "file_labels.tsv")
+    )
 
     clf = SS3()
     clf.set_model_path("tests")
+
+    clf_ml = SS3(name="multilabel")
+    clf_ml.set_model_path("tests")
 
     # no classifier assigned case
     Evaluation.clear_cache()
@@ -92,6 +99,7 @@ def test_evaluation(mocker):
 
     # default argument values
     clf.train(x_data, y_data)
+    clf_ml.train(x_data_ml, y_data_ml)
 
     assert Evaluation.test(clf, x_data, y_data, plot=PY3) == 1
     assert Evaluation.test(clf, ['bla bla bla'], ['pos'], plot=PY3) == 0
@@ -114,6 +122,8 @@ def test_evaluation(mocker):
 
     # test
     #   OK
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml) == 1 / 3.
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, metric='exact-match') == .5
     assert Evaluation.test(clf, x_data, y_data, def_cat='unknown', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, def_cat='neg', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, metric="f1-score", plot=PY3) == 1
@@ -128,6 +138,8 @@ def test_evaluation(mocker):
         Evaluation.test(clf, x_data, y_data, metric="xxx", plot=PY3)
     with pytest.raises(KeyError):
         Evaluation.test(clf, x_data, y_data, metric="recall", metric_target="xxx", plot=PY3)
+    with pytest.raises(ValueError):
+        Evaluation.test(clf, x_data, y_data, metric='hamming-loss')
 
     # k-fold
     #   OK
