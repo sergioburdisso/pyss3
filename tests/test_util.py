@@ -179,6 +179,7 @@ def test_evaluation(mocker):
     s1, l1, p1, a1 = Evaluation.grid_search(clf_ml, x_data_ml, y_data_ml, s=ss, l=ll, p=pp)
     s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data, s=ss, l=ll, p=pp)
     assert s0 == s1 and l0 == l1 and p0 == p1 and a0 == a1
+    s0, l0, p0, a0 = Evaluation.grid_search(clf_ml, x_data_ml, y_data_ml, k_fold=4)
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data, k_fold=4)
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data, def_cat='unknown', p=pp)
     s1, l1, p1, a1 = Evaluation.grid_search(clf, x_data, y_data, def_cat='neg', p=pp)

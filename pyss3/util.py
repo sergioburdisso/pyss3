@@ -643,7 +643,7 @@ class Evaluation:
             n_cats = len(categories)
             if def_cat == STR_UNKNOWN:
                 if categories[-1] != STR_UNKNOWN_CATEGORY:
-                    categories += [STR_UNKNOWN_CATEGORY]
+                    categories = categories + [STR_UNKNOWN_CATEGORY]
                 y_pred = [y if y != IDX_UNKNOWN_CATEGORY else n_cats for y in y_pred]
         else:
             y_pred = membership_matrix(clf, y_pred, labels=False)
@@ -1426,6 +1426,8 @@ class Evaluation:
                 clf_fold.fit(x_train_fold, y_train_fold, n_grams,
                              prep=prep, leave_pbar=False)
 
+                x_train_fold, y_train_fold = None, None  # free memory
+
                 if not multilabel:
                     y_test_fold = [clf_fold.get_category_index(y) for y in y_train[test_ix]]
                 else:
@@ -1444,6 +1446,7 @@ class Evaluation:
                     cache, method, tag,
                     plot=False, k_fold=k, i_fold=i_fold
                 )
+                x_test_fold, y_test_fold, y_pred = None, None, None  # free memory
 
             progress_bar.update(1)
 
@@ -1607,18 +1610,26 @@ class Evaluation:
             Print.verbosity_region_begin(VERBOSITY.NORMAL)
 
             x_data, y_data = np.array(x_data), np.array(y_data)
-            skf = StratifiedKFold(n_splits=k_fold)
+            kfold_split = MultilabelStratifiedKFold if multilabel else StratifiedKFold
+            skf = kfold_split(n_splits=k_fold)
+            categories = clf.get_categories()
 
-            for i_fold, (train_ix, test_ix) in enumerate(
-                skf.split(x_data, y_data)
-            ):
+            y_data_split = membership_matrix(clf, y_data).todense() if multilabel else y_data
+            k_fold_splits = enumerate(skf.split(x_data, y_data_split))
+            for i_fold, (train_ix, test_ix) in k_fold_splits:
                 x_train, y_train = x_data[train_ix], y_data[train_ix]
-                y_test = [clf.get_category_index(y) for y in y_data[test_ix]]
-                x_test = x_data[test_ix]
-                categories = clf.get_categories()
 
                 clf_fold = SS3()
                 clf_fold.fit(x_train, y_train, n_grams, prep=prep, leave_pbar=False)
+
+                x_train, y_train = None, None  # free memory
+
+                if not multilabel:
+                    y_test = [clf_fold.get_category_index(y) for y in y_data[test_ix]]
+                else:
+                    y_test = [[clf_fold.get_category_index(y) for y in yy]
+                              for yy in y_data[test_ix]]
+                x_test = x_data[test_ix]
 
                 Evaluation.__grid_search_loop__(
                     clf_fold, x_test, y_test, s, l, p, a, k_fold, i_fold,
@@ -1627,6 +1638,8 @@ class Evaluation:
                     desc_pbar="[fold %d/%d] Grid search" % (i_fold + 1, k_fold), prep=prep
                 )
                 Evaluation.__cache_update__()
+
+                x_test, y_test = None, None  # free memory
 
             Print.verbosity_region_end()
 
