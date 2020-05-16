@@ -212,11 +212,11 @@
 
 <body ng-controller="$controller" ng-app="ss3">
   <h3 ng-cloak>
-    <span class="title">{{title|uppercase}}</span><span class="subtitle">{{subtitle}}</span><br>
+    <span class="title">{{get_metric_name(title)|uppercase}}</span><span class="subtitle">{{subtitle}}</span><br>
     <span class="desciption" style="font-weight: normal">
-      <b style="color:#e91e63">{{global_best["value"]}}</b> is the global best <span ng-if="single_global_best"> (σ={{global_best["s"]}}, λ={{global_best["l"]}}, ρ={{global_best["p"]}} and α={{global_best["a"]}})</span>
+      <b style="color:#e91e63">{{get_metric_value(title, global_best["value"])}}</b> is the global best <span ng-if="single_global_best"> (σ={{global_best["s"]}}, λ={{global_best["l"]}}, ρ={{global_best["p"]}} and α={{global_best["a"]}})</span>
       <br>
-      <span ng-show="local_best['value'] != global_best['value']"><b style="color:#6c1ee9">{{local_best["value"]}}</b> is the local best<span ng-if="single_local_best"> (σ={{local_best["s"]}}, λ={{local_best["l"]}}, ρ={{local_best["p"]}})</span></span>
+      <span ng-show="local_best['value'] != global_best['value']"><b style="color:#6c1ee9">{{get_metric_value(title, local_best["value"])}}</b> is the local best<span ng-if="single_local_best"> (σ={{local_best["s"]}}, λ={{local_best["l"]}}, ρ={{local_best["p"]}})</span></span>
       <br>
     </span>
   </h3>
@@ -244,16 +244,16 @@
     <br>
     Metric:
     <select ng-model="c.mc" ng-change="update()">
-      <option ng-repeat="(metric, _) in results[c.p][c.m][c.dc]" ng-value="metric" ng-if="metric != 'confusion_matrix' && metric != 'categories'">{{metric}}</option>
+      <option ng-repeat="(metric, _) in results[c.p][c.m][c.dc]" ng-value="metric" ng-if="metric != 'confusion_matrix' && metric != 'categories'">{{get_metric_name(metric)}}</option>
     </select>
-    <span ng-show="c.mo && c.mc != 'accuracy'" class="show-left-right">
+    <span ng-show="c.mo && !is_global_metric(c.mc)" class="show-left-right">
       <br>
       Target:
       <select ng-model="c.mo" ng-change="update()">
         <option ng-repeat="(metric_op, _) in results[c.p][c.m][c.dc][c.mc]" ng-value="metric_op">{{metric_op}}</option>
       </select>
     </span>
-    <span ng-show="c.c && c.mc != 'accuracy' && c.mo == 'categories'" class="show-left-right">
+    <span ng-show="c.c && !is_global_metric(c.mc) && c.mo == 'categories'" class="show-left-right">
       <br>
       Category:
       <select ng-model="c.c" ng-change="update()">
@@ -335,6 +335,9 @@
   var DOM_INFO_CIRC = document.getElementById("info-circle");
   var DOM_INFO_PANEL = document.getElementById("point-info");
   var DEF_METRIC = "accuracy";
+  var GLOBAL_METRIC = ["accuracy", "hamming-loss", "exact-match"];
+  var INVERSE_METRIC = ["hamming-loss"];
+  var MULTILABEL = false;
   var CM_MAX_SIZE = 50;
   var CM_MAX_FOLD_SIZE = 90;
   var DATA = null;
@@ -375,11 +378,23 @@
   function hoverinfo_text(s, l, p, a, metric, v, title){
     title = title? `<b>${title}</b><br>` : '';
     return title +
-           `<b>${metric}</b>: ${_fp_(v, 3)}<br>` +
+           `<b>${get_metric_name(metric)}</b>: ${_fp_(get_metric_value(metric, v), 3)}<br>` +
            `<b>σ</b>: ${_fp_(s, 3)}<br>` +
            `<b>λ</b>: ${_fp_(l, 3)}<br>` +
            `<b>ρ</b>: ${_fp_(p, 3)}<br>` +
            `<b>α</b>: ${_fp_(a, 3)}<br>`;
+  }
+
+  function get_metric_name(m){
+      return (m == "accuracy" && MULTILABEL)? "exact match ratio" : m;
+    }
+
+  function get_metric_value(metric, v){
+    return INVERSE_METRIC.indexOf(metric.toLowerCase()) == -1? v : (1 - v).toFixed(4);
+  }
+
+  function get_colorbar_title(metric){
+    return INVERSE_METRIC.indexOf(metric.toLowerCase()) == -1? metric : `1 - ${metric}`;
   }
 
   app.controller("$controller",  function($scope){
@@ -478,7 +493,7 @@
         update_confusion_matrix();
       }
 
-      if (C.mc == "accuracy"){
+      if ($scope.is_global_metric(C.mc)){
         update_plot_metric($results[C.p][C.m][C.dc][C.mc], C.mc, '', new_plot, update_data);
       }else
       if (C.mo != "categories"){
@@ -511,15 +526,29 @@
     }
 
 
+    $scope.is_global_metric = function(m){
+      return GLOBAL_METRIC.indexOf(m) != -1;
+    }
+
+    $scope.get_metric_name = get_metric_name;
+
+    $scope.get_metric_value = get_metric_value;
+
     function set_default_data_options(){
       var C = $scope.c, best_size = 0;
 
-      C.mc = DEF_METRIC;
+      C.mc = null;
 
       for (let ph in $results) {
         for (let m in $results[ph]) {
           for (let dc in $results[ph][m]) {
             let size = 0;
+
+            if (C.mc === null){
+              // if multilabel => default metric = "hamming-loss"
+              MULTILABEL = "hamming-loss" in $results[ph][m][dc]
+              C.mc = MULTILABEL? "hamming-loss" : DEF_METRIC;
+            }
 
             for (let s in $results[ph][m][dc]['accuracy']){
               for (let l in $results[ph][m][dc]['accuracy'][s]){
@@ -891,13 +920,14 @@
       if (min_v == max_v)
         min_v = 0;
 
+      var colorbar_title = get_colorbar_title(get_metric_name(title));
       Plotly.animate(DOM_PLOT, {
           data: [{
             value: v,
             isomin: min_v,
             isomax: max_v,
             colorbar: {
-              title: title
+              title: colorbar_title
             }
           },{
             text: hoverinfo,
@@ -905,7 +935,7 @@
               color: v,
               cmin: min_v,
               cmax: max_v,
-              colorbar:{title: title}
+              colorbar:{title: colorbar_title}
             }
           },{
             name: `${name} Best`,
@@ -931,7 +961,7 @@
 
     function update_confusion_matrix(){
       var C = $scope.c, keys = Object.keys;
-      var cats_n = $results[C.p][C.m][C.dc]["categories"].length;
+      var cats_n = null;
       var cm_size = CM_MAX_FOLD_SIZE;
 
       CM = $results[C.p][C.m][C.dc]["confusion_matrix"];
@@ -952,14 +982,40 @@
                 if (!CM["folds"])
                   CM["folds"] = CM[s][l][p][a].length;
 
-                CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
-                  return cm_fold.map(r => {
-                    let r_sum = sum(r);
-                    return r.map(v => {
-                      return r_sum? +v / r_sum : 0;
+                if (!MULTILABEL){
+                  CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
+                    if (cats_n === null){
+                      cats_n = cm_fold.length
+                    }
+                    return cm_fold.map(r => {
+                      let r_sum = sum(r);
+                      return r.map(v => {
+                        return r_sum? +v / r_sum : 0;
+                      });
                     });
                   });
-                });
+                }else{
+                  CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
+                    return cm_fold.map(cm => {
+                      if (cats_n === null){
+                        cats_n = cm.length
+                      }
+                      return cm.map(r => {
+                        let r_sum = sum(r);
+                        return r.map(v => {
+                          return r_sum? +v / r_sum : 0;
+                        });
+                      });
+                    });
+                  });
+
+                  var cms = CM[s][l][p][a][0];
+                  CM[s][l][p][a] = Array(cms.length);
+                  for (let i = 0; i < cms.length; i++){
+                    CM[s][l][p][a][i] = cms[i];
+                  }
+                  CM["folds"] = cms.length;
+                }
 
               });
             });
