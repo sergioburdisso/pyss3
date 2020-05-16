@@ -942,7 +942,7 @@ class Evaluation:
 
     @staticmethod
     def get_best_hyperparameters(
-        metric='accuracy', metric_target='macro avg', tag=None, method=None, def_cat=None
+        metric=None, metric_target='macro avg', tag=None, method=None, def_cat=None
     ):
         """
         Return the best hyperparameter values for the given metric.
@@ -962,10 +962,12 @@ class Evaluation:
         that is, whether we want to measure some averaging performance  or the
         performance on a particular category.
 
-        :param metric: the evaluation metric, options are: 'accuracy', 'f1-score',
-                       'precision', or 'recall'. In addition, In multi-label
-                        classification also 'hamming-loss' and 'exact-match'
-                        (default: 'accuracy').
+        :param metric: the evaluation metric to return, options are:
+                       'accuracy', 'f1-score', 'precision', or 'recall'
+                       When working with multi-label classification problems,
+                       two more options are allowed: 'hamming-loss' and 'exact-match'.
+                       Note: exact match will produce the same result than 'accuracy'.
+                       (default: 'accuracy', or 'hamming-loss' for multi-label case).
         :type metric: str
         :param metric_target: the target we aim at measuring with the given
                               metric. Options are: 'macro avg', 'micro avg',
@@ -991,14 +993,16 @@ class Evaluation:
         if not Evaluation.__clf__:
             raise ValueError(ERROR_CNA)
 
-        if metric not in METRICS + GLOBAL_METRICS:
-            raise KeyError(ERROR_NAM % str(metric))
-
-        metric = metric if metric != STR_EXACT_MATCH else STR_ACCURACY
-
         l_tag, l_method, l_def_cat = Evaluation.__get_last_evaluation__()
         tag, method, def_cat = tag or l_tag, method or l_method, def_cat or l_def_cat
         cache = Evaluation.__cache__[tag][method][def_cat]
+
+        multilabel = STR_HAMMING_LOSS in cache
+        metric = metric or (STR_ACCURACY if not multilabel else STR_HAMMING_LOSS)
+        metric = metric if metric != STR_EXACT_MATCH else STR_ACCURACY
+
+        if metric not in METRICS + GLOBAL_METRICS:
+            raise KeyError(ERROR_NAM % str(metric))
 
         if metric_target not in AVGS and metric_target not in cache["categories"]:
             raise KeyError(ERROR_NAT % str(metric_target))
@@ -1009,6 +1013,7 @@ class Evaluation:
             best = c_metric["best"]
         else:
             if metric_target in AVGS:
+                print(metric, metric_target)
                 best = c_metric[metric_target]["best"]
             else:
                 best = c_metric["categories"][metric_target]["best"]
@@ -1084,7 +1089,7 @@ class Evaluation:
                             "    Best %s: %s %s" % (
                                 ps.green("hamming loss"),
                                 ps.warning(round_fix(1 - best["value"])),
-                                ps.blue("(s %s l %s p %s a %s)") % (
+                                ps.blue("(s=%s, l=%s, p=%s, a=%s)") % (
                                     best["s"], best["l"], best["p"], best["a"]
                                 )
                             )
@@ -1095,7 +1100,7 @@ class Evaluation:
                         "    Best %s: %s %s" % (
                             ps.green("accuracy" if not multilabel else "exact match ratio"),
                             ps.warning(best["value"]),
-                            ps.blue("(s %s l %s p %s a %s)") % (
+                            ps.blue("(s=%s, l=%s, p=%s, a=%s)") % (
                                 best["s"], best["l"], best["p"], best["a"]
                             )
                         )
@@ -1111,7 +1116,7 @@ class Evaluation:
                                 best = c_metric["categories"][cat]["best"]
                                 print((" " * 8) + "%s: %s %s" % (
                                     cat, ps.warning(best["value"]),
-                                    ps.blue("(s %s l %s p %s a %s)") % (
+                                    ps.blue("(s=%s, l=%s, p=%s, a=%s)") % (
                                         best["s"], best["l"], best["p"], best["a"]
                                     )
                                 ))
@@ -1125,7 +1130,7 @@ class Evaluation:
                                     best = c_metric[av]["best"]
                                     print((" " * 10) + "%s: %s %s" % (
                                         ps.header(av), ps.warning(best["value"]),
-                                        ps.blue("(s %s l %s p %s a %s)")
+                                        ps.blue("(s=%s, l=%s, p=%s, a=%s)")
                                         % (
                                             best["s"], best["l"],
                                             best["p"], best["a"]
@@ -1456,7 +1461,7 @@ class Evaluation:
     def grid_search(
         clf, x_data, y_data, s=None, l=None, p=None, a=None,
         k_fold=None, n_grams=None, def_cat=STR_MOST_PROBABLE, prep=True,
-        tag=None, metric='accuracy', metric_target='macro avg', cache=True, extended_pbar=False
+        tag=None, metric=None, metric_target='macro avg', cache=True, extended_pbar=False
     ):
         """
         Perform a grid search using the provided hyperparameter values.
@@ -1547,7 +1552,10 @@ class Evaluation:
         :type tag: str
         :param metric: the evaluation metric to return, options are:
                         'accuracy', 'f1-score', 'precision', or 'recall'
-                        (default: 'accuracy').
+                        When working with multi-label classification problems,
+                        two more options are allowed: 'hamming-loss' and 'exact-match'.
+                        Note: exact match will produce the same result than 'accuracy'.
+                        (default: 'accuracy', or 'hamming-loss' for multi-label case).
         :type metric: str
         :param metric_target: the target we aim at measuring with the given
                               metric. Options are: 'macro avg', 'micro avg',
@@ -1570,6 +1578,7 @@ class Evaluation:
             raise TypeError(ERROR_IKT)
 
         from . import SS3
+        multilabel = clf.__multilabel__
         Evaluation.set_classifier(clf)
         n_grams = n_grams or (len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1)
         tag = tag or Evaluation.__cache_get_default_tag__(clf, x_data, n_grams)
@@ -1584,7 +1593,11 @@ class Evaluation:
 
         Print.show()
         if not k_fold:  # if test
-            x_test, y_test = x_data, [clf.get_category_index(y) for y in y_data]
+            if not multilabel:
+                x_test, y_test = x_data, [clf.get_category_index(y) for y in y_data]
+            else:
+                x_test, y_test = x_data, [[clf.get_category_index(y) for y in yy]
+                                          for yy in y_data]
             Evaluation.__grid_search_loop__(
                 clf, x_test, y_test, s, l, p, a, 1, 0,
                 def_cat, tag, clf.get_categories(), cache,
