@@ -272,7 +272,7 @@ def test_multilabel():
     clf.fit(x_train, y_train)
 
     assert sorted(clf.get_categories()) == ['insult', 'obscene', 'severe_toxic', 'toxic']
-    assert clf.classify_multilabel("this is a unknown document!") == []
+    assert clf.classify_multilabel("this is a unknown document!") == ['toxic']
 
     y_pred = [[], ['toxic'], ['severe_toxic'], ['obscene'], ['insult'], ['toxic', 'insult']]
 

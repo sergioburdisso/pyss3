@@ -12,6 +12,7 @@ from numpy import mean, linspace, arange
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import StratifiedKFold
+from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 
 import numpy as np
 import unicodedata
@@ -458,7 +459,7 @@ class Evaluation:
     @staticmethod
     def __classification_report_k_fold__(
         tag, method, def_cat, s, l, p, a, plot=True,
-        metric='accuracy', metric_target='macro avg'
+        metric=None, metric_target='macro avg'
     ):
         """Create the classification report for k-fold validations."""
         Print.verbosity_region_begin(VERBOSITY.VERBOSE, force=True)
@@ -468,6 +469,10 @@ class Evaluation:
 
         cache = Evaluation.__cache_get_evaluations__(tag, method, def_cat)
         categories = cache["categories"]
+
+        multilabel = STR_HAMMING_LOSS in cache
+        metric = metric or (STR_ACCURACY if not multilabel else STR_HAMMING_LOSS)
+        metric = metric if metric != STR_EXACT_MATCH else STR_ACCURACY
 
         name_width = max(len(cn) for cn in categories)
         width = max(name_width, len(AVGS[-1]))
@@ -496,13 +501,19 @@ class Evaluation:
                 report += '\n'
 
         report += "\n\n %s: %.3f\n" % (
-            Print.style.bold("avg accuracy"), cache["accuracy"]["value"][s][l][p][a]
+            Print.style.bold("Avg. %s" % ("Exact Match Ratio" if multilabel else "Accuracy")),
+            cache["accuracy"]["value"][s][l][p][a]
         )
+        if multilabel:
+            report += " %s: %.3f\n" % (
+                Print.style.bold("Avg. Hamming Loss"),
+                round_fix(1 - cache["hamming-loss"]["value"][s][l][p][a])
+            )
 
         Print.show(report)
         Print.verbosity_region_end()
 
-        if plot:
+        if plot and not multilabel:
             Evaluation.__plot_confusion_matrices__(
                 cache["confusion_matrix"][s][l][p][a], categories,
                 r"$\sigma=%.3f; \lambda=%.3f; \rho=%.3f; \alpha=%.3f$"
@@ -510,8 +521,9 @@ class Evaluation:
                 (s, l, p, a)
             )
 
-        if metric == STR_ACCURACY:
-            return cache[metric]["value"][s][l][p][a]
+        if metric in GLOBAL_METRICS:
+            val = cache[metric]["value"][s][l][p][a]
+            return val if metric != STR_HAMMING_LOSS else 1 - val
         else:
             if metric not in cache:
                 raise KeyError(ERROR_NAM % str(metric))
@@ -609,7 +621,7 @@ class Evaluation:
     def __evaluation_result__(
         clf, y_true, y_pred, categories, def_cat, cache=True, method="test",
         tag=None, folder=False, plot=True, k_fold=1, i_fold=0, force_show=False,
-        metric='accuracy', metric_target='macro avg'
+        metric=None, metric_target='macro avg'
     ):
         """Compute evaluation results and save them to disk (cache)."""
         import warnings
@@ -619,6 +631,8 @@ class Evaluation:
             Print.verbosity_region_begin(VERBOSITY.VERBOSE, force=True)
 
         multilabel = clf.__multilabel__
+        metric = metric or (STR_ACCURACY if not multilabel else STR_HAMMING_LOSS)
+        metric = metric if metric != STR_EXACT_MATCH else STR_ACCURACY
         hammingloss = None
 
         if metric == STR_HAMMING_LOSS and not multilabel:
@@ -648,7 +662,7 @@ class Evaluation:
             Print.show("\n %s: %.3f" % (Print.style.bold("Accuracy"), accuracy))
         else:
             Print.show("\n %s: %.3f" % (Print.style.bold("Exact Match Ratio"), accuracy))
-            Print.show("\n %s: %.3f" % (Print.style.bold("Hamming Loss"), hammingloss))
+            Print.show(" %s: %.3f" % (Print.style.bold("Hamming Loss"), hammingloss))
 
         if not multilabel:
             unclassified = None
@@ -1262,6 +1276,7 @@ class Evaluation:
         :rtype: float
         :raises: EmptyModelError, KeyError, ValueError
         """
+        multilabel = clf.__multilabel__
         Evaluation.set_classifier(clf)
         tag = tag or Evaluation.__cache_get_default_tag__(clf, x_test)
         s, l, p, a = clf.get_hyperparameters()
@@ -1273,10 +1288,6 @@ class Evaluation:
             _y_test, y_pred, categories = Evaluation.__cache_get_test_evaluation__(
                 tag, def_cat, s, l, p, a
             )
-
-        multilabel = clf.__multilabel__
-        metric = metric or (STR_ACCURACY if not multilabel else STR_HAMMING_LOSS)
-        metric = metric if metric != STR_EXACT_MATCH else STR_ACCURACY
 
         # if not cached
         if not y_pred or multilabel:
@@ -1300,7 +1311,7 @@ class Evaluation:
     @staticmethod
     def kfold_cross_validation(
         clf, x_train, y_train, k=4, n_grams=None, def_cat=STR_MOST_PROBABLE, prep=True,
-        tag=None, plot=True, metric='accuracy', metric_target='macro avg', cache=True
+        tag=None, plot=True, metric=None, metric_target='macro avg', cache=True
     ):
         """
         Perform a Stratified k-fold cross validation on the given training set.
@@ -1349,7 +1360,10 @@ class Evaluation:
         :type plot: bool
         :param metric: the evaluation metric to return, options are:
                         'accuracy', 'f1-score', 'precision', or 'recall'
-                        (default: 'accuracy').
+                        When working with multi-label classification problems,
+                        two more options are allowed: 'hamming-loss' and 'exact-match'.
+                        Note: exact match will produce the same result than 'accuracy'.
+                        (default: 'accuracy', or 'hamming-loss' for multi-label case).
         :type metric: str
         :param metric_target: the target we aim at measuring with the given
                               metric. Options are: 'macro avg', 'micro avg',
@@ -1375,6 +1389,9 @@ class Evaluation:
         if n_grams is not None and (not isinstance(n_grams, int) or n_grams < 1):
             raise ValueError(ERROR_INGV)
 
+        multilabel = clf.__multilabel__
+        kfold_split = MultilabelStratifiedKFold if multilabel else StratifiedKFold
+
         Evaluation.set_classifier(clf)
         n_grams = n_grams or (len(clf.__max_fr__[0]) if len(clf.__max_fr__) > 0 else 1)
         tag = tag or Evaluation.__cache_get_default_tag__(clf, x_train, n_grams)
@@ -1387,16 +1404,15 @@ class Evaluation:
         s, l, p, a = clf.get_hyperparameters()
         categories = clf.get_categories()
         x_train, y_train = np.array(x_train), np.array(y_train)
-        skf = StratifiedKFold(n_splits=k)
+        skf = kfold_split(n_splits=k)
         pbar_desc = "k-fold validation"
         progress_bar = tqdm(total=k, desc=pbar_desc)
-        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_train, y_train)):
+        y_train_split = membership_matrix(clf, y_train).todense() if multilabel else y_train
+        for i_fold, (train_ix, test_ix) in enumerate(skf.split(x_train, y_train_split)):
             if not cache or not Evaluation.__cache_is_in__(
                 tag, method, def_cat, s, l, p, a
             ):
                 x_train_fold, y_train_fold = x_train[train_ix], y_train[train_ix]
-                y_test_fold = [clf.get_category_index(y) for y in y_train[test_ix]]
-                x_test_fold = x_train[test_ix]
 
                 clf_fold = SS3()
                 clf_fold.set_hyperparameters(s, l, p, a)
@@ -1404,6 +1420,13 @@ class Evaluation:
                 progress_bar.set_description_str(pbar_desc + " [training...]")
                 clf_fold.fit(x_train_fold, y_train_fold, n_grams,
                              prep=prep, leave_pbar=False)
+
+                if not multilabel:
+                    y_test_fold = [clf_fold.get_category_index(y) for y in y_train[test_ix]]
+                else:
+                    y_test_fold = [[clf_fold.get_category_index(y) for y in yy]
+                                   for yy in y_train[test_ix]]
+                x_test_fold = x_train[test_ix]
 
                 progress_bar.set_description_str(pbar_desc + " [classifying...]")
                 y_pred = clf_fold.predict(x_test_fold, def_cat,
@@ -2203,7 +2226,7 @@ def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     and that the classifier ``clf`` has been trained on 3 categories whose labels are
     'labelA', 'labelB', and 'labelC', then, we would have that:
 
-    >>> labels2membership(clf, [[], ['labelA'], ['labelB'], ['labelA', 'labelC']])
+    >>> membership_matrix(clf, [[], ['labelA'], ['labelB'], ['labelA', 'labelC']])
 
     returns the following membership matrix:
 
@@ -2234,10 +2257,10 @@ def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     labels2index = dict([(c if labels else clf.get_category_index(c), i)
                          for i, c in enumerate(clf.get_categories())])
     y_data_matrix = sparse.lil_matrix((len(y_data), len(labels2index)), dtype="b")
-
     try:
         li = np.array([[i, labels2index[l]] for i, ll in enumerate(y_data) for l in ll])
-        y_data_matrix[li[:, 0], li[:, 1]] = 1
+        if len(li) > 0:
+            y_data_matrix[li[:, 0], li[:, 1]] = 1
     except KeyError as e:
         raise ValueError("The `y_data` contains an unknown label (%s)" % str(e))
 

@@ -3,3 +3,4 @@ cython
 scikit-learn[alldeps]>=0.20
 tqdm>=4.8.4
 matplotlib
+iterative-stratification

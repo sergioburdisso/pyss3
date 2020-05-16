@@ -59,7 +59,8 @@ if __name__ == "__main__":
                             'cython',
                             'scikit-learn[alldeps]>=0.20',
                             'tqdm>=4.8.4',
-                            'matplotlib'],
+                            'matplotlib',
+                            'iterative-stratification'],
           tests_require=['pytest',
                          'pytest-mock'
                          'pytest-cov>=2.5'
@@ -69,5 +70,6 @@ if __name__ == "__main__":
                          'cython',
                          'scikit-learn[alldeps]>=0.20',
                          'tqdm>=4.8.4',
-                         'matplotlib'],
+                         'matplotlib',
+                         'iterative-stratification'],
           entry_points={'console_scripts': ['pyss3=pyss3.cmd_line:main']})

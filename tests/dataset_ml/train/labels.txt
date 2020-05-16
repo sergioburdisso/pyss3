@@ -6,3 +6,15 @@ toxic,severe_toxic,obscene,insult
 
 
 toxic
+toxic
+severe_toxic
+obscene
+insult
+toxic,insult
+severe_toxic,obscene
+obscene
+insult
+toxic
+severe_toxic
+obscene
+insult

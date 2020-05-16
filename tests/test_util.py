@@ -60,8 +60,10 @@ def test_evaluation(mocker):
     pp = [0, 2]
     x_data, y_data = Dataset.load_from_files(DATASET_PATH)
     x_data_ml, y_data_ml = Dataset.load_from_files_multilabel(
-        path.join(DATASET_MULTILABEL_PATH, "train_files"),
-        path.join(DATASET_MULTILABEL_PATH, "file_labels.tsv")
+        path.join(DATASET_MULTILABEL_PATH, "train/docs.txt"),
+        path.join(DATASET_MULTILABEL_PATH, "train/labels.txt"),
+        sep_label=",",
+        sep_doc="\n>>>>>\n"
     )
 
     clf = SS3()
@@ -107,6 +109,7 @@ def test_evaluation(mocker):
                            ['bla bla bla', "I love this love movie!"],
                            ['pos', 'pos'],
                            plot=PY3) == 0.5
+    assert kfold_validation(clf_ml, x_data_ml, y_data_ml, plot=PY3) > 0
     assert kfold_validation(clf, x_data, y_data, plot=PY3) > 0
     s, l, p, a = clf.get_hyperparameters()
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data)
@@ -122,8 +125,8 @@ def test_evaluation(mocker):
 
     # test
     #   OK
-    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, plot=PY3) == 1 / 3.
-    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, metric='exact-match', plot=PY3) == .5
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, plot=PY3) == .3125
+    assert Evaluation.test(clf_ml, x_data_ml, y_data_ml, metric='exact-match', plot=PY3) == .3
     assert Evaluation.test(clf, x_data, y_data, def_cat='unknown', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, def_cat='neg', plot=PY3) == 1
     assert Evaluation.test(clf, x_data, y_data, metric="f1-score", plot=PY3) == 1
@@ -271,6 +274,6 @@ def test_dataset():
         sep_doc="\n>>>>>\n"
     )
 
-    assert len(y_train) == len(y_train) and len(y_train) == 8
-    assert y_train == [[], ['toxic', 'severe_toxic', 'obscene', 'insult'],
-                       [], [], [], [], [], ['toxic']]
+    assert len(y_train) == len(y_train) and len(y_train) == 20
+    assert y_train[:8] == [[], ['toxic', 'severe_toxic', 'obscene', 'insult'],
+                           [], [], [], [], [], ['toxic']]
