@@ -567,8 +567,6 @@ class SS3:
 
         If category name doesn't exist, creates a new one.
         """
-        if isinstance(name, str):
-            name = name.lower()
         try:
             return self.__categories_index__[name]
         except KeyError:
@@ -1239,8 +1237,6 @@ class SS3:
         :rtype: int
         """
         try:
-            if isinstance(name, str):
-                name = name.lower()
             return self.__categories_index__[name]
         except KeyError:
             return IDX_UNKNOWN_CATEGORY

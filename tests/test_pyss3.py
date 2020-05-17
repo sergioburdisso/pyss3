@@ -93,8 +93,8 @@ def perform_tests_with(clf, cv_test, stopwords=True):
     most_prob_cat = clf.get_most_probable_category()
     most_prob_cat_idx = clf.__get_most_probable_category__()
 
-    # category names case-insensitiveness check
-    assert clf.get_category_index("SpOrTs") == clf.get_category_index("sports")
+    # category names case-sensitiveness check
+    assert clf.get_category_index("SpOrTs") == -1
 
     # predict
     y_pred = clf.predict(x_test)

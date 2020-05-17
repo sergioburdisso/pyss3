@@ -50,7 +50,7 @@ CONTET_TYPE = {
 }
 
 ENCODING = "utf-8"
-BASE_PATH = path.join(path.dirname(__file__), "resources/visual_classifier")
+BASE_PATH = path.join(path.dirname(__file__), "resources/live_test")
 
 
 def main():

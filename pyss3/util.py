@@ -46,7 +46,7 @@ REGEX_DOTS_CHARS = re.compile(r"(?:([(),;:?!=\"/.|<>\[\]]+)|(#(?![a-zA-Z])))")
 REGEX_DOTS_CHAINED = re.compile(r"(?:(#[a-zA-Z0-9]+)(\s)*(?=#))")
 
 EVAL_HTML_OUT_FILE = "ss3_model_evaluation[%s].html"
-EVAL_HTML_SRC_FOLDER = "resources/model_evaluation/"
+EVAL_HTML_SRC_FOLDER = "resources/evaluation_plot/"
 EVAL_CACHE_EXT = ".ss3ev"
 
 STR_ACCURACY, STR_PRECISION = "accuracy", "precision"
