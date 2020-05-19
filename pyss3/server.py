@@ -11,9 +11,10 @@ from tqdm import tqdm
 from select import select
 from datetime import datetime
 
-from . import SS3, __version__
-from .util import RecursiveDefaultDict, Print, VERBOSITY
+from . import SS3, kmean_multilabel_size, __version__
+from .util import is_a_collection, membership_matrix, RecursiveDefaultDict, Print, VERBOSITY
 
+import numpy as np
 import webbrowser
 import argparse
 import socket
@@ -249,7 +250,7 @@ class Server:
             "version": __version__,
             "model_name": clf.get_name(),
             "hps": clf.get_hyperparameters(),
-            "categories": clf.get_categories() + ["[unknown]"],
+            "categories": clf.get_categories(all=True) + ["[unknown]"],
             "docs": Server.__docs__
         })
         Print.info("sending classifier info...")
@@ -367,7 +368,7 @@ class Server:
         Server.__clear_testset__()
 
     @staticmethod
-    def set_testset(x_test, y_test):
+    def set_testset(x_test, y_test=None):
         """
          Assign the test set to visualize.
 
@@ -379,27 +380,58 @@ class Server:
         Server.__clear_testset__()
         Server.__x_test__ = x_test
 
-        classify = Server.__clf__.classify
+        clf = Server.__clf__
+        classify = clf.classify
+        docs = Server.__docs__
         unkwon_cat_i = len(Server.__clf__.get_categories())
+        no_y_test = y_test is None
+
+        multilabel = not no_y_test and len(y_test) and is_a_collection(y_test[0])
+        y_test_labels = y_test
+
+        if no_y_test or multilabel:
+            y_test = [""]
+
         for cat in set(y_test):
-            Server.__docs__[cat]["path"] = []
-            Server.__docs__[cat]["file"] = []
-            Server.__docs__[cat]["clf_result"] = []
+            docs[cat]["path"] = []
+            docs[cat]["file"] = []
+            docs[cat]["clf_result"] = []
 
         for idoc, doc in enumerate(x_test):
-            cat = y_test[idoc]
+            cat = y_test[0] if no_y_test or multilabel else y_test[idoc]
             doc_name = "doc_%d" % idoc
 
-            Server.__docs__[cat]["file"].append(doc_name)
-            Server.__docs__[cat]["path"].append(":x_test:%d" % idoc)
+            docs[cat]["file"].append(doc_name)
+            docs[cat]["path"].append(":x_test:%d" % idoc)
 
-            r = classify(doc, prep_func=Server.__preprocess__)
-            Server.__docs__[cat]["clf_result"].append(
-                r[0][0] if r[0][1] else unkwon_cat_i
-            )
+            if multilabel:
+                docs[cat]["clf_result"].append(
+                    classify(doc, prep_func=Server.__preprocess__)
+                )
+            elif not no_y_test:
+                res = classify(doc, prep_func=Server.__preprocess__)
+                docs[cat]["clf_result"].append(
+                    res[0][0] if res[0][1] else unkwon_cat_i
+                )
 
-        Print.info("%d categories found" % len(Server.__docs__))
-        return len(Server.__docs__) > 0
+        if multilabel:
+            t = membership_matrix(clf, y_test_labels).todense()
+            p = membership_matrix(
+                clf,
+                [[ci for ci, _ in r[:kmean_multilabel_size(r)]]
+                 for r in docs[y_test[0]]["clf_result"]],
+                labels=False
+            ).todense()
+            accuracy = (t & p).sum(axis=1) / (t | p).sum(axis=1)
+            accuracy[np.isnan(accuracy)] = 1
+            docs[y_test[0]]["true_labels"] = y_test_labels
+            docs[y_test[0]]["labels_recall"] = accuracy.reshape(-1).tolist()[0]
+            docs[y_test[0]]["clf_result"] = [r[0][0] if r[0][1] else unkwon_cat_i
+                                             for r in docs[cat]["clf_result"]]
+
+        if not no_y_test and not multilabel:
+            Print.info("%d categories found" % len(docs))
+        return len(docs) > 0
 
     @staticmethod
     def set_testset_from_files(test_path, folder_label=True):
@@ -510,7 +542,7 @@ class Server:
             Server.start_listening(port)
 
         if x_test is not None:
-            if y_test is not None and len(y_test) == len(x_test):
+            if y_test is None or len(y_test) == len(x_test):
                 Server.set_testset(x_test, y_test)
             else:
                 Print.error("y_test must have the same length as x_test")

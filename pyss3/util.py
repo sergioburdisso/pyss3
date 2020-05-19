@@ -3,6 +3,7 @@
 from __future__ import print_function
 from io import open
 from os import listdir, makedirs, path, remove as remove_file
+from sys import version_info
 from tqdm import tqdm
 from math import ceil
 from itertools import product
@@ -73,6 +74,10 @@ ERROR_IKT = "`k_fold` argument must be an integer"
 ERROR_INGV = "`n_grams` argument must be a positive integer"
 ERROR_IHV = "hyperparameter values must be numbers"
 
+PY2 = version_info[0] == 2
+if not PY2:
+    basestring = None  # to avoid the Flake8 "F821 undefined name" error
+
 # a more user-friendly alias for numpy.linspace
 # to be used along with grid_search
 span = linspace
@@ -141,9 +146,9 @@ class Evaluation:
                 Evaluation.__last_eval_method__, \
                 Evaluation.__last_eval_def_cat__
         elif Evaluation.__cache__:
-            tag = Evaluation.__cache__.keys()[0]
-            method = Evaluation.__cache__[tag].keys()[0]
-            def_cat = Evaluation.__cache__[tag][method].keys()[0]
+            tag = list(Evaluation.__cache__)[0]
+            method = list(Evaluation.__cache__[tag])[0]
+            def_cat = list(Evaluation.__cache__[tag][method])[0]
             return tag, method, def_cat
         else:
             return None, None, None
@@ -1013,7 +1018,6 @@ class Evaluation:
             best = c_metric["best"]
         else:
             if metric_target in AVGS:
-                print(metric, metric_target)
                 best = c_metric[metric_target]["best"]
             else:
                 best = c_metric["categories"][metric_target]["best"]
@@ -2235,6 +2239,12 @@ def list_by_force(v):
         return [v]
 
 
+def is_a_collection(o):
+    """Return True when the object ``o`` is a collection."""
+    return hasattr(o, "__getitem__") and ((PY2 and not isinstance(o, basestring)) or
+                                          (not PY2 and not isinstance(o, (str, bytes))))
+
+
 def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     """
     Transform a list of (multiple) labels into a "membership matrix".
@@ -2283,11 +2293,11 @@ def membership_matrix(clf, y_data, labels=True, show_pbar=True):
     labels2index = dict([(c if labels else clf.get_category_index(c), i)
                          for i, c in enumerate(clf.get_categories())])
     y_data_matrix = sparse.lil_matrix((len(y_data), len(labels2index)), dtype="b")
-    try:
-        li = np.array([[i, labels2index[l]] for i, ll in enumerate(y_data) for l in ll])
-        if len(li) > 0:
-            y_data_matrix[li[:, 0], li[:, 1]] = 1
-    except KeyError as e:
-        raise ValueError("The `y_data` contains an unknown label (%s)" % str(e))
+    li = np.array([[i, labels2index[l]]
+                   for i, ll in enumerate(y_data)
+                   for l in ll
+                   if l in labels2index])
+    if len(li) > 0:
+        y_data_matrix[li[:, 0], li[:, 1]] = 1
 
     return y_data_matrix

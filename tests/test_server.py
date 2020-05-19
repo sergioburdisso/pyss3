@@ -54,6 +54,7 @@ class MockCmdLineArgs:
 @pytest.fixture()
 def mockers(mocker):
     """Set mockers up."""
+    mocker.patch("webbrowser.open")
     mocker.patch.object(LT, "serve")
     mocker.patch.object(SS3, "load_model")
     mocker.patch.object(argparse.ArgumentParser, "add_argument")
@@ -61,7 +62,7 @@ def mockers(mocker):
                         "parse_args").return_value = MockCmdLineArgs
 
 
-@pytest.fixture(params=[0, 1, 2, 3])
+@pytest.fixture(params=[0, 1, 2, 3, 4, 5])
 def test_case(request, mocker):
     """Argument values generator for test_live_test(test_case)."""
     mocker.patch("webbrowser.open")
@@ -123,16 +124,22 @@ def test_live_test(test_case):
     """Test the HTTP Live Test Server."""
     global PORT
 
-    if test_case != 3:
+    if test_case < 3:
         PORT = LT.start_listening()
     else:
         Print.error = lambda _: None  # do nothing
 
     serve_args = {
-        "x_test": x_train if test_case == 2 or test_case == 3 else None,
+        "x_test": x_train if test_case >= 2 else None,
         "y_test": y_train if test_case == 2 else None,
         "quiet": test_case != 0
     }
+
+    if test_case == 4:
+        serve_args["y_test"] = [["labelA", "labelB"]] * (len(x_train) // 2)
+        serve_args["y_test"] += [["labelC"]] * (len(x_train) // 2)
+    elif test_case == 5:
+        serve_args["y_test"] = ["label"]
 
     if PYTHON3:
         threading.Thread(target=LT.serve, kwargs=serve_args, daemon=True).start()
@@ -140,7 +147,7 @@ def test_live_test(test_case):
         return
         # threading.Thread(target=LT.serve, kwargs=serve_args).start()
 
-    if test_case == 3:
+    if test_case >= 3:
         return
 
     # empty message

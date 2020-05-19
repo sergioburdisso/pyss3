@@ -15,6 +15,7 @@ app.controller("mainCtrl", function($scope) {
   $scope.scat = -1;
   $scope.ncats = 0;
   $scope.levels = [false, true, true];
+  $scope.multilabel = false;
   $scope.info = null;
   $scope.document = ''; 
   $scope.document_original = null;
@@ -71,7 +72,8 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.get_clf_result = function(c, i){
-    return $scope.info.categories[$scope.info.docs[c]["clf_result"][i]];
+    return "clf_result" in $scope.info.docs[c]?
+        $scope.info.categories[$scope.info.docs[c]["clf_result"][i]] : c;
   }
 
   $scope.get_doc = function(c, i){
@@ -92,11 +94,21 @@ app.controller("mainCtrl", function($scope) {
     );
   }
 
-  $scope.get_accuracy = function(c){
+  $scope.get_recall = function(c){
     var hits = $scope.info.docs[c]["file"].map(function(_, i_doc){
       return $scope.get_clf_result(c, i_doc) == c;
     });
     return sum(hits) / $scope.info.docs[c]["file"].length * 100;
+  }
+
+  $scope.get_accuracy_color = function(v, i){
+    if (i == $scope.i_doc)
+      return 'white-text';
+    if (v == 0)
+      return 'red-text';
+    if (v == 1)
+      return 'green-text';
+    return 'blue-text';
   }
 
   $scope.get_cat_rgb = function(icat){
@@ -127,6 +139,7 @@ app.controller("mainCtrl", function($scope) {
 
   $scope.clear = function(){
     __reset__();
+    $scope.i_doc = -1;
     $scope.document= "";
     __update_textarea__();
     __goto__(0);
@@ -186,7 +199,12 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.is_cat_active = function (cat_info) {
-    return active_cats.indexOf(cat_info[0]) != -1;
+    var icat = Number.isInteger(cat_info)? cat_info : cat_info[0];
+    return active_cats.indexOf(icat) != -1;
+  }
+
+  $scope.is_in_golden_true = function(cv_i){
+    return $scope.info.docs['']['true_labels'][$scope.i_doc].indexOf($scope.ss3.ci[cv_i[0]]) != -1;
   }
 
   $scope.on_chart_change = function(){
@@ -464,6 +482,7 @@ app.controller("mainCtrl", function($scope) {
   $server.submit("get_info", '', function(data){
     $scope.info = data;
     var cats = data.categories.slice(0, -1);
+    $scope.multilabel = ('' in data.docs) && ("true_labels" in data.docs['']);
     $scope.ncats = cats.length;
     __rgba_colors__ = cats.map(function(_, i){
       return "rgba(" + __get_rgb__(i, cats.length) + ',';

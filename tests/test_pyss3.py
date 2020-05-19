@@ -276,9 +276,6 @@ def test_multilabel():
 
     y_pred = [[], ['toxic'], ['severe_toxic'], ['obscene'], ['insult'], ['toxic', 'insult']]
 
-    with pytest.raises(ValueError):
-        membership_matrix(clf, y_pred + [["xxx"]])
-
     y_pred_memmatrix = membership_matrix(clf, y_pred).todense().tolist()
     assert y_pred_memmatrix == [[0, 0, 0, 0],  # []
                                 [1, 0, 0, 0],  # ['toxic']
@@ -286,6 +283,9 @@ def test_multilabel():
                                 [0, 0, 1, 0],  # ['obscene']
                                 [0, 0, 0, 1],  # ['insult']
                                 [1, 0, 0, 1]]  # ['toxic', 'insult']
+
+    y_pred_memmatrix = membership_matrix(clf, y_pred + [["xxx"]]).todense().tolist()
+    assert y_pred_memmatrix[-1] == [0, 0, 0, 0]
 
 
 def test_pyss3_ss3(mockers):

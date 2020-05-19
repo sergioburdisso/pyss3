@@ -12,11 +12,10 @@ import errno
 import numpy as np
 
 from io import open
-from sys import version_info
 from time import time
 from tqdm import tqdm
 from math import pow, tanh
-from .util import Print, VERBOSITY, Preproc as Pp
+from .util import is_a_collection, Print, VERBOSITY, Preproc as Pp
 
 # python 2 and 3 compatibility
 from functools import reduce
@@ -58,10 +57,6 @@ EMPTY_WORD_INFO = [0, 0, 0, 0, 0, 0]
 
 NOISE_FR = 1
 MIN_MAD_SD = .03
-
-PY2 = version_info[0] == 2
-if not PY2:
-    basestring = None  # to avoid the Flake8 "F821 undefined name" error
 
 
 class SS3:
@@ -1195,7 +1190,7 @@ class SS3:
         """
         return self.__a__
 
-    def get_categories(self):
+    def get_categories(self, all=False):
         """
         Get the list of category names.
 
@@ -1205,7 +1200,7 @@ class SS3:
         return [
             self.get_category_name(ci)
             for ci in range(len(self.__categories__))
-            if self.get_category_name(ci) != STR_OTHERS_CATEGORY
+            if all or self.get_category_name(ci) != STR_OTHERS_CATEGORY
         ]
 
     def get_most_probable_category(self):
@@ -2628,12 +2623,6 @@ def list_hash(str_list):
         except (TypeError, UnicodeEncodeError):
             m.update(doc.encode('ascii', 'ignore'))
     return m.hexdigest()
-
-
-def is_a_collection(o):
-    """Return True when the object ``o`` is a collection."""
-    return hasattr(o, "__getitem__") and ((PY2 and not isinstance(o, basestring)) or
-                                          (not PY2 and not isinstance(o, (str, bytes))))
 
 
 def vsum(v0, v1):

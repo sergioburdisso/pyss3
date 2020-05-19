@@ -169,6 +169,12 @@
     a.sidenav-trigger.top-nav i {
       font-size: 32px;
     }
+    .label-ok{
+      color: #26a69a;
+    }
+    .label-nok{
+      color: #e53935;
+    }
     @media only screen and (max-width: 992px){ header, main, footer {
       padding-left: 0;
     }}
@@ -192,17 +198,18 @@
       <a href="#" data-target="slide-out" class="top-nav sidenav-trigger waves-effect waves-light circle hide-on-large-only"><i class="material-icons">menu</i></a>
     </div>
     <ul id="slide-out" class="sidenav sidenav-fixed" ng-show="keys(info.docs).length">
-      <li><a class="subheader">Test Documents by Category</a></li>
+      <li><a class="subheader">Test Documents<span ng-if="!info.docs.hasOwnProperty('')">by Category</span></a></li>
       <ul class="collapsible">
         <li ng-repeat="c in keys(info.docs)" ng-cloak ng-class="{active:keys(info.docs).length == 1}">
-          <div class="collapsible-header"><i class="material-icons right" ng-style="{'color': get_cat_rgb(info.categories.indexOf(c))}">
-            style</i>{{c}} ({{info.docs[c].file.length}}) <small class="recall blue-text text-darken-2 right" title="recall (% of hits)" ng-if="info.categories.indexOf(c) != -1">{{get_accuracy(c)|number:1}}%</small>
+          <div class="collapsible-header" ng-if="!info.docs.hasOwnProperty('')"><i class="material-icons right" ng-style="{'color': get_cat_rgb(info.categories.indexOf(c))}">
+            style</i>{{c}} ({{info.docs[c].file.length}}) <small class="recall blue-text text-darken-2 right" title="recall (% of hits)" ng-if="info.categories.indexOf(c) != -1">{{get_recall(c)|number:1}}%</small>
           </div>
           <div class="collapsible-body">
             <ul>
               <li ng-repeat="f in info.docs[c].file track by $index" ng-class="{'active': $index == i_doc && c == c_doc}">
                 <a class="waves-effect" href="#" ng-click="get_doc(c, $index)">
-                  {{f}} 
+                  {{f}}
+                  <small class="recall text-darken-2 right" title="hamming score (label-based accuracy)" ng-class="get_accuracy_color(info.docs[c]['labels_recall'][$index], $index)" ng-if="multilabel">{{info.docs[c]['labels_recall'][$index] * 100 | number:1}}%</small>
                   <i class="material-icons right misclass" ng-if="info.categories.indexOf(c) != -1 && get_clf_result(c, $index) != c" title="misclassified as '{{get_clf_result(c, $index)}}'">priority_high</i>
                 </a>
               </li>
@@ -258,8 +265,19 @@
               Edit Text<i class="material-icons right">mode_edit</i>
             </button>
             <div class="pink-text text-darken-2" style="margin-bottom: 0;">
-              <h5 class="blue-text" ng-if="f_doc && document">Document: <span style="color:black">{{f_doc}}</span> <span style="color:gray">({{c_doc}})</span></h5>
-              <h5 style="margin-top: 0;">
+              <h5 class="blue-text" ng-if="f_doc && document">
+                Document: <span style="color:black">{{f_doc}}</span> <span style="color:gray" ng-if="c_doc">({{c_doc}})</span>
+                <span ng-if="multilabel" ng-repeat="label in info.docs['']['true_labels'][i_doc]">
+                  <div class="chip pointer"  ng-class="{'label-ok': is_cat_active(ss3.ci.indexOf(label)), 'label-nok': !is_cat_active(ss3.ci.indexOf(label))}" ng-click="select_cat(ss3.ci.indexOf(label))">{{label}}</div>
+                </span>
+              </h5>
+              <h5 style="margin-top: 0;" ng-if="multilabel">
+                <span class="blue-text" id="hashtag">Classification Result: </span>
+                <span ng-if="multilabel" ng-repeat="cv_i in ss3.cvns" ng-show="is_cat_active(cv_i)">
+                  <div class="chip pointer" ng-class="{'label-ok': is_in_golden_true(cv_i), 'label-nok': !is_in_golden_true(cv_i)}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</div>
+                </span>
+              </h5>
+              <h5 style="margin-top: 0;" ng-if="!multilabel">
                 <!-- <span style="color: black" id="hashtag">Main Category: </span> -->
                 <span class="blue-text" id="hashtag">Classification Result: </span>
                 <span ng-hide="ss3 || loading">N/A</span>
@@ -272,13 +290,13 @@
                   <span class="pointer pulse" ng-style="{'opacity': ss3.cvns[0][1]}" ng-click="select_cat(ss3.cvns[0][0])">{{ss3.ci[ss3.cvns[0][0]]}}</span>
                 </span>
               </h5>
-              <h5 ng-if="ss3 && ncats > 2 && is_cat_active(ss3.cvns[1]) && ss3.cvns[0][1]">
+              <h5 ng-if="!multilabel && ss3 && ncats > 2 && is_cat_active(ss3.cvns[1]) && ss3.cvns[0][1] && ss3.cvns[0][2] >= .75">
                 <span style="color: black">
                   <span ng-show="ss3.cvns[1][1] < .25">Hmmm...Just Guessing...</span>
                   <span ng-show="ss3.cvns[1][1] < .5">Maybe </span>
                   Also<span ng-show="ss3.cvns[1][1] >= .4">:</span> 
                 </span>
-                <span style="display:inline-block; padding-right:" ng-repeat="cv_i in ss3.cvns" ng-hide="$first" ng-if="is_cat_active(cv_i) && $index < 3">
+                <span style="display:inline-block; padding-right:" ng-repeat="cv_i in ss3.cvns" ng-hide="$first" ng-if="is_cat_active(cv_i)">
                   <span ng-show="$index > 1" class="black-text">,</span>
                   <span class="pointer" ng-style="{'opacity': cv_i[1]}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</span>
                 </span>

@@ -334,18 +334,19 @@
   var DOM_INFO_LINE = document.getElementById("info-line");
   var DOM_INFO_CIRC = document.getElementById("info-circle");
   var DOM_INFO_PANEL = document.getElementById("point-info");
+  var DATA = null;
   var DEF_METRIC = "accuracy";
   var GLOBAL_METRIC = ["accuracy", "hamming-loss", "exact-match"];
   var INVERSE_METRIC = ["hamming-loss"];
   var MULTILABEL = false;
   var CM_MAX_SIZE = 50;
   var CM_MAX_FOLD_SIZE = 90;
-  var DATA = null;
+  var CM_N_CATS = null;
   var CM = {// confusion matrix
     matrix: null,
     p: null,   // path
     m: null,   // method
-    dc: null   // default category
+    dc: null,  // default category
   };
   var PI = {cmd: {}, code: {}};
   var app = angular.module("ss3", ["ngAnimate"]);
@@ -638,7 +639,7 @@
       cmd_eval += hparams;
 
       PI.cmd.cmd_set = 'set ' + hparams;
-      PI.code.cmd_set = code_set + "Live_test.run(clf, x_test, y_test)";
+      PI.code.cmd_set = code_set + "Live_Test.run(clf, x_test, y_test)";
       PI.cmd.cmd_eval = cmd_eval;
       PI.code.cmd_eval = code_set + code_eval;
       PI.cmd.cmd_remove = `evaluations remove ${C.p} ${C.m}${def_cat} ` + hparams;
@@ -961,7 +962,6 @@
 
     function update_confusion_matrix(){
       var C = $scope.c, keys = Object.keys;
-      var cats_n = null;
       var cm_size = CM_MAX_FOLD_SIZE;
 
       CM = $results[C.p][C.m][C.dc]["confusion_matrix"];
@@ -984,8 +984,8 @@
 
                 if (!MULTILABEL){
                   CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
-                    if (cats_n === null){
-                      cats_n = cm_fold.length
+                    if (CM_N_CATS === null){
+                      CM_N_CATS = cm_fold.length
                     }
                     return cm_fold.map(r => {
                       let r_sum = sum(r);
@@ -997,8 +997,8 @@
                 }else{
                   CM[s][l][p][a] = CM[s][l][p][a].map(cm_fold => {
                     return cm_fold.map(cm => {
-                      if (cats_n === null){
-                        cats_n = cm.length
+                      if (CM_N_CATS === null){
+                        CM_N_CATS = cm.length
                       }
                       return cm.map(r => {
                         let r_sum = sum(r);
@@ -1030,8 +1030,8 @@
       CM.dc = $scope.c.dc;
 
       cm_size /= Math.min(CM["folds"], 3);
-      // $scope.conf_matrix_cell_size =  Math.min(cm_size,  (cats_n > 2? CM_MAX_SIZE : 30)) / cats_n;
-      $scope.conf_matrix_cell_size =  Math.min(cm_size, CM_MAX_SIZE) / cats_n;
+      // $scope.conf_matrix_cell_size =  Math.min(cm_size,  (CM_N_CATS > 2? CM_MAX_SIZE : 30)) / CM_N_CATS;
+      $scope.conf_matrix_cell_size =  Math.min(cm_size, CM_MAX_SIZE) / CM_N_CATS;
     }
 
     $scope.update(true, true);
