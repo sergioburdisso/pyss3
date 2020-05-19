@@ -857,22 +857,16 @@ class SS3:
             else:
                 if pred_cv.sum() == 0:
                     if def_cat == IDX_UNKNOWN_CATEGORY:
-                        y_pred[doc_idx] = [STR_UNKNOWN_CATEGORY if labels else def_cat]
+                        y_pred[doc_idx] = []
                     else:
                         y_pred[doc_idx] = [self.get_category_name(def_cat) if labels else def_cat]
                 else:
-                    r = sorted(
-                        [
-                            (i, pred_cv[i])
-                            for i in range(pred_cv.size)
-                        ],
-                        key=lambda e: -e[1]
-                    )
+                    r = sorted([(i, pred_cv[i])
+                                for i in range(pred_cv.size)],
+                               key=lambda e: -e[1])
                     if labels:
-                        y_pred[doc_idx] = [
-                            self.get_category_name(cat_i)
-                            for cat_i, _ in r[:kmean_multilabel_size(r)]
-                        ]
+                        y_pred[doc_idx] = [self.get_category_name(cat_i)
+                                           for cat_i, _ in r[:kmean_multilabel_size(r)]]
                     else:
                         y_pred[doc_idx] = [cat_i for cat_i, _ in r[:kmean_multilabel_size(r)]]
 
@@ -1931,6 +1925,9 @@ class SS3:
         """
         self.__cv_cache__ = None
 
+        if not doc or not cat:
+            return
+
         try:
             doc = doc.decode(ENCODING)
         except UnicodeEncodeError:  # for python 2 compatibility
@@ -2143,7 +2140,7 @@ class SS3:
 
         return cat if labels else self.get_category_index(cat)
 
-    def classify_multilabel(self, doc, def_cat=STR_MOST_PROBABLE, labels=True, prep=True):
+    def classify_multilabel(self, doc, def_cat=STR_UNKNOWN, labels=True, prep=True):
         """
         Classify a given document returning multiple category labels.
 
@@ -2156,7 +2153,7 @@ class SS3:
         :param def_cat: default category to be assigned when SS3 is not
                         able to classify a document. Options are
                         "most-probable", "unknown" or a given category name.
-                        (default: "most-probable")
+                        (default: "unknown")
         :type def_cat: str
         :param labels: whether to return the category labels or just the
                        category indexes (default: True)
@@ -2171,7 +2168,7 @@ class SS3:
 
         if not r or not r[0][1]:
             if not def_cat or def_cat == STR_UNKNOWN:
-                cat = STR_UNKNOWN_CATEGORY
+                return []
             elif def_cat == STR_MOST_PROBABLE:
                 cat = self.get_most_probable_category()
             else:
@@ -2185,10 +2182,8 @@ class SS3:
         else:
             __other_idx__ = self.get_category_index(STR_OTHERS_CATEGORY)
             if labels:
-                result = [
-                    self.get_category_name(cat_i)
-                    for cat_i, _ in r[:kmean_multilabel_size(r)]
-                ]
+                result = [self.get_category_name(cat_i)
+                          for cat_i, _ in r[:kmean_multilabel_size(r)]]
                 # removing "hidden" special category ("[other]")
                 if __other_idx__ != IDX_UNKNOWN_CATEGORY and STR_OTHERS_CATEGORY in result:
                     result.remove(STR_OTHERS_CATEGORY)
@@ -2313,7 +2308,7 @@ class SS3:
         ]
 
     def predict(
-        self, x_test, def_cat=STR_MOST_PROBABLE,
+        self, x_test, def_cat=None,
         labels=True, multilabel=False, prep=True, leave_pbar=True
     ):
         """
@@ -2324,6 +2319,8 @@ class SS3:
         :param def_cat: default category to be assigned when SS3 is not
                         able to classify a document. Options are
                         "most-probable", "unknown" or a given category name.
+                        (default: "most-probable", or "unknown" for
+                         multi-label classification)
         :type def_cat: str
         :param labels: whether to return the list of category names or just
                        category indexes
@@ -2347,11 +2344,17 @@ class SS3:
         if not self.__categories__:
             raise EmptyModelError
 
+        multilabel = multilabel or self.__multilabel__
+
+        if def_cat is None:
+            def_cat = STR_UNKNOWN if multilabel else STR_MOST_PROBABLE
+
         if not def_cat or def_cat == STR_UNKNOWN:
-            Print.info(
-                "default category was set to 'unknown' (its index will be -1)",
-                offset=1
-            )
+            if not multilabel:
+                Print.info(
+                    "default category was set to 'unknown' (its index will be -1)",
+                    offset=1
+                )
         else:
             if def_cat == STR_MOST_PROBABLE:
                 Print.info(
@@ -2363,8 +2366,6 @@ class SS3:
                 Print.info("default category was set to '%s'" % def_cat, offset=1)
                 if self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY:
                     raise InvalidCategoryError
-
-        multilabel = multilabel or self.__multilabel__
 
         if self.get_ngrams_length() == 1 and self.__summary_ops_are_pristine__():
             return self.__predict_fast__(x_test, def_cat=def_cat, labels=labels,
@@ -2547,6 +2548,10 @@ def kmean_multilabel_size(res):
     clust = {"neg": [], "pos": []}  # clusters (2 clusters: "pos" and "neg")
     new_cent_neg = res[-1][1]
     new_cent_pos = res[0][1]
+
+    if new_cent_neg == new_cent_pos:
+        return 0
+
     while (cent["pos"] != new_cent_pos) or (cent["neg"] != new_cent_neg):
         cent["neg"], cent["pos"] = new_cent_neg, new_cent_pos
         clust["neg"], clust["pos"] = [], []

@@ -68,7 +68,7 @@ ERROR_NAT = "'%s' is not a valid target "
 ERROR_NAT += "(excepted: %s or a category label)" % (", ".join(["'%s'" % a for a in AVGS]))
 ERROR_CNE = "the classifier has not been evaluated yet"
 ERROR_CNA = ("a classifier has not yet been assigned "
-             "(try using `Evaluation.set_classifier (clf)`)")
+             "(try using `Evaluation.set_classifier(clf)`)")
 ERROR_IKV = "`k_fold` argument must be an integer greater than or equal to 2"
 ERROR_IKT = "`k_fold` argument must be an integer"
 ERROR_INGV = "`n_grams` argument must be a positive integer"

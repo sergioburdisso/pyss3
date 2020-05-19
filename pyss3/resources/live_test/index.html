@@ -276,6 +276,7 @@
                 <span ng-if="multilabel" ng-repeat="cv_i in ss3.cvns" ng-show="is_cat_active(cv_i)">
                   <div class="chip pointer" ng-class="{'label-ok': is_in_golden_true(cv_i), 'label-nok': !is_in_golden_true(cv_i)}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</div>
                 </span>
+                <span ng-if="get_n_active_cats() == 0">N/A</span>
               </h5>
               <h5 style="margin-top: 0;" ng-if="!multilabel">
                 <!-- <span style="color: black" id="hashtag">Main Category: </span> -->

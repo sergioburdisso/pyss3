@@ -198,6 +198,17 @@ app.controller("mainCtrl", function($scope) {
       $scope.chart.obj.setSelection({row:null,colum:null});
   }
 
+  $scope.get_n_active_cats = function(){
+    var c = 0;
+    for (let i=0; i < $scope.ss3.cvns.length; i++){
+      if ($scope.is_cat_active($scope.ss3.cvns[i]))
+        c++;
+      else
+        break;
+    }
+    return c;
+  }
+
   $scope.is_cat_active = function (cat_info) {
     var icat = Number.isInteger(cat_info)? cat_info : cat_info[0];
     return active_cats.indexOf(icat) != -1;
@@ -281,6 +292,10 @@ app.controller("mainCtrl", function($scope) {
     var new_cent_neg = cats[cats.length - 1][2];
     var new_cent_pos = cats[0][2];
     var active_cats = null;
+
+    if (new_cent_neg == new_cent_pos)
+      return [];
+
     while (cent.pos != new_cent_pos || cent.neg != new_cent_neg){
       cent.neg = new_cent_neg;
       cent.pos = new_cent_pos;
