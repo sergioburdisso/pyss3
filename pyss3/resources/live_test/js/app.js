@@ -199,6 +199,7 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.get_n_active_cats = function(){
+    if ($scope.ss3 == null) return;
     var c = 0;
     for (let i=0; i < $scope.ss3.cvns.length; i++){
       if ($scope.is_cat_active($scope.ss3.cvns[i]))
@@ -210,12 +211,20 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.is_cat_active = function (cat_info) {
-    var icat = Number.isInteger(cat_info)? cat_info : cat_info[0];
-    return active_cats.indexOf(icat) != -1;
+    if (!$scope.ss3 || !cat_info)
+      return false;
+
+    if (active_cats.length == 0){
+      return $scope.info.def_cat && $scope.ss3.ci[cat_info] == $scope.info.def_cat;
+    }else{
+      var icat = Number.isInteger(cat_info)? cat_info : cat_info[0];
+      return active_cats.indexOf(icat) != -1;
+    }
   }
 
-  $scope.is_in_golden_true = function(cv_i){
-    return $scope.info.docs['']['true_labels'][$scope.i_doc].indexOf($scope.ss3.ci[cv_i[0]]) != -1;
+  $scope.is_in_golden_true = function(l){
+    l = (typeof l === 'string' || l instanceof String)? l : $scope.ss3.ci[l[0]];
+    return $scope.info.docs['']['true_labels'][$scope.i_doc].indexOf(l) != -1;
   }
 
   $scope.on_chart_change = function(){

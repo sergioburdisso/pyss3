@@ -633,6 +633,16 @@ class SS3:
         )
         return sorted(vocab_icat, key=lambda k: -k[-1])
 
+    def __get_def_cat__(self, def_cat):
+        """Given the `def_cat` argument, get the default category value."""
+        if def_cat is not None and (def_cat not in [STR_MOST_PROBABLE, STR_UNKNOWN] and
+                                    self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY):
+            raise ValueError(
+                "the default category must be 'most-probable', 'unknown', or a category name."
+            )
+        def_cat = None if def_cat == STR_UNKNOWN else def_cat
+        return self.get_most_probable_category() if def_cat == STR_MOST_PROBABLE else def_cat
+
     def __get_next_iwords__(self, sent, icat):
         """Return the list of possible following words' indexes."""
         if not self.get_category_name(icat):

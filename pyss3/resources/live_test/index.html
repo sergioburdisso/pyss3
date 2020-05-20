@@ -276,7 +276,10 @@
                 <span ng-if="multilabel" ng-repeat="cv_i in ss3.cvns" ng-show="is_cat_active(cv_i)">
                   <div class="chip pointer" ng-class="{'label-ok': is_in_golden_true(cv_i), 'label-nok': !is_in_golden_true(cv_i)}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</div>
                 </span>
-                <span ng-if="get_n_active_cats() == 0">N/A</span>
+                <span ng-if="get_n_active_cats() == 0">
+                  <span ng-if="!info.def_cat">N/A</span>
+                  <div class="chip pointer" ng-if="info.def_cat" ng-class="{'label-ok': is_in_golden_true(info.def_cat), 'label-nok': !is_in_golden_true(info.def_cat)}" ng-click="select_cat(ss3.ci.indexOf(info.def_cat))">{{info.def_cat}}</div>
+                </span>
               </h5>
               <h5 style="margin-top: 0;" ng-if="!multilabel">
                 <!-- <span style="color: black" id="hashtag">Main Category: </span> -->
@@ -375,7 +378,7 @@
                 </div>
                 <div ng-repeat="cv_i in ss3.cvns" class="menu_item waves-effect waves-red" ng-click="select_cat_menu(cv_i[0])" ng-class="{active:scat==cv_i[0]}" style="display: block">
                   <a href="" class="menu_item" ng-class="{'disabled':!is_cat_active(cv_i)}" ng-style="{'border-color':get_cat_rgb(cv_i[0])}" style="border-width: 7px;">
-                    {{ss3.ci[cv_i[0]]|uppercase}} <label title="confidence value">({{cv_i[2]|number:1}}cv)</label>
+                    {{ss3.ci[cv_i[0]]|uppercase}} <label title="confidence value">({{cv_i[2]|number:2}}cv)</label>
                   </a>
                 </div>
               </div>

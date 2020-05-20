@@ -112,9 +112,12 @@ def test_evaluation(mocker):
     assert kfold_validation(clf_ml, x_data_ml, y_data_ml, plot=PY3) > 0
     assert kfold_validation(clf, x_data, y_data, plot=PY3) > 0
     s, l, p, a = clf.get_hyperparameters()
+    s, l, p, a = clf.get_hyperparameters()
     s0, l0, p0, a0 = Evaluation.grid_search(clf, x_data, y_data)
     s1, l1, p1, a1 = Evaluation.get_best_hyperparameters()
     s2, l2, p2, a2 = Evaluation.get_best_hyperparameters("recall")
+    Evaluation.__last_eval_tag__ = None
+    s1, l1, p1, a1 = Evaluation.get_best_hyperparameters()
     assert s0 == s and l0 == l and p0 == p and a0 == a
     assert s0 == s1 and l0 == l1 and p0 == p1 and a0 == a1
     assert s0 == s2 and l0 == l2 and p0 == p2 and a0 == a2

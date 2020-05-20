@@ -62,7 +62,7 @@ def mockers(mocker):
                         "parse_args").return_value = MockCmdLineArgs
 
 
-@pytest.fixture(params=[0, 1, 2, 3, 4, 5])
+@pytest.fixture(params=[0, 1, 2, 3, 4, 5, 6, 7])
 def test_case(request, mocker):
     """Argument values generator for test_live_test(test_case)."""
     mocker.patch("webbrowser.open")
@@ -140,6 +140,12 @@ def test_live_test(test_case):
         serve_args["y_test"] += [["labelC"]] * (len(x_train) // 2)
     elif test_case == 5:
         serve_args["y_test"] = ["label"]
+    elif test_case == 6:
+        serve_args["y_test"] = y_train
+        serve_args["def_cat"] = 'most-probable'
+    elif test_case == 7:
+        serve_args["y_test"] = y_train
+        serve_args["def_cat"] = 'xxxxx'  # raise ValueError
 
     if PYTHON3:
         threading.Thread(target=LT.serve, kwargs=serve_args, daemon=True).start()
@@ -197,7 +203,7 @@ def test_live_test(test_case):
     assert "<html>" in r
 
 
-def test_main(mockers):
+def test_main(mockers, mocker):
     """Test the main() function."""
     if not PYTHON3:
         return

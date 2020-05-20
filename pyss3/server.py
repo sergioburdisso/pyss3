@@ -147,6 +147,7 @@ class Server:
     __folder_label__ = None
     __preprocess__ = None
     __default_prep__ = None
+    __default_cat__ = None
 
     @staticmethod
     def __send_as_json__(sock, data):
@@ -251,7 +252,8 @@ class Server:
             "model_name": clf.get_name(),
             "hps": clf.get_hyperparameters(),
             "categories": clf.get_categories(all=True) + ["[unknown]"],
-            "docs": Server.__docs__
+            "docs": Server.__docs__,
+            "def_cat": Server.__default_cat__
         })
         Print.info("sending classifier info...")
 
@@ -368,7 +370,7 @@ class Server:
         Server.__clear_testset__()
 
     @staticmethod
-    def set_testset(x_test, y_test=None):
+    def set_testset(x_test, y_test=None, def_cat=None):
         """
          Assign the test set to visualize.
 
@@ -376,11 +378,20 @@ class Server:
         :type x_test: list (of str)
         :param y_label: the list of category labels
         :type y_label: list (of str)
+        :param def_cat: default category to be assigned when SS3 is not
+                        able to classify a document. Options are
+                        "most-probable", "unknown" or a given category name.
+                        (default: "most-probable", or "unknown" for
+                         multi-label classification)
+        :type def_cat: str
+        :raises: ValueError
         """
+        clf = Server.__clf__
+
         Server.__clear_testset__()
         Server.__x_test__ = x_test
+        Server.__default_cat__ = clf.__get_def_cat__(def_cat)
 
-        clf = Server.__clf__
         classify = clf.classify
         docs = Server.__docs__
         unkwon_cat_i = len(Server.__clf__.get_categories())
@@ -415,13 +426,13 @@ class Server:
                 )
 
         if multilabel:
+            y_pred = [[ci for ci, _ in r[:kmean_multilabel_size(r)]]
+                      for r in docs[y_test[0]]["clf_result"]]
+            if Server.__default_cat__ is not None:
+                y_pred = [labels if labels else [clf.get_category_index(Server.__default_cat__)]
+                          for labels in y_pred]
             t = membership_matrix(clf, y_test_labels).todense()
-            p = membership_matrix(
-                clf,
-                [[ci for ci, _ in r[:kmean_multilabel_size(r)]]
-                 for r in docs[y_test[0]]["clf_result"]],
-                labels=False
-            ).todense()
+            p = membership_matrix(clf, y_pred, labels=False).todense()
             accuracy = (t & p).sum(axis=1) / (t | p).sum(axis=1)
             accuracy[np.isnan(accuracy)] = 1
             docs[y_test[0]]["true_labels"] = y_test_labels
@@ -502,7 +513,7 @@ class Server:
     @staticmethod
     def serve(
         clf=None, x_test=None, y_test=None, port=0, browser=True,
-        quiet=True, prep=True, prep_func=None
+        quiet=True, prep=True, prep_func=None, def_cat=None
     ):
         """
         Wait for classification requests and serve them.
@@ -529,8 +540,16 @@ class Server:
                   If not given, the default preprocessing function will
                   be used
         :type prep_func: function
+        :param def_cat: default category to be assigned when SS3 is not
+                        able to classify a document. Options are
+                        "most-probable", "unknown" or a given category name.
+                        (default: "most-probable", or "unknown" for
+                         multi-label classification)
+        :type def_cat: str
+        :raises: ValueError
         """
-        Server.__clf__ = clf or Server.__clf__
+        clf = clf or Server.__clf__
+        Server.__clf__ = clf
         Server.__preprocess__ = prep_func
         Server.__default_prep__ = prep
 
@@ -543,7 +562,7 @@ class Server:
 
         if x_test is not None:
             if y_test is None or len(y_test) == len(x_test):
-                Server.set_testset(x_test, y_test)
+                Server.set_testset(x_test, y_test, def_cat)
             else:
                 Print.error("y_test must have the same length as x_test")
                 return
