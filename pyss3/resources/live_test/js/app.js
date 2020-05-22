@@ -211,7 +211,7 @@ app.controller("mainCtrl", function($scope) {
   }
 
   $scope.is_cat_active = function (cat_info) {
-    if (!$scope.ss3 || !cat_info)
+    if ($scope.ss3 == null || cat_info == null)
       return false;
 
     if (active_cats.length == 0){

@@ -268,7 +268,7 @@
               <h5 class="blue-text" ng-if="f_doc && document">
                 Document: <span style="color:black">{{f_doc}}</span> <span style="color:gray" ng-if="c_doc">({{c_doc}})</span>
                 <span ng-if="multilabel" ng-repeat="label in info.docs['']['true_labels'][i_doc]">
-                  <div class="chip pointer"  ng-class="{'label-ok': is_cat_active(ss3.ci.indexOf(label)), 'label-nok': !is_cat_active(ss3.ci.indexOf(label))}" ng-click="select_cat(ss3.ci.indexOf(label))">{{label}}</div>
+                  <div class="chip pointer"  ng-class="{'label-ok': ss3 && is_cat_active(ss3.ci.indexOf(label)), 'label-nok': ss3 && !is_cat_active(ss3.ci.indexOf(label))}" ng-click="select_cat(ss3.ci.indexOf(label))">{{label}}</div>
                 </span>
               </h5>
               <h5 style="margin-top: 0;" ng-if="multilabel">
