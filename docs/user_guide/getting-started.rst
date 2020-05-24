@@ -47,6 +47,8 @@ Tutorials
 
 * :ref:`extract-insight`
 
+* :ref:`custom-preprocessing`
+
 
 API Documentation
 -----------------

@@ -159,6 +159,7 @@ Further Readings
    tutorials/topic-categorization
    tutorials/movie-review
    tutorials/extract-insight
+   tutorials/custom-preprocessing
 
 .. toctree::
    :maxdepth: 3
