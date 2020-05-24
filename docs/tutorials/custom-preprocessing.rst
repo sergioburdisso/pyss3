@@ -19,7 +19,7 @@ Let's begin by importing the needed modules:
 
 --------------
 
-.. code:: ipython3
+.. code:: python
 
     %matplotlib inline
     import re
@@ -36,7 +36,7 @@ applying just a simple stemming on the documents using the Snowball
 Stemmer. So, we will define a simple function, called
 ``my_preprocessing``, to carry out that task for us.
 
-.. code:: ipython3
+.. code:: python
 
     stemmer = SnowballStemmer('english')
     
@@ -51,7 +51,7 @@ We will use the dataset we used for `Sentiment Analysis on Movie Reviews
 tutorial <https://pyss3.readthedocs.io/en/latest/tutorials/movie-review-notebook.html>`__.
 Let's load the training and test sets.
 
-.. code:: ipython3
+.. code:: python
 
     x_train, y_train = Dataset.load_from_files("datasets/movie_review/train")
     x_test, y_test = Dataset.load_from_files("datasets/movie_review/test")
@@ -67,7 +67,7 @@ Now that the dataset has been loaded, we will use our
 ``my_preprocessing`` function to preprocess all the training and test
 documents like so.
 
-.. code:: ipython3
+.. code:: python
 
     # Note: A better option would be to preprocess all the documents
     # only once and then stored them to disk. Then, later we could
@@ -81,7 +81,7 @@ stored in ``x_train_prep``. In addition, we need to use the
 ``prep``\ argument to tell our classifier to disable the default
 preprocessing process (``prep=False``).
 
-.. code:: ipython3
+.. code:: python
 
     # In the "Hyperparameter Optimization" section at the bottom,
     # it is shown how we obtained these hyperparemter values: s=.44, l=.48, p=.5
@@ -99,7 +99,7 @@ preprocessing process (``prep=False``).
 Let's check if our classifier performs well at classifying the test
 documents.
 
-.. code:: ipython3
+.. code:: python
 
     # Here we're also disabling default preprocessing
     # since ``x_test_prep`` is already preprocessed
@@ -130,7 +130,7 @@ live test as usual but this time using our preprocessed test documents
 (``x_test_prep``) and again disabling the default preprocessing process
 (``prep=False``), as follows:
 
-.. code:: ipython3
+.. code:: python
 
     # note we are using the preprocessed documents here (`x_test_prep`)
     Live_Test.run(clf, x_test_prep, y_test, prep=False)
@@ -154,7 +154,7 @@ documents stored in ``x_test`` and using the ``prep_func`` argument to
 tell what function we want to be applied when classifying, in our case
 it would be ``prep_func=my_preprocessing``, as follows:
 
-.. code:: ipython3
+.. code:: python
 
     Live_Test.run(clf, x_test, y_test, prep_func=my_preprocessing)
 
@@ -182,7 +182,7 @@ indicating that it was converted to ":math:`watch`" (and
 Hyperparameter Optimization
 ---------------------------
 
-.. code:: ipython3
+.. code:: python
 
     clf = SS3(name="movie-reviews")
     
@@ -196,7 +196,7 @@ Hyperparameter Optimization
     Training on 'pos': 100%|██████████| 2/2 [00:06<00:00,  3.01s/it]
 
 
-.. code:: ipython3
+.. code:: python
 
     best_s, best_l, best_p, best_a = Evaluation.grid_search(
         clf, x_test_prep, y_test,
@@ -227,7 +227,7 @@ Hyperparameter Optimization
     Alpha(a): 0.0
 
 
-.. code:: ipython3
+.. code:: python
 
     clf.set_hyperparameters(0.44, 0.48, 0.5, 0.0)
     y_pred = clf.predict(x_test_prep, prep=False)
@@ -245,7 +245,7 @@ Hyperparameter Optimization
 The best accuracy with the obtained hyperparameters is 0.828. Now let's
 train a 3-grams version using the same hyperparameters:
 
-.. code:: ipython3
+.. code:: python
 
     clf = SS3(0.44, 0.48, 0.5, 0.0, name="movie-reviews")
     
@@ -257,7 +257,7 @@ train a 3-grams version using the same hyperparameters:
     Training on 'pos': 100%|██████████| 2/2 [00:13<00:00,  6.96s/it]
 
 
-.. code:: ipython3
+.. code:: python
 
     y_pred = clf.predict(x_test_prep, prep=False)
     
