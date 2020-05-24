@@ -6,6 +6,41 @@ Change Log
 
 All notable changes to PySS3 will be documented here.
 
+[0.6.0] 2020-05-24
+==================
+
+Added
+-----
+PySS3 now fully support multi-label classification! :)
+
+- The ``load_from_files_multilabel()`` function was added to the ``Dataset`` class (`7ece7ce <https://github.com/sergioburdisso/pyss3/commit/7ece7ce>`__, resolved `#6 <https://github.com/sergioburdisso/pyss3/issues/6>`__)
+
+- The ``Evaluation`` class now supports multi-label classification (resolved `#5 <https://github.com/sergioburdisso/pyss3/issues/5>`__)
+
+  - Add multi-label support to ``train()/fit()`` (`4d00476 <https://github.com/sergioburdisso/pyss3/commit/4d00476>`__)
+  - Add multi-label support to ``Evaluation.test()`` (`0a897dd <https://github.com/sergioburdisso/pyss3/commit/0a897dd>`__)
+  - Add multi-label support to ``show_best and get_best()`` (`ef2419b <https://github.com/sergioburdisso/pyss3/commit/ef2419b>`__)
+  - Add multi-label support to ``kfold_cross_validation()`` (`aacd3a0 <https://github.com/sergioburdisso/pyss3/commit/aacd3a0>`__)
+  - Add multi-label support to ``grid_search()`` (`925156d <https://github.com/sergioburdisso/pyss3/commit/925156d>`__, `79f1e9d <https://github.com/sergioburdisso/pyss3/commit/79f1e9d>`__)
+  - Add multi-label support to the 3D Evaluation Plot (`42bbc65 <https://github.com/sergioburdisso/pyss3/commit/42bbc65>`__)
+
+- The Live Test tool now supports multi-label classification as well (`15657ee <https://github.com/sergioburdisso/pyss3/commit/15657ee>`__, `b617bb7 <https://github.com/sergioburdisso/pyss3/commit/b617bb7>`__, resolved `#9 <https://github.com/sergioburdisso/pyss3/issues/9>`__)
+
+- Category names are no longer case-insensitive (`4ec009a <https://github.com/sergioburdisso/pyss3/commit/4ec009a>`__, resolved `#8 <https://github.com/sergioburdisso/pyss3/issues/8>`__)
+
+
+[0.5.7] 2020-05-05
+==================
+
+Added
+-----
+
+- The Live Test Tool now supports custom (user-defined) preprosessing methods (`b50cfaf <https://github.com/sergioburdisso/pyss3/commit/b50cfaf>`__, `7c6b0c6 <https://github.com/sergioburdisso/pyss3/commit/7c6b0c6>`__, resolved `#3 <https://github.com/sergioburdisso/pyss3/issues/3>`__).
+
+- The tokenization process was improved (`26fff88 <https://github.com/sergioburdisso/pyss3/commit/26fff88>`__, `4af8e80 <https://github.com/sergioburdisso/pyss3/commit/4af8e80>`__).
+
+- The process for recognizing word n-grams during classification was improved (`2ceb148 <https://github.com/sergioburdisso/pyss3/commit/2ceb148>`__).
+
 
 [0.5.5] 2020-03-02
 ==================
