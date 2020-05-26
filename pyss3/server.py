@@ -145,6 +145,7 @@ class Server:
     __x_test__ = None
     __test_path__ = None
     __folder_label__ = None
+    __sep_doc__ = None
     __preprocess__ = None
     __default_prep__ = None
     __default_cat__ = None
@@ -263,13 +264,8 @@ class Server:
         doc = ""
         if ":line:" in file:
             file, line_n = file.split(":line:")
-            line_n = int(line_n)
             with open(file, 'r', encoding=ENCODING) as fdoc:
-                line = 0
-                doc = fdoc.readline()
-                while line < line_n:
-                    doc = fdoc.readline()
-                    line += 1
+                doc = fdoc.read().split(Server.__sep_doc__)[int(line_n)]
         elif ":x_test:" in file:
             if Server.__x_test__ is not None:
                 idoc = int(file.split(":x_test:")[1])
@@ -288,6 +284,7 @@ class Server:
         Server.__test_path__ = None
         Server.__folder_label__ = None
         Server.__x_test__ = None
+        Server.__sep_doc__ = None
 
     @staticmethod
     def __load_testset_from_files__():
@@ -445,7 +442,7 @@ class Server:
         return len(docs) > 0
 
     @staticmethod
-    def set_testset_from_files(test_path, folder_label=True):
+    def set_testset_from_files(test_path, folder_label=True, sep_doc='\n'):
         """
         Load the test set files to visualize from ``test_path``.
 
@@ -461,6 +458,7 @@ class Server:
         Server.__clear_testset__()
         Server.__test_path__ = test_path
         Server.__folder_label__ = folder_label
+        Server.__sep_doc__ = sep_doc
 
         docs = 0
         if not Server.__folder_label__:
