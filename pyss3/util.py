@@ -1800,6 +1800,7 @@ class Dataset:
         :type sep_doc: str
         :returns: the (x_train, y_train) or (x_test, y_test) pairs.
         :rtype: tuple
+        :raises: ValueError
         """
         x_data = []
         y_data = []
@@ -1816,11 +1817,20 @@ class Dataset:
                 doc_labels = {}
                 doc_names = []
 
-                for doc_name, label in doc_labels_raw:
+                for i_doc_label, doc_label in enumerate(doc_labels_raw):
+                    if len(doc_label) == 2:
+                        doc_name, label = doc_label
+                    elif len(doc_label) > 2:
+                        doc_name, label = doc_label[0], " ".join(doc_label[1:])
+                    else:
+                        if doc_label[0] not in doc_labels:
+                            doc_labels[doc_label[0]] = []
+                        continue
+
                     if doc_name not in doc_labels:
                         doc_labels[doc_name] = [label]
                         doc_names.append(doc_name)
-                    else:
+                    elif label:
                         doc_labels[doc_name].append(label)
                     cat_info[label] += 1
 
