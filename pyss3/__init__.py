@@ -147,10 +147,10 @@ class SS3:
         """
         self.__name__ = (name or self.__name__).lower()
 
-        self.__s__ = s or self.__s__
-        self.__l__ = l or self.__l__
-        self.__p__ = p or self.__p__
-        self.__a__ = a or self.__a__
+        self.__s__ = self.__s__ if s is None else s
+        self.__l__ = self.__l__ if l is None else l
+        self.__p__ = self.__p__ if p is None else p
+        self.__a__ = self.__a__ if a is None else a
 
         try:
             float(self.__s__ + self.__l__ + self.__p__ + self.__a__)
