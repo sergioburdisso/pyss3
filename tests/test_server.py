@@ -19,11 +19,13 @@ RECV_BUFFER = 1024 * 1024  # 1MB
 PYTHON3 = sys.version_info[0] >= 3
 DATASET_FOLDER = "dataset"
 DATASET_FOLDER_MR = "dataset_mr"
+DATASET_MULTILABEL_FOLDER = "dataset_ml"
 ADDRESS, PORT = "localhost", None
 LT = s.Live_Test
 
 dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 dataset_path_mr = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER_MR)
+dataset_path_multilabel = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
 
 x_train, y_train = None, None
 clf = None
@@ -47,6 +49,7 @@ class MockCmdLineArgs:
     quiet = True
     MODEL = "name"
     path = dataset_path
+    path_labels = None
     label = 'folder'
     port = 0
 
@@ -62,7 +65,7 @@ def mockers(mocker):
                         "parse_args").return_value = MockCmdLineArgs
 
 
-@pytest.fixture(params=[0, 1, 2, 3, 4, 5, 6, 7])
+@pytest.fixture(params=[0, 1, 2, 3, 4, 5, 6, 7, 8])
 def test_case(request, mocker):
     """Argument values generator for test_live_test(test_case)."""
     mocker.patch("webbrowser.open")
@@ -73,6 +76,9 @@ def test_case(request, mocker):
         LT.set_testset_from_files(dataset_path_mr, folder_label=True)
     elif request.param == 2:
         LT.set_testset(x_train, y_train)
+    elif request.param == 8:
+        LT.set_testset_from_files_multilabel(dataset_path_multilabel + "/train_files",
+                                             dataset_path_multilabel + "/file_labels.tsv")
     else:
         LT.__server_socket__ = None
 
@@ -132,7 +138,8 @@ def test_live_test(test_case):
     serve_args = {
         "x_test": x_train if test_case >= 2 else None,
         "y_test": y_train if test_case == 2 else None,
-        "quiet": test_case != 0
+        "quiet": test_case != 0,
+        "browser": test_case == 0
     }
 
     if test_case == 4:
@@ -146,6 +153,8 @@ def test_live_test(test_case):
     elif test_case == 7:
         serve_args["y_test"] = y_train
         serve_args["def_cat"] = 'xxxxx'  # raise ValueError
+    elif test_case == 8:
+        serve_args["x_test"] = None
 
     if PYTHON3:
         threading.Thread(target=LT.serve, kwargs=serve_args, daemon=True).start()

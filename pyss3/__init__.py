@@ -638,7 +638,8 @@ class SS3:
         if def_cat is not None and (def_cat not in [STR_MOST_PROBABLE, STR_UNKNOWN] and
                                     self.get_category_index(def_cat) == IDX_UNKNOWN_CATEGORY):
             raise ValueError(
-                "the default category must be 'most-probable', 'unknown', or a category name."
+                "the default category must be 'most-probable', 'unknown', or a category name"
+                " (current value is '%s')." % str(def_cat)
             )
         def_cat = None if def_cat == STR_UNKNOWN else def_cat
         return self.get_most_probable_category() if def_cat == STR_MOST_PROBABLE else def_cat
