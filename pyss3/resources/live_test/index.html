@@ -274,13 +274,16 @@
                 </span>
               </h5>
               <h5 style="margin-top: 0;" ng-if="multilabel">
-                <span class="blue-text" id="hashtag">Classification Result: </span>
-                <span ng-if="multilabel" ng-repeat="cv_i in ss3.cvns" ng-show="is_cat_active(cv_i)">
-                  <div class="chip pointer" ng-class="{'label-ok': is_in_golden_true(cv_i), 'label-nok': !is_in_golden_true(cv_i)}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</div>
-                </span>
-                <span ng-if="get_n_active_cats() == 0">
-                  <span ng-if="!info.def_cat">N/A</span>
-                  <div class="chip pointer" ng-if="info.def_cat" ng-class="{'label-ok': is_in_golden_true(info.def_cat), 'label-nok': !is_in_golden_true(info.def_cat)}" ng-click="select_cat(ss3.ci.indexOf(info.def_cat))">{{info.def_cat}}</div>
+                <span class="blue-text" id="hashtag">Classification Result: </span> <span ng-show="loading">...</span>
+                <div class="progress" ng-if="loading"><div class="indeterminate"></div></div>
+                <span ng-hide="loading">
+                  <span ng-if="multilabel" ng-repeat="cv_i in ss3.cvns" ng-show="is_cat_active(cv_i)">
+                    <div class="chip pointer" ng-class="{'label-ok': is_in_golden_true(cv_i), 'label-nok': !is_in_golden_true(cv_i)}" ng-click="select_cat(cv_i[0])">{{ss3.ci[cv_i[0]]}}</div>
+                  </span>
+                  <span ng-if="get_n_active_cats() == 0">
+                    <span ng-if="!info.def_cat">N/A</span>
+                    <div class="chip pointer" ng-if="info.def_cat" ng-class="{'label-ok': is_in_golden_true(info.def_cat), 'label-nok': !is_in_golden_true(info.def_cat)}" ng-click="select_cat(ss3.ci.indexOf(info.def_cat))">{{info.def_cat}}</div>
+                  </span>
                 </span>
               </h5>
               <h5 style="margin-top: 0;" ng-if="!multilabel">
