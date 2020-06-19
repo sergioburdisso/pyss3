@@ -6,6 +6,7 @@ coverage.xml
 htmlcov
 docs/_build
 tests/pyss3
+examples/datasets/movie_genres
 examples/datasets/movie_review
 examples/datasets/topic
 dist/
