@@ -295,6 +295,19 @@ def test_pyss3_ss3(mockers):
     with pytest.raises(ValueError):
         clf = SS3("hyperparameter")
 
+    # Using integer labels
+    test_x = ["this is the first document"] * 5 + ["this is the second document"] * 5
+    test_y = [0] * 5 + [1] * 5
+    clf = SS3()
+    clf.train(test_x, test_y)
+    assert clf.classify_label("this is the first document") == 0
+    assert clf.classify_label("this is the second document") == 1
+
+    # traning only with one category
+    clf = SS3()
+    clf.train(["this is the first document"], ["first"])
+
+    # training different cases
     clf = SS3(
         s=.45, l=.5, p=1, a=0,
         cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI

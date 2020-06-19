@@ -214,7 +214,10 @@ class SS3:
 
         s = sum([min(v, 1) for v in m_values])
 
-        return pow((c - (s + 1)) / ((c - 1) * (s + 1)), self.__p__)
+        try:
+            return pow((c - (s + 1)) / ((c - 1) * (s + 1)), self.__p__)
+        except ZeroDivisionError:  # if c <= 1
+            return 1.
 
     def __sg_vanilla__(self, ngram, icat, cache=True):
         """The original significance (sg) function definition."""
@@ -1936,7 +1939,7 @@ class SS3:
         """
         self.__cv_cache__ = None
 
-        if not doc or not cat:
+        if not doc or cat is None:
             return
 
         try:
