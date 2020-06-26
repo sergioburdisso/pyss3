@@ -83,9 +83,9 @@ class SS3:
                  term (word or n-grams), options are:
                  "norm_gv_xai", "norm_gv" and "gv" (default: "norm_gv_xai")
     :type cv_m: str
-    :param sn_m: method used to compute the sanction (sn) function, options
+    :param sg_m: method used to compute the significance (sg) function, options
                  are: "vanilla" and "xai" (default: "xai")
-    :type sn_m: str
+    :type sg_m: str
     """
 
     __name__ = "model"
@@ -119,7 +119,7 @@ class SS3:
 
     def __init__(
         self, s=None, l=None, p=None, a=None,
-        name="", cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
+        name="", cv_m=STR_NORM_GV_XAI, sg_m=STR_XAI
     ):
         """
         Class constructor.
@@ -140,9 +140,9 @@ class SS3:
                      term (word or n-grams), options are:
                      "norm_gv_xai", "norm_gv" and "gv" (default: "norm_gv_xai")
         :type cv_m: str
-        :param sn_m: method used to compute the sanction (sn) function, options
+        :param sg_m: method used to compute the significance (sg) function, options
                      are: "vanilla" and "xai" (default: "xai")
-        :type sn_m: str
+        :type sg_m: str
         :raises: ValueError
         """
         self.__name__ = (name or self.__name__).lower()
@@ -172,13 +172,13 @@ class SS3:
         elif cv_m == STR_GV:
             self.__cv__ = self.__gv__
 
-        if sn_m == STR_XAI:
+        if sg_m == STR_XAI:
             self.__sg__ = self.__sg_xai__
-        elif sn_m == STR_VANILLA:
+        elif sg_m == STR_VANILLA:
             self.__sg__ = self.__sg_vanilla__
 
         self.__cv_mode__ = cv_m
-        self.__sn_mode__ = sn_m
+        self.__sg_mode__ = sg_m
 
         self.original_sumop_ngrams = self.summary_op_ngrams
         self.original_sumop_sentences = self.summary_op_sentences
@@ -1400,7 +1400,7 @@ class SS3:
             "__index_to_word__": self.__index_to_word__,
             "__word_to_index__": self.__word_to_index__,
             "__cv_mode__": self.__cv_mode__,
-            "__sn_mode__": self.__sn_mode__,
+            "__sg_mode__": self.__sg_mode__,
             "__multilabel__": self.__multilabel__
         }
 
@@ -1470,7 +1470,7 @@ class SS3:
         self.__index_to_word__ = jmodel["__index_to_word__"]
         self.__word_to_index__ = jmodel["__word_to_index__"]
         self.__cv_mode__ = jmodel["__cv_mode__"]
-        self.__sn_mode__ = jmodel["__sn_mode__"]
+        self.__sg_mode__ = jmodel["__sg_mode__"]
         self.__multilabel__ = jmodel["__multilabel__"] if "__multilabel__" in jmodel else False
 
         self.__zero_cv__ = (0,) * len(self.__categories__)
