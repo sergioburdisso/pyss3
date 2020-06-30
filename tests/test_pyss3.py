@@ -310,7 +310,7 @@ def test_pyss3_ss3(mockers):
     # training different cases
     clf = SS3(
         s=.45, l=.5, p=1, a=0,
-        cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
+        cv_m=STR_NORM_GV_XAI, sg_m=STR_XAI
     )
     clf.set_name("test")
 
@@ -333,7 +333,7 @@ def test_pyss3_ss3(mockers):
         clf.train([], [])
 
     # train and predict/classify tests (model: terms are single words)
-    # cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
+    # cv_m=STR_NORM_GV_XAI, sg_m=STR_XAI
     clf.fit(x_train, y_train)
 
     assert clf.get_ngrams_length() == 1
@@ -347,30 +347,30 @@ def test_pyss3_ss3(mockers):
     perform_tests_on(clf.cv, 0, "video games", "science&technology")
     perform_tests_on(clf.gv, 0, "video games", "science&technology")
 
-    # cv_m=STR_NORM_GV, sn_m=STR_XAI
+    # cv_m=STR_NORM_GV, sg_m=STR_XAI
     clf = SS3(
         s=.45, l=.5, p=1, a=0, name="test-norm-gv-sn-xai",
-        cv_m=STR_NORM_GV, sn_m=STR_XAI
+        cv_m=STR_NORM_GV, sg_m=STR_XAI
     )
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [.00114, .00294, 0, 0, 0, .00016, .01878, 8.43969])
     perform_tests_on(clf.cv, 0.4307)
 
-    # cv_m=STR_GV, sn_m=STR_XAI
+    # cv_m=STR_GV, sg_m=STR_XAI
     clf = SS3(
         s=.45, l=.5, p=1, a=0, name="test-gv-sn-xai",
-        cv_m=STR_GV, sn_m=STR_XAI
+        cv_m=STR_GV, sg_m=STR_XAI
     )
     clf.fit(x_train, y_train)
 
     perform_tests_with(clf, [.00062, .00109, 0, 0, 0, .00014, .01878, 6.31605])
     assert clf.cv("chicken", "food") == clf.gv("chicken", "food")
 
-    # cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
+    # cv_m=STR_NORM_GV_XAI, sg_m=STR_VANILLA
     clf = SS3(
         s=.45, l=.5, p=1, a=0, name="test-norm-gv-xai-sn-vanilla",
-        cv_m=STR_NORM_GV_XAI, sn_m=STR_VANILLA
+        cv_m=STR_NORM_GV_XAI, sg_m=STR_VANILLA
     )
     clf.fit(x_train, y_train)
 
@@ -379,7 +379,7 @@ def test_pyss3_ss3(mockers):
     # train and predict/classify tests (model: terms are word n-grams)
     clf = SS3(
         name="test-3grams",
-        cv_m=STR_NORM_GV_XAI, sn_m=STR_XAI
+        cv_m=STR_NORM_GV_XAI, sg_m=STR_XAI
     )
 
     clf.fit(x_train, y_train, n_grams=3)
