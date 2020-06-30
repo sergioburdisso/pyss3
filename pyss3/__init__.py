@@ -1470,8 +1470,10 @@ class SS3:
         self.__index_to_word__ = jmodel["__index_to_word__"]
         self.__word_to_index__ = jmodel["__word_to_index__"]
         self.__cv_mode__ = jmodel["__cv_mode__"]
-        self.__sg_mode__ = jmodel["__sg_mode__"]
         self.__multilabel__ = jmodel["__multilabel__"] if "__multilabel__" in jmodel else False
+        self.__sg_mode__ = (jmodel["__sg_mode__"]
+                            if "__sg_mode__" in jmodel
+                            else jmodel["__sn_mode__"])
 
         self.__zero_cv__ = (0,) * len(self.__categories__)
         self.__s_update__ = self.__s__
