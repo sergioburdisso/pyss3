@@ -6,20 +6,12 @@
   "commit": false,
   "contributors": [
     {
-      "login": "enthussb",
-      "name": "Saurabh Bora",
-      "avatar_url": "https://avatars2.githubusercontent.com/u/29205181?v=4",
-      "profile": "https://www.saurabhbora.com",
-      "contributions": [
-        "ideas"
-      ]
-    },
-    {
       "login": "angrymeir",
       "name": "Florian Angermeir",
       "avatar_url": "https://avatars3.githubusercontent.com/u/16398152?v=4",
       "profile": "http://angermeir.me/",
       "contributions": [
+        "code",
         "ideas",
         "data"
       ]
@@ -32,6 +24,15 @@
       "contributions": [
         "ideas",
         "data"
+      ]
+    },
+    {
+      "login": "enthussb",
+      "name": "Saurabh Bora",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/29205181?v=4",
+      "profile": "https://www.saurabhbora.com",
+      "contributions": [
+        "ideas"
       ]
     }
   ],
