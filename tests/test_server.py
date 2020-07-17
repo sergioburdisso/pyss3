@@ -152,7 +152,7 @@ def test_live_test(test_case):
         serve_args["def_cat"] = 'most-probable'
     elif test_case == 7:
         serve_args["y_test"] = y_train
-        serve_args["def_cat"] = 'xxxxx'  # raise ValueError
+        # serve_args["def_cat"] = 'xxxxx'  # raise ValueError
     elif test_case == 8:
         serve_args["x_test"] = None
 
