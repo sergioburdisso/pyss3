@@ -21,7 +21,7 @@ from .util import is_a_collection, Print, VERBOSITY, Preproc as Pp
 from functools import reduce
 from six.moves import xrange
 
-__version__ = "0.6.2"
+__version__ = "0.6.3"
 
 ENCODING = "utf-8"
 
