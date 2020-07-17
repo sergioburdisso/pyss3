@@ -581,13 +581,13 @@ class Evaluation:
 
             if (axi % max_colums) == 0:
                 ax.set_ylabel('True', fontweight="bold")
-                ax.set_yticklabels(classes)
+                ax.set_yticklabels(classes[:cm.shape[0]])
             else:
                 ax.tick_params(labelleft=False)
 
             if axi + 1 > n_cms - max_colums or multilabel:
                 ax.set_xlabel('Predicted', fontweight="bold")
-                ax.set_xticklabels(classes)
+                ax.set_xticklabels(classes[:cm.shape[1]])
             else:
                 ax.tick_params(labelbottom=False)
 
