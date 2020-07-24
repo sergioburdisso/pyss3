@@ -23,7 +23,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 * Well suited for classification over **text streams**.
 * It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
 
-**Note:** this package also incorporates different variations of the SS3 classifier, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://doi.org/10.1016/j.patrec.2020.07.001)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important word n-grams "on the fly".
+**Note:** this package also incorporates different variations of the SS3 classifier, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://authors.elsevier.com/a/1bQRHcAmyjIcC)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important word n-grams "on the fly".
 
 ## What is PySS3?
 
