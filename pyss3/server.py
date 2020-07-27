@@ -635,6 +635,9 @@ class Server:
                 try:
                     read_socks, write_socks, error_socks = select(clients, [], [])
 
+                    for sock in error_socks:
+                        clients.remove(sock)
+
                     for sock in read_socks:
                         if sock is server_socket:
                             sockfd, addr = server_socket.accept()
