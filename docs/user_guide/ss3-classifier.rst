@@ -16,7 +16,7 @@ Some virtues of SS3:
 * It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
 
 
-PySS3 implements the original SS3 definition as well as different variations of it, such as the one introduced in `"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams" <https://authors.elsevier.com/a/1bQRHcAmyjIcC>`__ (preprint available `here <https://arxiv.org/abs/1911.06147>`__ which allows SS3 to recognize important word n-grams "on the fly".
+PySS3 implements the original SS3 definition as well as different variations of it, such as the one introduced in `"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams" <https://authors.elsevier.com/a/1bQRHcAmyjIcC>`__ (preprint available `here <https://arxiv.org/abs/1911.06147>`__) which allows SS3 to recognize important word n-grams "on the fly".
 
 
 .. _ss3-introduction:
