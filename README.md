@@ -10,7 +10,11 @@
 
 ---
 
-# :sparkles: A python package implementing a novel text classifier with visualization tools for Explainable AI :sparkles:
+# :sparkles: A Python package implementing a new model for text classification with visualization tools for Explainable AI :sparkles:
+
+:sushi: **Online live demos:** http://tworld.io/ss3/ :icecream::ice_cream::cake:
+
+<br>
 
 The SS3 text classifier is a novel supervised machine learning model for text classification. SS3 was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ (preprint available [here](https://arxiv.org/abs/1905.08772)).
 
