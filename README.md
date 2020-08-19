@@ -76,8 +76,8 @@ from pyss3.util import Evaluation
 ...
 best_s, best_l, best_p, _ = Evaluation.grid_search(
     clf, x_train, y_train,
-    s=[0.2 , 0.32, 0.44, 0.56, 0.68, 0.8],
-    l=[0.1 , 0.48, 0.86, 1.24, 1.62, 2],
+    s=[0.2, 0.32, 0.44, 0.56, 0.68, 0.8],
+    l=[0.1, 0.48, 0.86, 1.24, 1.62, 2],
     p=[0.5, 0.8, 1.1, 1.4, 1.7, 2],
     k_fold=4
 )
