@@ -16,15 +16,13 @@
 
 <br>
 
-The SS3 text classifier is a novel supervised machine learning model for text classification. SS3 was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ (preprint available [here](https://arxiv.org/abs/1905.08772)).
+The SS3 text classifier is a novel supervised machine learning model for text classification. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ (preprint available [here](https://arxiv.org/abs/1905.08772)). Given its white-box nature, it allows researchers and practitioners to deploy explainable, and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
 **Some virtues of SS3:**
 
 * It has the **ability to naturally explain its rationale**.
-* It is robust to **the class-imbalance problem** since it learns a (special kind of) language model for each class (making the relative difference in the number of documents among classes irrelevant).
 * Naturally supports both, **multinomial and multi-label classification**.
-* Naturally supports **incremental (online) learning** and **incremental classification**.
-* Well suited for classification over **text streams**.
+* Naturally supports **online learning** as well as **text stream (online) classification**.
 * It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
 
 **Note:** this package also incorporates different variations of the SS3 classifier, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://authors.elsevier.com/a/1bQRHcAmyjIcC)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important word n-grams "on the fly".
