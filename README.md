@@ -10,7 +10,7 @@
 
 ---
 
-# :sparkles: A Python package implementing a new model for text classification with visualization tools for Explainable AI :sparkles:
+# A Python package implementing a new model for text classification with visualization tools for Explainable AI
 
 :sushi: **Online live demos:** http://tworld.io/ss3/ :icecream::ice_cream::cake:
 
@@ -21,8 +21,7 @@ The SS3 text classifier is a novel supervised machine learning model for text cl
 **Some virtues of SS3:**
 
 * It has the **ability to naturally explain its rationale**.
-* Naturally supports both, **multinomial and multi-label classification**.
-* Naturally supports **online learning** as well as **text stream (online) classification**.
+* Naturally supports **online learning** as well as **(online) text stream classification**.
 * It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
 
 **Note:** this package also incorporates different variations of the SS3 classifier, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://authors.elsevier.com/a/1bQRHcAmyjIcC)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important word n-grams "on the fly".
