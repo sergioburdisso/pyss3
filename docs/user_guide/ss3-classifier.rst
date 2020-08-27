@@ -4,19 +4,10 @@
 The SS3 Classification Model
 ****************************
 
-The SS3 text classifier is a novel supervised machine learning model for text classification.
+The SS3 text classifier is a novel supervised machine learning model for text classification which has the **ability to naturally explain its rationale**. It was originally introduced in Section 3 of the paper `"A text classification framework for simple and effective early depression detection over social media streams" <https://dx.doi.org/10.1016/j.eswa.2019.05.023>`__ (preprint available `here <https://arxiv.org/abs/1905.08772>`__). Given its white-box nature, it allows researchers and practitioners to deploy explainable, and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
-Some virtues of SS3:
-
-* It has the **ability to naturally explain its rationale**.
-* It is robust to **the class-imbalance problem** since it learns a (special kind of) language model for each class (making the relative difference in the number of documents among classes irrelevant).
-* Naturally supports both, **multinomial and multi-label classification**.
-* Naturally supports **incremental (online) learning** and **incremental classification**.
-* Well suited for classification over **text streams**.
-* It is not an "obscure" model since it **only has 3 semantically well-defined hyperparameters** which are easy-to-understand.
-
-
-PySS3 implements the original SS3 definition as well as different variations of it, such as the one introduced in `"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams" <https://authors.elsevier.com/a/1bQRHcAmyjIcC>`__ (preprint available `here <https://arxiv.org/abs/1911.06147>`__) which allows SS3 to recognize important word n-grams "on the fly".
+.. note::
+    PySS3 also incorporates different variations of the original model, such as the one introduced in `"t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams" <https://authors.elsevier.com/a/1bQRHcAmyjIcC>`__ (preprint available `here <https://arxiv.org/abs/1911.06147>`__) which allows SS3 to recognize important variable-length word n-grams "on the fly".
 
 
 .. _ss3-introduction:
@@ -24,8 +15,8 @@ PySS3 implements the original SS3 definition as well as different variations of 
 Introduction
 ============
 
-SS3 was originally introduced in Section 3 of the paper `"A text classification framework for simple and effective early depression detection over social media streams" <https://dx.doi.org/10.1016/j.eswa.2019.05.023>`__ (preprint available `here <https://arxiv.org/abs/1905.08772>`__).  As it is described in more detail in this paper, SS3 first builds a dictionary of words for each category during the training phase, in which the frequency of each word is stored.
-Then, using these word frequencies, and during the classification stage, it calculates a value for each word using a function :math:`gv(w,c)` to value words in relation to each category (:math:`gv` stands for "global value" of a word). :math:`gv` takes a word :math:`w` and a category :math:`c` and outputs a number in the interval [0,1] representing the degree of confidence with which :math:`w` is believed to **exclusively** belong to :math:`c`. For instance, suppose the categories are :math:`travel, technology, business`, and :math:`food`, we could have:
+As it is described in more detail in original paper, SS3 first builds a dictionary of words for each category during the training phase, in which the frequency of each word is stored.
+Then, using these word frequencies, and during the classification stage, it calculates a value for each word using a function :math:`gv(w,c)` to value words in relation to each category (:math:`gv` stands for "global value" of a word). :math:`gv` takes a word :math:`w` and a category :math:`c` and outputs a number in the interval [0,1] representing the degree of confidence with which :math:`w` is believed to **exclusively** belong to :math:`c`. For instance, suppose the categories are :math:`travel, technology, business`, and :math:`food`. After training, SS3 would learn to value words like "apple" and "the" as follows:
 
 .. math::
     gv(apple, travel) = 0;\ \ \ &gv(the, travel) = 0;\\
