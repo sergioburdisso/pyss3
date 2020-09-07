@@ -18,7 +18,7 @@
 
 The SS3 text classifier is a novel supervised machine learning model for text classification which has the **ability to naturally explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ (preprint available [here](https://arxiv.org/abs/1905.08772)). Given its white-box nature, it allows researchers and practitioners to deploy explainable, and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
-**Note:** this package also incorporates different variations of the original model, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://authors.elsevier.com/a/1bQRHcAmyjIcC)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important variable-length word n-grams "on the fly".
+**Note:** this package also incorporates different variations of the original model, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://doi.org/10.1016/j.patrec.2020.07.001)_ (preprint available [here](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important variable-length word n-grams "on the fly".
 
 ## What is PySS3?
 
