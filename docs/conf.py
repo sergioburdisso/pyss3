@@ -29,7 +29,7 @@ with open(__init_file__, encoding="utf-8") as __init__py:
 # -- Project information -----------------------------------------------------
 
 project = 'PySS3'
-copyright = '{year}, Sergio Burdisso (sergio.burdisso@gmail.com)'.format(
+copyright = '{year}, The PySS3 Development Team'.format(
     year=datetime.now().year
 )
 author = 'Sergio Burdisso'
