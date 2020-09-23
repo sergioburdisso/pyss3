@@ -36,7 +36,7 @@ which implements the classifier using a clear API (very similar to that of `skle
     y_pred = clf.predict(x_test)
 ````
 
-Also, this class provides a handful of other useful methods, such as, for instance, [``classify_multilabel``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel) to provide [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification) support: 
+Also, this class provides a handful of other useful methods, such as, for instance, [``extract_insight()``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to [extract the text fragments involved in the classification decision](https://pyss3.readthedocs.io/en/latest/tutorials/extract-insight.html) (allowing you to better understand the rationale behind the model’s predictions) or [``classify_multilabel()``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel) to provide [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification) support: 
 
 ````python
     doc = "Liverpool CEO Peter Moore on Building a Global Fanbase"
@@ -47,7 +47,6 @@ Also, this class provides a handful of other useful methods, such as, for instan
     # multi-label classification
     labels = clf.classify_multilabel(doc)  # ['business', 'sports']
 ````
-or [``extract_insight``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to allow you to [extract the text fragments involved in the classification decision](https://pyss3.readthedocs.io/en/latest/tutorials/extract-insight.html).
 
 ### :point_right: The ``Live_Test`` class
 
