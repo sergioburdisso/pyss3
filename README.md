@@ -104,10 +104,6 @@ Simply use:
 ```console
 pip install pyss3
 ```
-Or, if you already have installed an old version, update it with:
-```console
-pip install -U pyss3
-```
 
 ## Want to contribute to this Open Source project? :sparkles::octocat::sparkles:
 
