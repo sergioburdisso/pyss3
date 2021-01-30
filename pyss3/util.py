@@ -1919,7 +1919,7 @@ class Preproc:
         # cleaning up the text
         if not dots:
             return (
-                " ".join(re.findall("[a-zA-Z\n]{%d,}" % min_len, text))
+                " ".join(re.findall(r"[\w\n]{%d,}" % min_len, text))
             ).lower()
         else:
             text = REGEX_DOTS_CHARS.sub(
@@ -1927,7 +1927,7 @@ class Preproc:
                 REGEX_DOTS_CHAINED.sub(r"\1.", text)
             ) + "."
             return (
-                " ".join(re.findall(r"[a-zA-Z\n]{%d,}|\." % min_len, text))
+                " ".join(re.findall(r"[\w\n]{%d,}|\." % min_len, text))
             ).lower()
 
 
