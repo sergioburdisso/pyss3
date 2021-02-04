@@ -670,6 +670,7 @@ class SS3Prompt(Cmd):
                 Print.error(ERROR_NSD % test_path)
                 return
         else:
+            Server.set_model(CLF)
             Server.set_testset([], [])
 
         Server.serve(CLF, quiet=not verbose)
