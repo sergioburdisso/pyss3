@@ -200,7 +200,7 @@
       <a href="#" data-target="slide-out" class="top-nav sidenav-trigger waves-effect waves-light circle hide-on-large-only"><i class="material-icons">menu</i></a>
     </div>
     <ul id="slide-out" class="sidenav sidenav-fixed" ng-show="keys(info.docs).length">
-      <li><a class="subheader">Test Documents<span ng-if="!info.docs.hasOwnProperty('')">by Category</span></a></li>
+      <li><a class="subheader">Test Documents<span ng-if="get_n_test_cat() > 1"> by Class</span></a></li>
       <ul class="collapsible">
         <li ng-repeat="c in keys(info.docs)" ng-cloak ng-class="{active:keys(info.docs).length == 1}">
           <div class="collapsible-header" ng-if="!info.docs.hasOwnProperty('')"><i class="material-icons right" ng-style="{'color': get_cat_rgb(info.categories.indexOf(c))}">
@@ -230,9 +230,10 @@
           </div>
           <div class="col s12 m4 xl5 offset-xl1">
             <div class="buysellads-header center-on-small-only" ng-cloak>
-              <h4 class="light" ng-cloak><b>MODEL:</b> {{info.model_name|uppercase}}</h4>
+              <h5 class="light" ng-cloak><b>MODEL INFO</b></h5>
+              Name: <span class="blue-text text-darken-2">{{info.model_name}};</span><br>
               Hyperparameters: <span class="blue-text text-darken-2">σ={{info.hps[0]}}; λ={{info.hps[1]}}; ρ={{info.hps[2]}}; α={{info.hps[3]}};</span><br>
-              Categories: <span class="blue-text text-darken-2">{{info.categories[0]}}<span ng-repeat="c in info.categories" ng-if="!$first && !$last">, {{c}}</span></span>
+              Class labels: <span class="blue-text text-darken-2">{{info.categories[0]}}<span ng-repeat="c in info.categories" ng-if="!$first && !$last">; {{c}}</span></span>
             </div>
           </div>
         </div>
@@ -313,10 +314,9 @@
             </div>
             <div class="row animate-show-3d-top" ng-show="ss3" style="margin-bottom: 0">
               <hr>
-              <h5 class="blue-text">Visual Description<span ng-if="scat != -1"> (for {{ss3.ci[scat]}})</span></h5>
-              <div style="padding-bottom: 50px"><i class="material-icons small blue-text">live_help</i> Select the <b>description level and topic</b> using the Level and Topic options below. Additionally, click on individual words to see their  <b><span class="math">gv</span> and <span class="math">lv</span> values and <span class="math">frequency</span>.</b></div>
+              <h5 class="teal-text text-lighten-1">Explanation:<span ng-if="scat != -1"> (for {{ss3.ci[scat]}})</span></h5>
               <div class="col l9 s12">
-                <h5 style="display: inline" class="blue-text text-darken-2">Level: </h5>
+                <h5 style="display: inline" class="teal-text text-lighten-1">Level: </h5>
                 <label>
                   <input type="checkbox" class="_filled-in" checked="checked" ng-model="levels[0]"/>
                   <span>Paragraphs</span>
@@ -375,7 +375,7 @@
                 </div>
               </div>
               <div class="col l3 s12">
-                <h5 class="blue-text text-darken-2">Topic: </h5>
+                <h5 class="teal-text text-lighten-1">Class: </h5>
                 <div class="menu_item waves-effect waves-red" ng-class="{active:scat==-1}" style="display: block">
                   <a href="" class="menu_item" ng-click="select_cat_menu(-1)" style="border-width: 7px; border-color: grey">
                     [MIXED]
@@ -388,10 +388,11 @@
                 </div>
               </div>
             </div>
+            <div class="row" ng-show="ss3"  style="opacity: 0.5"><i class="material-icons teal-text text-lighten-1" style="font-size: 1rem;">live_help</i> Using the "Level" and "Class" options above you can set the desired <b>class</b> and <b>detail level</b> for the explanation. Additionally, you can click on individual words to see their <span class="math">gv</span>, <span class="math">lv</span>, and <span class="math">frequency</span> values at the bottom. Finally, enabling the <b>advanced</b> mode will show an interactive line chart illustrating how the model's confidence value changes as the document is processed.</b></div>
             <div class="row" style="margin-bottom: 0" ng-show="ss3">
               <div class="col l9 s12">
                 <div class="row right" style="margin-bottom: 0">
-                  <span style="padding-right: 30px">Advanced</span>
+                  <span style="padding-right: 30px"><b>Advanced</b></span>
                   <span class="switch">
                     <label>
                       Off
@@ -406,7 +407,7 @@
               </div>
             </div>
             <div class="row" ng-show="ss3" id="chart-section">
-              <div class="input-field m4 col s12" ng-show="show_chart"><h5>Interactive Line Chart</h5></div>
+              <div class="input-field m4 col s12" ng-show="show_chart"><h5 class="teal-text text-lighten-1">Interactive Line Chart</h5></div>
               <div class="input-field m4 col s12" ng-show="show_chart"></div>
               <div class="input-field m4 col s12" ng-show="show_chart">
                 <select ng-model="chart.level" ng-change="on_chart_change()">

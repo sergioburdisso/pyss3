@@ -210,6 +210,10 @@ app.controller("mainCtrl", function($scope) {
     return c;
   }
 
+  $scope.get_n_test_cat = function(){
+    return Object.keys($scope.info.docs).length;
+  }
+
   $scope.is_cat_active = function (cat_info) {
     if ($scope.ss3 == null || cat_info == null)
       return false;
