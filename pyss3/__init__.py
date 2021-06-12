@@ -594,7 +594,7 @@ class SS3:
             sizes.append((icat, self.__get_category_length__(icat)))
         return sorted(sizes, key=lambda v: v[1])[-1][0]
 
-    def __get_vocabularies__(self, icat, vocab, preffix, n_grams, output):
+    def __get_vocabularies__(self, icat, vocab, preffix, n_grams, output, ngram_char="_"):
         """Get category list of n-grams with info."""
         senq_ilen = len(preffix)
         get_name = self.get_word
@@ -608,14 +608,14 @@ class SS3:
             if (self.__cv__(seq, icat) > 0):
                 output[senq_ilen].append(
                     (
-                        "_".join([get_name(wi) for wi in seq]),
+                        ngram_char.join([get_name(wi) for wi in seq]),
                         vocab[word][FR],
                         self.__gv__(seq, icat),
                         self.__cv__(seq, icat)
                     )
                 )
             self.__get_vocabularies__(
-                icat, vocab[word][NEXT], seq, n_grams, output
+                icat, vocab[word][NEXT], seq, n_grams, output, ngram_char
             )
 
     def __get_category_vocab__(self, icat):
@@ -1514,6 +1514,107 @@ class SS3:
         """
         for icat in xrange(len(self.__categories__)):
             self.__save_cat_vocab__(icat, path, n_grams)
+
+    def save_wordcloud(self, cat, top_n=100, n_grams=1, path=None, size=1024,
+                       shape="circle", palette="cartocolors.qualitative.Prism_2", color=None,
+                       background_color="white", plot=False):
+        """
+        Create a word cloud and save it to disk as an image.
+
+        The word cloud shows the top-n words selected by the confidence value learned by the model.
+        In addition, individual words are sized by the learned value.
+
+        :param cat: the category label
+        :type cat: str
+        :param top_n: number of words to be taken into account.
+                    For instance, top 50 words (default: 100).
+        :type top_n: int
+        :param n_grams: indicates the word n-grams to be used to create the cloud. For instance,
+                        1 for word cloud, 2 for bigrams cloud, 3 for trigrams cloud, and so on
+                        (default: 1).
+        :type n_grams: int
+        :param path: the path to the image file in which to store the word cloud
+                     (e.g. "../../my_wordcloud.jpg").
+                     If no path is given, by default, the image file will be stored in the current
+                     working directory as "wordcloud_topN_CAT(NGRAM).png" where N is the `top_n`
+                     value, CAT the category label and NGRAM indicates what n-grams  populate
+                     the could.
+        :type path: str
+        :param size: the size of the image in pixels (default: 1024)
+        :type size: int
+        :param shape: the shape of the cloud (a FontAwesome icon name).
+                      The complete list of allowed icon names are available at
+                      https://fontawesome.com/v5.15/icons?d=gallery&p=1&m=free
+                      (default: "circle")
+        :type shape: str
+        :param palette: the color palette used for coloring words by giving the
+                        palettable module and palette name
+                        (list available at https://jiffyclub.github.io/palettable/)
+                        (default: "cartocolors.qualitative.Prism_2")
+        :type palette: str
+        :param color: a custom color for words (if given, overrides the color palette).
+                      The color string could be the hex color code (e.g. "#FF5733") or the HTML
+                      color name (e.g. "tomato"). The complete list of HTML color names is available
+                      at https://www.w3schools.com/colors/colors_names.asp
+        :type color: str
+        :param background_color: the background color as either the HTML color name or the hex code
+                                 (default: "white").
+        :type background_color: str
+        :param plot: whether or not to also plot the cloud (after saving the file)
+                     (default: False)
+        :type plot: bool
+        :raises: InvalidCategoryError, ValueError
+        """
+        if self.get_category_index(cat) == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
+        if top_n < 1 or n_grams < 1 or size < 1:
+            raise ValueError("`top_n`, `n_grams`, and `size` arguments must be positive integers")
+
+        import stylecloud
+
+        icat = self.get_category_index(cat)
+        category = self.__categories__[icat]
+        vocab = category[VOCAB]
+        vocabularies_out = [[] for _ in xrange(n_grams)]
+
+        self.__get_vocabularies__(icat, vocab, [], n_grams, vocabularies_out, "+")
+
+        ilen = n_grams - 1
+
+        if top_n < 1 or not vocabularies_out[ilen]:
+            Print.info("\t[ empty word could: no %d-grams to be shown ]" % n_grams)
+            return
+
+        terms = dict((t, cv)
+                     for t, _, _, cv
+                     in sorted(vocabularies_out[ilen], key=lambda k: -k[-1])[:top_n])
+
+        if path is None:
+            term = ["", "(bigrams)", "(trigrams)"][ilen] if ilen <= 2 else "(%d-grams)" % (ilen + 1)
+            path = "wordcloud_top%d_%s%s.png" % (top_n, cat, term)
+
+        stylecloud.gen_stylecloud(
+            terms,
+            icon_name="fas fa-%s" % shape,
+            output_name=path,
+            palette=palette,
+            colors=color,
+            background_color=background_color,
+            size=size
+        )
+        Print.info("\t[ word cloud stored in '%s' ]" % path)
+
+        if plot:
+            import matplotlib.pyplot as plt
+            import matplotlib.image as mpimg
+
+            wc = mpimg.imread(path)
+
+            plt.figure(figsize=(size / 100., size / 100.))
+            plt.imshow(wc, interpolation='bilinear')
+            plt.axis("off")
+            plt.show()
 
     def update_values(self, force=False):
         """
