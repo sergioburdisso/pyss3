@@ -72,4 +72,7 @@ if __name__ == "__main__":
                          'tqdm>=4.8.4',
                          'matplotlib',
                          'iterative-stratification'],
+          extras_require={
+              ':python_version >= "3"': ['stylecloud'],
+          },
           entry_points={'console_scripts': ['pyss3=pyss3.cmd_line:main']})
