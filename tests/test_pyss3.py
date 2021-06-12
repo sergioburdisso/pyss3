@@ -17,6 +17,7 @@ pyss3.set_verbosity(VERBOSITY.QUIET)
 
 DATASET_FOLDER = "dataset"
 DATASET_MULTILABEL_FOLDER = "dataset_ml"
+PYTHON3 = sys.version_info[0] >= 3
 
 dataset_path = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
 dataset_multilabel_path = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
@@ -346,6 +347,20 @@ def test_pyss3_ss3(mockers):
     perform_tests_on(clf.sn, 1)
     perform_tests_on(clf.cv, 0, "video games", "science&technology")
     perform_tests_on(clf.gv, 0, "video games", "science&technology")
+
+    # world cloud tests
+    with pytest.raises(pyss3.InvalidCategoryError):
+        clf.save_wordcloud("xxx")
+    with pytest.raises(ValueError):
+        clf.save_wordcloud("sports", top_n=0)
+    with pytest.raises(ValueError):
+        clf.save_wordcloud("sports", n_grams=0)
+    with pytest.raises(ValueError):
+        clf.save_wordcloud("sports", size=0)
+
+    if PYTHON3:
+        clf.save_wordcloud("science&technology", n_grams=3)  # empty cloud
+        clf.save_wordcloud("science&technology", plot=True)
 
     # cv_m=STR_NORM_GV, sg_m=STR_XAI
     clf = SS3(

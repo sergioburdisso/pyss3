@@ -1582,7 +1582,7 @@ class SS3:
 
         ilen = n_grams - 1
 
-        if top_n < 1 or not vocabularies_out[ilen]:
+        if not vocabularies_out[ilen]:
             Print.info("\t[ empty word could: no %d-grams to be shown ]" % n_grams)
             return
 
