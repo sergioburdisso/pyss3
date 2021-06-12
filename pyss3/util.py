@@ -1412,7 +1412,7 @@ class Evaluation:
 
         s, l, p, a = clf.get_hyperparameters()
         categories = clf.get_categories()
-        x_train, y_train = np.array(x_train), np.array(y_train)
+        x_train, y_train = np.array(x_train, dtype=object), np.array(y_train, dtype=object)
         skf = kfold_split(n_splits=k)
         pbar_desc = "k-fold validation"
         progress_bar = tqdm(total=k, desc=pbar_desc)
@@ -1613,7 +1613,7 @@ class Evaluation:
         else:  # if k-fold
             Print.verbosity_region_begin(VERBOSITY.NORMAL)
 
-            x_data, y_data = np.array(x_data), np.array(y_data)
+            x_data, y_data = np.array(x_data, dtype=object), np.array(y_data, dtype=object)
             kfold_split = MultilabelStratifiedKFold if multilabel else StratifiedKFold
             skf = kfold_split(n_splits=k_fold)
             categories = clf.get_categories()

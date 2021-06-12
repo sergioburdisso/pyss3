@@ -1897,7 +1897,7 @@ class SS3:
             linewidth=2, color="#7f7d7e"
         )
         plt.plot(
-            x, y_gv, "g-", label="global value ($gv$)",
+            x, y_gv, "-", label="global value ($gv$)",
             linewidth=4, color="#2ca02c")
         plt.legend()
 
