@@ -160,6 +160,7 @@ Further Readings
    tutorials/movie-review
    tutorials/extract-insight
    tutorials/custom-preprocessing
+   tutorials/wordcloud
 
 .. toctree::
    :maxdepth: 3
