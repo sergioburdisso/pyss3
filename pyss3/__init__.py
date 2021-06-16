@@ -346,18 +346,21 @@ class SS3:
         except TypeError:
             return 0
 
-    def __apply_fn__(self, fn, ngram, cat):
+    def __apply_fn__(self, fn, ngram, cat=None):
         """Private method used by gv, lv, sn, sg functions."""
-        icat = self.get_category_index(cat)
-        if icat == IDX_UNKNOWN_CATEGORY:
-            raise InvalidCategoryError
-
         if ngram.strip() == '':
             return 0
 
         ngram = [self.get_word_index(w)
                  for w in re.split(self.__word_delimiter__, ngram)
                  if w]
+
+        if cat is None:
+            return fn(ngram) if IDX_UNKNOWN_WORD not in ngram else 0
+
+        icat = self.get_category_index(cat)
+        if icat == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
         return fn(ngram, icat) if IDX_UNKNOWN_WORD not in ngram else 0
 
     def __summary_ops_are_pristine__(self):
