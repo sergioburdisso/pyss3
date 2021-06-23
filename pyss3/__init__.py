@@ -9,6 +9,7 @@ import os
 import re
 import json
 import errno
+import numbers
 import numpy as np
 
 from io import open
@@ -2638,8 +2639,38 @@ class SS3Vectorizer(CountVectorizer):
     __ss3_weight__ = None
     __tf_weight__ = None
 
-    def __init__(self, clf, cat, ss3_weight='only_cat',
-                 tf_weight='raw_count', top_n=None, **kwargs):
+    def __init__(self, clf, cat, ss3_weight='only_cat', tf_weight='raw_count', top_n=None,
+                 **kwargs):
+
+        if clf.get_category_index(cat) == IDX_UNKNOWN_CATEGORY:
+            raise InvalidCategoryError
+
+        if not callable(ss3_weight) and ss3_weight not in WEIGHT_SCHEMES_SS3:
+            raise ValueError("`ss3_weight` argument must be either a custom "
+                             "function or any of the following strings: %s" %
+                             ", ".join(WEIGHT_SCHEMES_SS3))
+        if not callable(tf_weight) and tf_weight not in WEIGHT_SCHEMES_TF:
+            raise ValueError("`tf_weight` argument must be either a custom "
+                             "function or any of the following strings: %s" %
+                             ", ".join(WEIGHT_SCHEMES_TF))
+
+        if top_n is not None:
+            if not isinstance(top_n, numbers.Integral) or top_n <= 0:
+                raise ValueError("`top_n` argument must be either a positive integer or None")
+
+        ss3_n_grams = clf.get_ngrams_length()
+        min_n, max_n = kwargs["ngram_range"] if "ngram_range" in kwargs else (1, 1)
+        if not isinstance(min_n, numbers.Integral) or (
+           not isinstance(max_n, numbers.Integral)) or (min_n > max_n or min_n <= 0):
+            raise ValueError("`ngram_range` (n0, n1) argument must be a valid n-gram range "
+                             "where n0 and n1 are positive integer such that n0 <= n1.")
+        if max_n > ss3_n_grams:
+            Print.warn("`ngram_range` (n0, n1) argument, n1 is greater than the longest n-gram "
+                       "learned by the given SS3 model")
+            min_n, max_n = min(min_n, ss3_n_grams), min(max_n, ss3_n_grams)
+
+        if "dtype" not in kwargs:
+            kwargs["dtype"] = float
 
         self.__clf__ = clf
         self.__icat__ = clf.get_category_index(cat)
@@ -2682,7 +2713,6 @@ class SS3Vectorizer(CountVectorizer):
             vocabulary = kwargs["vocabulary"]
             del kwargs["vocabulary"]
         else:
-            min_n, max_n = kwargs["ngram_range"] if "ngram_range" in kwargs else (1, 1)
             icat = self.__icat__
             vocabularies_out = [[] for _ in range(max_n)]
             clf.__get_vocabularies__(icat, clf.__categories__[icat][VOCAB],
@@ -2693,16 +2723,13 @@ class SS3Vectorizer(CountVectorizer):
                                for t
                                in sorted(vocabularies_out[i_gram], key=lambda k: -k[-1])[:top_n]]
 
-        super(SS3Vectorizer, self).__init__(binary=(tf_weight == "binary"),
-                                            vocabulary=vocabulary,
-                                            **kwargs)
+        super().__init__(binary=(tf_weight == "binary"), vocabulary=vocabulary, **kwargs)
 
-    def fit_transform(self, raw_documents, y=None):
+    def fit_transform(self, raw_documents):
         return self.transform(raw_documents)
 
     def transform(self, raw_documents):
-        dtm = super(SS3Vectorizer, self).transform(raw_documents)
-        dtm.data = dtm.data.astype(float)
+        dtm = super().transform(raw_documents)
 
         # caching in-loop variables
         clf = self.__clf__
