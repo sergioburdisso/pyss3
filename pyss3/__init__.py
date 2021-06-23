@@ -14,7 +14,8 @@ import numpy as np
 from io import open
 from time import time
 from tqdm import tqdm
-from math import pow, tanh
+from math import pow, tanh, log
+from sklearn.feature_extraction.text import CountVectorizer
 from .util import is_a_collection, Print, VERBOSITY, Preproc as Pp
 
 # python 2 and 3 compatibility
@@ -41,6 +42,9 @@ STR_GV, STR_NORM_GV, STR_NORM_GV_XAI = "gv", "norm_gv", "norm_gv_xai"
 
 STR_MODEL_FOLDER = "ss3_models"
 STR_MODEL_EXT = "ss3m"
+
+WEIGHT_SCHEMES_SS3 = ['only_cat', 'diff_all', 'diff_max', 'diff_median', 'diff_mean']
+WEIGHT_SCHEMES_TF = ['binary', 'raw_count', 'term_freq', 'log_norm', 'double_norm']
 
 VERBOSITY = VERBOSITY  # to allow "from pyss3 import VERBOSITY"
 
@@ -2625,6 +2629,101 @@ class SS3:
         :raises: InvalidCategoryError
         """
         return self.__apply_fn__(self.__sn__, ngram, cat)
+
+
+class SS3Vectorizer(CountVectorizer):
+
+    __clf__ = None
+    __icat__ = None
+    __ss3_weight__ = None
+    __tf_weight__ = None
+
+    def __init__(self, clf, cat, ss3_weight='only_cat',
+                 tf_weight='raw_count', top_n=None, **kwargs):
+
+        self.__clf__ = clf
+        self.__icat__ = clf.get_category_index(cat)
+
+        if ss3_weight == WEIGHT_SCHEMES_SS3[0]:    # 'only_cat'
+            self.__ss3_weight__ = lambda cv, icat: cv[icat]
+        elif ss3_weight == WEIGHT_SCHEMES_SS3[1]:  # 'diff_all'
+            self.__ss3_weight__ = lambda cv, icat: cv[icat] - sum([cv[i]
+                                                                  for i in range(len(cv))
+                                                                  if i != icat])
+        elif ss3_weight == WEIGHT_SCHEMES_SS3[2]:  # 'diff_max'
+            self.__ss3_weight__ = lambda cv, icat: cv[icat] - max([cv[i]
+                                                                   for i in range(len(cv))
+                                                                   if i != icat])
+        elif ss3_weight == WEIGHT_SCHEMES_SS3[3]:  # 'diff_median'
+            self.__ss3_weight__ = lambda cv, icat: cv[icat] - sorted(cv)[
+                len(cv) // 2 - int(not (len(cv) % 2))
+            ]
+        elif ss3_weight == WEIGHT_SCHEMES_SS3[4]:  # 'diff_mean'
+            self.__ss3_weight__ = lambda cv, icat: cv[icat] - sum(cv) / float(len(cv))
+        else:
+            self.__ss3_weight__ = ss3_weight
+
+        if "binary" in kwargs and kwargs["binary"]:
+            tf_weight = "binary"
+            del kwargs["binary"]
+
+        if tf_weight in WEIGHT_SCHEMES_TF[:2]:    # 'binary' or 'raw_count'
+            self.__tf_weight__ = lambda freqs, iterm: freqs[iterm]
+        elif tf_weight == WEIGHT_SCHEMES_TF[2]:  # 'term_freq'
+            self.__tf_weight__ = lambda freqs, iterm: freqs[iterm] / np.sum(freqs)
+        elif tf_weight == WEIGHT_SCHEMES_TF[3]:  # 'log_norm'
+            self.__tf_weight__ = lambda freqs, iterm: log(1 + freqs[iterm])
+        elif tf_weight == WEIGHT_SCHEMES_TF[4]:  # 'double_norm'
+            self.__tf_weight__ = lambda freqs, iterm: .5 + .5 * freqs[iterm] / np.max(freqs)
+        else:
+            self.__tf_weight__ = tf_weight
+
+        if "vocabulary" in kwargs:
+            vocabulary = kwargs["vocabulary"]
+            del kwargs["vocabulary"]
+        else:
+            min_n, max_n = kwargs["ngram_range"] if "ngram_range" in kwargs else (1, 1)
+            icat = self.__icat__
+            vocabularies_out = [[] for _ in range(max_n)]
+            clf.__get_vocabularies__(icat, clf.__categories__[icat][VOCAB],
+                                     [], max_n, vocabularies_out, " ")
+            vocabulary = []
+            for i_gram in range(min_n - 1, max_n):
+                vocabulary += [t[0]
+                               for t
+                               in sorted(vocabularies_out[i_gram], key=lambda k: -k[-1])[:top_n]]
+
+        super(SS3Vectorizer, self).__init__(binary=(tf_weight == "binary"),
+                                            vocabulary=vocabulary,
+                                            **kwargs)
+
+    def fit_transform(self, raw_documents, y=None):
+        return self.transform(raw_documents)
+
+    def transform(self, raw_documents):
+        dtm = super(SS3Vectorizer, self).transform(raw_documents)
+        dtm.data = dtm.data.astype(float)
+
+        # caching in-loop variables
+        clf = self.__clf__
+        ss3_weight = self.__ss3_weight__
+        tf_weight = self.__tf_weight__
+        icat = self.__icat__
+        clf_apply = clf.__apply_fn__
+        clf_cv = clf.__classify_ngram__
+        feature_names = self.get_feature_names()
+        indptr, indices, data = dtm.indptr, dtm.indices, dtm.data
+
+        for i_row in range(dtm.shape[0]):
+            doc_freqs = data[indptr[i_row]:indptr[i_row + 1]].copy()
+            for offset in range(indptr[i_row + 1] - indptr[i_row]):
+                i_col = indptr[i_row] + offset
+                term = feature_names[indices[i_col]]
+                term_cv = clf_apply(clf_cv, term, None)
+
+                data[i_col] = tf_weight(doc_freqs, i_col) * ss3_weight(term_cv, icat)
+
+        return dtm  # document-term matrix
 
 
 class EmptyModelError(Exception):
