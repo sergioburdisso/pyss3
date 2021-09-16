@@ -224,12 +224,11 @@ def perform_tests_on(fn, value, ngram="chicken", cat="food"):
     assert round(fn("xxx", cat), 4) == 0
     assert round(fn("the xxx chicken", cat), 4) == 0
     assert round(fn("", cat), 4) == 0
+    assert round(fn("", ""), 4) == 0
     with pytest.raises(pyss3.InvalidCategoryError):
         fn("chicken", "xxx")
     with pytest.raises(pyss3.InvalidCategoryError):
         fn("chicken", "")
-    with pytest.raises(pyss3.InvalidCategoryError):
-        fn("", "")
 
 
 def test_pyss3_functions():
@@ -359,8 +358,8 @@ def test_pyss3_ss3(mockers):
         clf.save_wordcloud("sports", size=0)
 
     if PYTHON3:
-        clf.save_wordcloud("science&technology", n_grams=3)  # empty cloud
-        clf.save_wordcloud("science&technology", plot=True)
+        clf.save_wordcloud("science&technology", n_grams=3, path="./tests/ss3_models/wc.png")
+        clf.save_wordcloud("science&technology", plot=True, path="./tests/ss3_models/wc.png")
 
     # cv_m=STR_NORM_GV, sg_m=STR_XAI
     clf = SS3(
