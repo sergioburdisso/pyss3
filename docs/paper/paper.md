@@ -139,7 +139,7 @@ Which will print the following (fragment, confidence value) pair:
 Kiev, Ukraine on Saturday). Meanwhile Moore has',  0.97)
 ````
 
-This pair indicates the document was classified as "sports", mainly due to our model finding this fragment as belonging to "sports" with a confidence value of 0.97.^[Interested readers may refer to the "getting the text fragments involved in the classification decision" tutorial [available online](https://pyss3.rtfd.io/en/latest/tutorials/extract-insight.html)].
+This pair indicates the document was classified as "sports", mainly due to our model finding this fragment as belonging to "sports" with a confidence value of 0.97.^[Interested readers may refer to the "getting the text fragments involved in the classification decision" tutorial [available online](https://pyss3.rtfd.io/en/latest/tutorials/extract-insight.html)]
 
 ![Live Test screenshot. On the left side, the list of test documents grouped by category is shown along with the percentage of success.
 Note the `doc_2` document is marked with an exclamation mark (!); this mark indicates it was misclassified, which eases error analysis.

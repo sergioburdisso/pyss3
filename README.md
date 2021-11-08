@@ -10,13 +10,13 @@
 
 ---
 
-# A Python package implementing a new model for text classification with visualization tools for Explainable AI
+# A Python package implementing a new simple and interpretable model for text classification
 
 :sushi: **Online live demos:** http://tworld.io/ss3/ :icecream::ice_cream::cake:
 
 <br>
 
-The SS3 text classifier is a novel supervised machine learning model for text classification which has the **ability to naturally explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ ([arXiv preprint](https://arxiv.org/abs/1905.08772)). Given its white-box nature, it allows researchers and practitioners to deploy explainable, and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
+The SS3 text classifier is a novel and simple supervised machine learning model for text classification which is interpretable, that is, it has the **ability to naturally (self)explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ ([arXiv preprint](https://arxiv.org/abs/1905.08772)). Given its white-box nature, it allows researchers and practitioners to deploy interpretable (i.e. self-explainable) and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
 **Note:** this package also incorporates different variations of the original model, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://doi.org/10.1016/j.patrec.2020.07.001)_ ([arXiv preprint](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important variable-length word n-grams "on the fly".
 
@@ -111,8 +111,6 @@ Thanks for your interest in the project, you're ![Awesome](https://cdn.rawgit.co
 Any kind of help is very welcome (Code, Bug reports, Content, Data, Documentation, Design, Examples, Ideas, Feedback, etc.),  Issues and/or Pull Requests are welcome for any level of improvement, from a small typo to new features, help us make PySS3 better :+1:
 
 Remember that you can use the "Edit" button ('pencil' icon) up the top to [edit any file of this repo directly on GitHub](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-your-repository).
-
-Also, if you star this repo (:star2:), you would be helping PySS3 to gain more visibility and reach the hands of people who may find it useful (repository lists and search results are typically ordered by number of stars).
 
 Finally, in case you're planning to create a **new Pull Request**, for committing to this repo, we follow the "seven rules of a great Git commit message" from ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/), so make sure your commits follow them as well.
 
