@@ -7,6 +7,18 @@
 Welcome to PySS3's documentation!
 =================================
 
+The SS3 text classifier is a novel and simple supervised machine learning model for text
+classification which is interpretable, that is, it has the **ability to naturally (self)explain its rationale**.
+It was originally introduced in Section 3 of the paper
+* `"A text classification framework for simple and effective early depression detection over social media streams" <https://dx.doi.org/10.1016/j.eswa.2019.05.023>`__ *
+(`arXiv preprint <https://arxiv.org/abs/1905.08772>`__).
+This simple model obtained the best and 2nd-best results, consecutively, in the last three editions of the
+`CLEF's eRisk lab <https://erisk.irlab.org/>`__ among all participating models
+[`Burdisso et al. 2019 <http://ceur-ws.org/Vol-2380/paper_103.pdf>`__;
+`Loyola et al. 2021 <http://ceur-ws.org/Vol-2936/paper-81.pdf>`__].
+Given its white-box nature, it allows researchers and practitioners to deploy interpretable (i.e. self-explainable)
+and therefore more reliable, models for text classification (which could be especially useful for those working with
+classification problems by which people's lives could be somehow affected).
 
 `PySS3`_ is a Python package that allows you to work with :ref:`ss3-classifier` in a very
 straightforward, interactive and visual way. In addition to the
