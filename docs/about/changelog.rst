@@ -6,6 +6,43 @@ Change Log
 
 All notable changes to PySS3 will be documented here.
 
+[0.6.4] 2021-01-30
+==================
+
+Fixed
+-----
+
+- Quick fix of default compatibility with foreign languages (`#15 <https://github.com/sergioburdisso/pyss3/issues/15>`__).
+
+
+[0.6.3] 2020-07-17
+==================
+
+Fixed
+-----
+
+- Patches issue `#11 <https://github.com/sergioburdisso/pyss3/issues/11>`__.
+
+
+[0.6.1] 2020-05-26
+==================
+
+Added
+-----
+
+- ``Dataset.load_from_files_multilabel()`` can load documents with no
+  labels as well (`31251f8 <https://github.com/sergioburdisso/pyss3/commit/31251f8>`__).
+
+- A ``set_testset_from_files_multilabel()`` function was added to the
+  ``Live_Test`` class. This function allows loading multilabel
+  datasets from disk Live Test server (`0ddbd6a <https://github.com/sergioburdisso/pyss3/commit/0ddbd6a>`__).
+
+Fixed
+-----
+
+- Fixed a bug in SS3 hyperparameter initialization (`e2e72f9 <https://github.com/sergioburdisso/pyss3/commit/e2e72f9>`__).
+
+
 [0.6.0] 2020-05-24
 ==================
 
