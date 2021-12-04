@@ -29,11 +29,23 @@ Given its white-box nature, it allows researchers and practitioners to deploy in
 
 ### :point_right: The ``SS3`` class
 
-which implements the classifier using a clear API (very similar to that of `sklearn`'s models):
+which implements the classifier using a clear API. For instance, let's first load [one of the tutorial](https://pyss3.rtfd.io/en/latest/tutorials/movie-review.html)'s dataset:
+
+```python
+from pyss3.util import Dataset
+
+url = "https://github.com/sergioburdisso/pyss3/raw/master/examples/datasets/movie_review.zip"
+
+x_train, y_train = Dataset.load_from_url(url, "train")
+x_test, y_test = Dataset.load_from_url(url, "test")
+```
+
+Now let's train our first SS3 model! note that the API is very similar to that of `sklearn`'s models:
+
 ````python
     from pyss3 import SS3
+
     clf = SS3()
-    ...
     clf.fit(x_train, y_train)
     y_pred = clf.predict(x_test)
 ````
@@ -55,11 +67,10 @@ Also, this class provides a handful of other useful methods, such as, for instan
 which allows you to interactively test your model and visually see the reasons behind classification decisions, **with just one line of code**:
 ```python
     from pyss3.server import Live_Test
-    from pyss3 import SS3
 
     clf = SS3()
-    ...
     clf.fit(x_train, y_train)
+
     Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
 ```
 As shown in the image below, this will open up, locally, an interactive tool in your browser which you can use to (live) test your models with the documents given in `x_test` (or typing in your own!). This will allow you to visualize and understand what your model is actually learning.
@@ -74,7 +85,7 @@ This is probably one of the most useful components of PySS3. As the name may sug
 
 ```python
 from pyss3.util import Evaluation
-...
+
 best_s, best_l, best_p, _ = Evaluation.grid_search(
     clf, x_train, y_train,
     s=[0.2, 0.32, 0.44, 0.56, 0.68, 0.8],
