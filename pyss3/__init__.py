@@ -2634,7 +2634,7 @@ class SS3:
 
 class SS3Vectorizer(CountVectorizer):
     r"""
-    Convert a collection of text documents to a document-term matrix weighted using a given SS3 model.
+    Convert a collection of text documents to a document-term matrix weighted using an SS3 model.
 
     The weight of a term t in a document d in relation to category c is calculated by multiplying a
     term frequency weight (tf_weight) with an SS3-based weight (ss3_weight), as follows:

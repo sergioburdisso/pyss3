@@ -1680,7 +1680,7 @@ class Dataset:
             zipfile.extractall(path=Dataset.__tmp_dataset_path__)
 
         tmp_path = Dataset.__tmp_dataset_path__
-        if not path.exists(path.join(tmp_path, inner_path)) and len(listdir(tmp_path)) > 0:
+        if len(listdir(tmp_path)) == 1:
             Dataset.__tmp_dataset_path__ = path.join(tmp_path, listdir(tmp_path)[0])
 
         return path.join(Dataset.__tmp_dataset_path__, inner_path)

@@ -10,10 +10,12 @@ import pytest
 import pyss3
 
 PY3 = sys.version_info[0] >= 3
+BASE_PATH = path.abspath(path.dirname(__file__))
 DATASET_FOLDER = "dataset_mr"
 DATASET_MULTILABEL_FOLDER = "dataset_ml"
-DATASET_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_FOLDER)
-DATASET_MULTILABEL_PATH = path.join(path.abspath(path.dirname(__file__)), DATASET_MULTILABEL_FOLDER)
+DATASET_ZIP = path.join(BASE_PATH, DATASET_FOLDER + ".zip")
+DATASET_PATH = path.join(BASE_PATH, DATASET_FOLDER)
+DATASET_MULTILABEL_PATH = path.join(BASE_PATH, DATASET_MULTILABEL_FOLDER)
 TMP_FOLDER = "tests/ss3_models/"
 
 
@@ -282,3 +284,18 @@ def test_dataset():
     assert len(y_train) == len(y_train) and len(y_train) == 20
     assert y_train[:8] == [[], ['toxic', 'severe_toxic', 'obscene', 'insult'],
                            [], [], [], [], [], ['toxic']]
+    
+    # tests for `Dataset.load_from_url`
+    from six.moves import urllib
+    # spoofing the original `urlopen` method
+    urllib.request.urlopen = lambda p: open(p, 'rb')
+
+    x_data_u, y_data_u = Dataset.load_from_url(DATASET_ZIP)
+    # forcing to use of the cache
+    x_data_u, y_data_u = Dataset.load_from_url(DATASET_ZIP)
+    x_data, y_data = Dataset.load_from_files(DATASET_PATH)
+
+    assert len(x_data_u) == len(x_data) and len(y_data_u) == len(y_data)
+
+    with pytest.raises(FileNotFoundError):
+        x_data_u, y_data_u = Dataset.load_from_url(DATASET_ZIP, 'xxx')
