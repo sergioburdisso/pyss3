@@ -1653,6 +1653,38 @@ class Evaluation:
 class Dataset:
     """A helper class with methods to read datasets from disk."""
 
+    # temporary path to store downloaded datasets
+    __tmp_dataset_url__ = None
+    __tmp_dataset_path__ = None
+
+    @staticmethod
+    def __download_dataset_from_url__(zip_url, inner_path):
+        """Download and extract a zipped dataset from an url."""
+        if inner_path is None:
+            inner_path = ''
+
+        # download only if it hasn't been previously downloaded
+        if Dataset.__tmp_dataset_url__ != zip_url:
+            import tempfile
+            from six.moves import urllib
+            from io import BytesIO
+            from zipfile import ZipFile
+
+            Dataset.__tmp_dataset_url__ = zip_url
+            Dataset.__tmp_dataset_path__ = tempfile.TemporaryDirectory().name
+
+            Print.info("downloading zip file...")
+            http_response = urllib.request.urlopen(zip_url)
+            zipfile = ZipFile(BytesIO(http_response.read()))
+            Print.info("extracting zip file...")
+            zipfile.extractall(path=Dataset.__tmp_dataset_path__)
+
+        tmp_path = Dataset.__tmp_dataset_path__
+        if not path.exists(path.join(tmp_path, inner_path)) and len(listdir(tmp_path)) > 0:
+            Dataset.__tmp_dataset_path__ = path.join(tmp_path, listdir(tmp_path)[0])
+
+        return path.join(Dataset.__tmp_dataset_path__, inner_path)
+
     @staticmethod
     def load_from_files(data_path, folder_label=True, as_single_doc=False, sep_doc='\n'):
         r"""
@@ -1870,6 +1902,70 @@ class Dataset:
         return x_data, y_data
 
     # TODO: save_to_files(x_train, y_train, x_test, y_test)
+
+    @staticmethod
+    def load_from_url(zip_url, inner_path=None,
+                      folder_label=True, as_single_doc=False, sep_doc='\n'):
+        r"""
+        Load training/test documents and category labels from the given url.
+
+        This method download and extract the zip file (given by the ``zip_url`` url) into the
+        system's temporary folder and then calls ``Dataset.load_from_files()``.
+
+        :param zip_url: the url to the zipped dataset
+        :type zip_url: str
+        :param inner_path: the path within the zip file to be used
+        :type inner_path: str
+        :param folder_label: if True, read category labels from folders,
+                             otherwise, read category labels from file names.
+                             (default: True)
+        :type folder_label: bool
+        :param as_single_doc: read the documents as a single (and big) document
+                              (default: False)
+        :type as_single_doc: bool
+        :param sep_doc: the separator/delimiter used to separate each document
+                        when loading training/test documents from single file. Valid
+                        only when ``folder_label=False``. (default: ``'\n'``)
+        :type sep_doc: str
+        :returns: the (x_train, y_train) or (x_test, y_test) pairs.
+        :rtype: tuple
+        :raises: FileNotFoundError
+        """
+        tmp_path = Dataset.__download_dataset_from_url__(zip_url, inner_path)
+        return Dataset.load_from_files(tmp_path, folder_label, as_single_doc, sep_doc)
+
+    @staticmethod
+    def load_from_url_multilabel(zip_url, labels_path, inner_path=None,
+                                 sep_label=None, sep_doc='\n'):
+        r"""
+        Load training/test multilabel documents from the given url.
+
+        This method download and extract the zip file (given by the ``zip_url`` url) into the
+        system's temporary folder and then calls ``Dataset.load_from_files_multilabel()``.
+
+        :param zip_url: the url to the zipped dataset
+        :type zip_url: str
+        :param labels_path: the file containing the labels for each document. (please see
+                            ``Dataset.load_from_files_multilabel()`` documentation for more info)
+        :type labels_path: str
+        :param inner_path: the path within the zip file to be used
+        :type inner_path: str
+        :param sep_label: the separator/delimiter used to separate either each label (if
+                          ``docs_path`` is a file) or the document name from its category
+                          (if ``docs_path`` is a folder).
+                          (default: ``';'`` when ``docs_path`` is a file, the ``'\s+'`` regular
+                          expression otherwise).
+        :type sep_label: str
+        :param sep_doc: the separator/delimiter used to separate each document
+                        when loading training/test documents from single file. Valid
+                        only when ``folder_label=False``. (default: ``\n'``)
+        :type sep_doc: str
+        :returns: the (x_train, y_train) or (x_test, y_test) pairs.
+        :rtype: tuple
+        :raises: FileNotFoundError, ValueError
+        """
+        tmp_path = Dataset.__download_dataset_from_url__(zip_url, inner_path)
+        return Dataset.load_from_files_multilabel(tmp_path, labels_path, sep_label, sep_doc)
 
 
 class RecursiveDefaultDict(dict):
