@@ -43,35 +43,35 @@ x_test, y_test = Dataset.load_from_url(url, "test")
 Now let's train our first SS3 model! note that the API is very similar to that of `sklearn`'s models:
 
 ````python
-    from pyss3 import SS3
+from pyss3 import SS3
 
-    clf = SS3()
-    clf.fit(x_train, y_train)
-    y_pred = clf.predict(x_test)
+clf = SS3()
+clf.fit(x_train, y_train)
+y_pred = clf.predict(x_test)
 ````
 
 Also, this class provides a handful of other useful methods, such as, for instance, [``extract_insight()``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.extract_insight) to [extract the text fragments involved in the classification decision](https://pyss3.readthedocs.io/en/latest/tutorials/extract-insight.html) (allowing you to better understand the rationale behind the model’s predictions) or [``classify_multilabel()``](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.SS3.classify_multilabel) to provide [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification) support: 
 
 ````python
-    doc = "Liverpool CEO Peter Moore on Building a Global Fanbase"
-    
-    # standard "single-label" classification
-    label = clf.classify_label(doc) # 'business'
+doc = "Liverpool CEO Peter Moore on Building a Global Fanbase"
 
-    # multi-label classification
-    labels = clf.classify_multilabel(doc)  # ['business', 'sports']
+# standard "single-label" classification
+label = clf.classify_label(doc) # 'business'
+
+# multi-label classification
+labels = clf.classify_multilabel(doc)  # ['business', 'sports']
 ````
 
 ### :point_right: The ``Live_Test`` class
 
 which allows you to interactively test your model and visually see the reasons behind classification decisions, **with just one line of code**:
 ```python
-    from pyss3.server import Live_Test
+from pyss3.server import Live_Test
 
-    clf = SS3()
-    clf.fit(x_train, y_train)
+clf = SS3()
+clf.fit(x_train, y_train)
 
-    Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
+Live_Test.run(clf, x_test, y_test) # <- this one! cool uh? :)
 ```
 As shown in the image below, this will open up, locally, an interactive tool in your browser which you can use to (live) test your models with the documents given in `x_test` (or typing in your own!). This will allow you to visualize and understand what your model is actually learning.
 
@@ -103,7 +103,7 @@ Evaluation.plot()
 
 ![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/plot_evaluations.gif)
 
-In this 3D plot, each point represents an experiment/evaluation performed using that particular combination of values (s, l, and p). Also, these points are painted proportional to how good the performance was according to the selected metric; the plot will update "on the fly" when the user select a different evaluation metric (accuracy, precision, recall, f1, etc.). Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file in your project folder containing the interactive plots. This allows users to store, send or upload the plots to another place using this single HTML file. For example, we have uploaded two of these files for you to see: ["Sentiment Analysis (Movie Reviews)"](https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[topic_categorization_3grams].html), both evaluation plots were also obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html#tutorials).
+In this 3D plot, each point represents an experiment/evaluation performed using that particular combination of values (`s`, `l`, and `p`). Also, these points are painted proportional to how good the performance was according to the selected metric; the plot will update "on the fly" when the user select a different evaluation metric (accuracy, precision, recall, f1, etc.). Additionally, when the cursor is moved over a data point, useful information is shown (including a "compact" representation of the confusion matrix obtained in that experiment). Finally, it is worth mentioning that, before showing the 3D plots, PySS3 creates a single and portable HTML file in your project folder containing the interactive plots. This allows users to store, send or upload the plots to another place using this single HTML file. For example, we have uploaded two of these files for you to see: ["Sentiment Analysis (Movie Reviews)"](https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[movie_review_3grams].html) and ["Topic Categorization"](https://pyss3.readthedocs.io/en/latest/_static/ss3_model_evaluation[topic_categorization_3grams].html), both evaluation plots were also obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html#tutorials).
 
 
 ## Want to give PySS3 a shot? :eyeglasses: :coffee:
