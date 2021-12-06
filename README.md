@@ -138,14 +138,16 @@ Thanks goes to these awesome people ([emoji key](https://allcontributors.org/doc
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="http://angermeir.me/"><img src="https://avatars3.githubusercontent.com/u/16398152?v=4" width="100px;" alt=""/><br /><sub><b>Florian Angermeir</b></sub></a><br /><a href="#code-angrymeir" title="Code">💻</a> <a href="#ideas-angrymeir" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-angrymeir" title="Data">🔣</a></td>
-    <td align="center"><a href="https://www.linkedin.com/in/muneebvaiyani/"><img src="https://avatars3.githubusercontent.com/u/36028992?v=4" width="100px;" alt=""/><br /><sub><b>Muneeb Vaiyani</b></sub></a><br /><a href="#ideas-Vaiyani" title="Ideas, Suggestions, & Feedback">🤔</a> <a href="#data-Vaiyani" title="Data">🔣</a></td>
-    <td align="center"><a href="https://www.saurabhbora.com"><img src="https://avatars2.githubusercontent.com/u/29205181?v=4" width="100px;" alt=""/><br /><sub><b>Saurabh Bora</b></sub></a><br /><a href="#ideas-enthussb" title="Ideas & Feedback">🤔</a></td>
+    <td align="center"><a href="http://angermeir.me/"><img src="https://avatars3.githubusercontent.com/u/16398152?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Florian Angermeir</b></sub></a><br /><a href="https://github.com/sergioburdisso/pyss3/commits?author=angrymeir" title="Code">💻</a> <a href="#ideas-angrymeir" title="Ideas, Planning, & Feedback">🤔</a> <a href="#data-angrymeir" title="Data">🔣</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/muneebvaiyani/"><img src="https://avatars3.githubusercontent.com/u/36028992?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Muneeb Vaiyani</b></sub></a><br /><a href="#ideas-Vaiyani" title="Ideas, Planning, & Feedback">🤔</a> <a href="#data-Vaiyani" title="Data">🔣</a></td>
+    <td align="center"><a href="https://www.saurabhbora.com"><img src="https://avatars2.githubusercontent.com/u/29205181?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saurabh Bora</b></sub></a><br /><a href="#ideas-enthussb" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://hbaniecki.com"><img src="https://avatars.githubusercontent.com/u/32574004?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hubert Baniecki</b></sub></a><br /><a href="#ideas-hbaniecki" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/sergioburdisso/pyss3/commits?author=hbaniecki" title="Documentation">📖</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
