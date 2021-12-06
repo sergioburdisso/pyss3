@@ -34,6 +34,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "hbaniecki",
+      "name": "Hubert Baniecki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32574004?v=4",
+      "profile": "https://hbaniecki.com",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
