@@ -1,12 +1,12 @@
 ---
-title: 'PySS3: A new interpretable and simple machine learning model for text classification'
+title: 'PySS3: A Python package implementing SS3, a simple and interpretable machine learning model for text classification'
 tags:
   - Python
   - Machine learning
   - Natural Language Processing
   - Text Classification
+  - Interpretability
   - Explainable Artificial Intelligence
-  - XAI
 authors:
   - name: Sergio G. Burdisso^[corresponding author]
     # orcid: 0000-000...
@@ -34,7 +34,7 @@ bibliography: paper.bib
 # Summary
 
 
-In this paper, we briefly introduce `PySS3`[^pyss3] and share it with the community. `PySS3` is an open-source Python package that implements a novel machine learning model for text classification, called SS3. `PySS3` comes with two useful tools that allow working with SS3 in an effortless, interactive, and visual way. For instance, one of these tools provides post hoc explanations using visualizations that directly highlight relevant portions of the raw input document, allowing researchers to better understand the models being deployed. Therefore, `PySS3` could be especially useful for those working with sensitive text classification problems by which people's lives could be affected since it allows researchers and practitioners to deploy interpretable (i.e. self-explainable) and more reliable models for text classification. 
+In this paper, we briefly introduce `PySS3`[^pyss3] and share it with the community. `PySS3` is an open-source Python package that implements the SS3 machine learning model for text classification. `PySS3` comes with useful tools that allow working with SS3 in an interactive, and visual way. For instance, one of these tools provides post hoc explanations using visualizations that directly highlight relevant portions of the raw input document, allowing researchers to better understand the models being deployed. Therefore, `PySS3` could be especially useful for those working with sensitive classification problems by which people's lives could be affected since it allows researchers and practitioners to deploy interpretable (i.e. self-explainable) and more reliable models for text classification. 
 
 [^pyss3]: [https://github.com/sergioburdisso/pyss3](https://github.com/sergioburdisso/pyss3)
 
@@ -57,12 +57,12 @@ Therefore, we decided to develop an open-source Python package to provide the fi
 
 # Implementation
 
-`PySS3` was coded to be compatible with Python 2 and Python 3 as well as with different operating systems, such as Linux, macOS, and Microsoft Windows. To ensure this compatibility holds whenever the source code is updated, we have configured and linked the github repository with the Travis CI service. This service automatically runs the test scripts using different operating systems and versions of Python whenever new code is pushed to the repository.
+`PySS3` was coded to be compatible with Python 2 and Python 3 as well as with different operating systems, such as Linux, macOS, and Microsoft Windows. To ensure this compatibility holds whenever the source code is updated, we have configured and linked the Github repository with the Travis CI service. This service automatically runs the test scripts using different operating systems and versions of Python whenever new code is pushed to the repository.
 
 The package is composed of one main module and three submodules.[^more_info] 
 The main module is called `pyss3` and contains the classifier's implementation _per se_ in a class called `SS3`.
-This class not only implements the "plain-vanilla" version of the classifier [@burdisso2019] but also different variations, such as the one introduced later by the same authors [@burdisso2019-tss3], which allows SS3 to recognize important word n-grams on the fly.
-As the reader will notice in the example shown in the next section, this class exposes a clear and simple API that is similar to that of _Scikit-learn_ models . For instance, it provides standard methods like `fit()` and `predict()` for  training and classification, respectively.[^api_doc]
+This class not only implements the "plain-vanilla" version of the classifier [@burdisso2019] but also different variations, such as the one introduced later by Burdisso _et al._ [@burdisso2019-tss3], which allows SS3 to recognize important word n-grams on the fly.
+As the reader will notice in the example shown in the next section, this class exposes a clear and simple API that is similar to that of _Scikit-learn_ models [@pedregosa2011scikit]. For instance, it provides standard methods like `fit()` and `predict()` for  training and classification, respectively.[^api_doc]
 Finally, the three submodules, `pyss3.server`, `pyss3.cmd_line`, and `pyss3.util`, provide a collection of useful tools and utility functions such as, for instance, those related to data loading, evaluation or, as will be shown in the next section,  "live" testing the models.
 
 [^more_info]: A more detailed description of the package is given in the official documentation ([https://pyss3.rtfd.io](https://pyss3.rtfd.io)). Additionally, an extended version of this paper can be found in ArXiv[@burdisso2019pyss3].
@@ -78,15 +78,19 @@ Additionally, for readers interested in trying PySS3 out "right away", we have c
 
 [^note]: [https://github.com/sergioburdisso/pyss3/tree/master/examples](https://github.com/sergioburdisso/pyss3/tree/master/examples)
 
-Before introducing the examples, we will assume the user has already loaded the training and test documents and category labels, as usual, in the `x_train`, `y_train`, `x_test`, `y_test` lists, respectively.
-For instance, this could be done using the `Dataset` class from the `pyss3.util` submodule, as follows:
+Before introducing the examples, we first need to load the training and test documents and category labels, as usual, in the `x_train`, `y_train`, `x_test`, `y_test` lists, respectively.
+For instance, we can use the [`load_from_url()`](https://pyss3.rtfd.io/en/latest/api/index.html#pyss3.util.Dataset.load_from_url) function from `Dataset` class to  load the ["Topic Categorization"](https://pyss3.rtfd.io/en/latest/tutorials/topic_categorization-notebook.html) tutorial's dataset, as follows:
 
 ````python
 from pyss3.util import Dataset
 
-x_train,y_train = Dataset.load_from_files("path/to/train")
-x_test, y_test = Dataset.load_from_files("path/to/test")
+url = "https://github.com/sergioburdisso/pyss3/raw/master/examples/datasets/topic.zip"
+
+x_train, y_train = Dataset.load_from_url(url, "train", folder_label=False)
+x_test, y_test = Dataset.load_from_url(url, "test", folder_label=False)
 ````
+
+This dataset was created collecting about 30k tweets and contains the following 8 different class labels: _"art&photography", "beauty&fashion", "business&finance", "food", "health", "music", "science&technology"_, and _"sports"_.
 
 ## Training and test example
 
@@ -141,7 +145,7 @@ Kiev, Ukraine on Saturday). Meanwhile Moore has',  0.97)
 
 This pair indicates the document was classified as "sports", mainly due to our model finding this fragment as belonging to "sports" with a confidence value of 0.97.^[Interested readers may refer to the "getting the text fragments involved in the classification decision" tutorial [available online](https://pyss3.rtfd.io/en/latest/tutorials/extract-insight.html)]
 
-![Live Test screenshot. On the left side, the list of test documents grouped by category is shown along with the percentage of success.
+![Live Test screenshot. On the left side, the list of test documents grouped by category is shown along with the percentage of success (true positive ratio).
 Note the `doc_2` document is marked with an exclamation mark (!); this mark indicates it was misclassified, which eases error analysis.
 The user has selected the `doc_1`, the "classification result" is shown above the visual description. 
 In this figure, the user has chosen to display the visual explanation at sentence-and-word level, using mixed topics.
@@ -151,7 +155,7 @@ Note that the user can also edit the document or even create new ones using the 
 
 # Conclusions
 
-We have briefly introduced `PySS3`, an open-source Python package that implements a novel machine learning model for text classification that comes with useful visualization tools.
+We have briefly introduced `PySS3`, an open-source Python package that implements SS3, an interpretable machine learning model for text classification. As such, PySS3 comes with useful visualization tools that help understand the reasons behind its classification decisions.
 This software could be especially useful for researchers and practitioners interested in deploying interpretable and more reliable models for text classification.
 Finally, we hope to continue the advancement and improvement of PySS3 through the direct or indirect help of those in the mathematical and computer science disciplines who want to be part of this open-source project.
 

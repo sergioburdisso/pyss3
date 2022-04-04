@@ -1831,7 +1831,7 @@ class SS3:
             len(self.get_category_name(ic))
             for ic in xrange(len(self.__categories__))
         ])
-        cat_len = max(cat_len, 8)
+        cat_len = max(cat_len, 35)
         header_template = Print.style.bold(
             " {:<%d} |    fr    |  lv   |  sg   |  sn   |  gv   |  cv   |"
             % cat_len
@@ -1853,7 +1853,7 @@ class SS3:
                 print(
                     row_template
                     .format(
-                        self.get_category_name(icat)[:16],
+                        self.get_category_name(icat)[:35],
                         n_gram_tip[FR],
                         self.__lv__(ngram, icat),
                         self.__sg__(ngram, icat),
