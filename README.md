@@ -3,7 +3,6 @@
 [![Documentation Status](https://readthedocs.org/projects/pyss3/badge/?version=latest)](http://pyss3.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://api.travis-ci.com/sergioburdisso/pyss3.svg?branch=master)](https://app.travis-ci.com/github/sergioburdisso/pyss3)
 [![codecov](https://codecov.io/gh/sergioburdisso/pyss3/branch/master/graph/badge.svg)](https://codecov.io/gh/sergioburdisso/pyss3)
-[![Requirements Status](https://requires.io/github/sergioburdisso/pyss3/requirements.svg?branch=master)](https://requires.io/github/sergioburdisso/pyss3/requirements/?branch=master)
 [![PyPI version](https://badge.fury.io/py/pyss3.svg)](https://badge.fury.io/py/pyss3)
 [![Downloads](https://pepy.tech/badge/pyss3)](https://pepy.tech/project/pyss3)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sergioburdisso/pyss3/master?filepath=examples)
