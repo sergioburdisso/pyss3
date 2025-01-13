@@ -28,16 +28,14 @@ Given its white-box nature, it allows researchers and practitioners to deploy in
 
 ### :point_right: The ``SS3`` class
 
-which implements the classifier using a clear API. For instance, let's first load [one of the tutorial](https://pyss3.rtfd.io/en/latest/tutorials/movie-review.html)'s dataset:
-
-```python
-from pyss3.util import Dataset
-
-url = "https://github.com/sergioburdisso/pyss3/raw/master/examples/datasets/movie_review.zip"
-
-x_train, y_train = Dataset.load_from_url(url, "train")
-x_test, y_test = Dataset.load_from_url(url, "test")
-```
+which implements the classifier using a clear API (very similar to that of `sklearn`'s models):
+````python
+    from pyss3 import SS3
+    clf = SS3()
+    ...
+    clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+````
 
 Now let's train our first SS3 model! note that the API is very similar to that of `sklearn`'s models:
 
