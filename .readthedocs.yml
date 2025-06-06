@@ -17,7 +17,7 @@ sphinx:
 
 # Python setup
 python:
-  version: 3.12
+  version: "3.12"
   install:
     - requirements: docs/requirements.txt
     - method: pip
