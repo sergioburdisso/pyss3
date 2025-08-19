@@ -11,19 +11,19 @@
 
 # A Python package implementing a new simple and interpretable model for text classification
 
-:sushi: **Online live demos:** https://sergioburdisso.github.io/ss3/ :icecream::ice_cream::cake:
+:sushi: Online **live demos** available **[here](https://sergioburdisso.github.io/ss3/)** :icecream::ice_cream::cake:
 
 <br>
 
 The SS3 text classifier is a novel and simple supervised machine learning model for text classification which is interpretable, that is, it has the **ability to naturally (self)explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ ([arXiv preprint](https://arxiv.org/abs/1905.08772)).
-This simple model obtained the best and 2nd-best results, consecutively, in the last three editions of the [CLEF's eRisk lab](https://erisk.irlab.org/) among all participating models [[Burdisso *et al.* 2019](http://ceur-ws.org/Vol-2380/paper_103.pdf); [Loyola *et al.* 2021](http://ceur-ws.org/Vol-2936/paper-81.pdf)].
+This simple model obtained the best and second-best results, consecutively, in the three [CLEF eRisk](https://erisk.irlab.org/) editions from 2019 to 2021 [[Burdisso *et al.* 2019](http://ceur-ws.org/Vol-2380/paper_103.pdf); [Loyola *et al.* 2021](http://ceur-ws.org/Vol-2936/paper-81.pdf)].
 Given its white-box nature, it allows researchers and practitioners to deploy interpretable (i.e. self-explainable) and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
 **Note:** this package also incorporates different variations of the original model, such as the one introduced in _["t-SS3: a text classifier with dynamic n-grams for early risk detection over text streams"](https://doi.org/10.1016/j.patrec.2020.07.001)_ ([arXiv preprint](https://arxiv.org/abs/1911.06147)) which allows SS3 to recognize important variable-length word n-grams "on the fly".
 
 ## What is PySS3?
 
-[PySS3](https://github.com/sergioburdisso/pyss3) is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementation of the SS3 classifier, PySS3 comes with a set of tools to help you developing your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you to see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Live_Test`` class, and the ``Evaluation`` class, as pointed out below.
+[PySS3](https://github.com/sergioburdisso/pyss3) is a Python package that allows you to work with SS3 in a very straightforward, interactive and visual way. In addition to the implementation of the SS3 classifier, PySS3 comes with a set of tools to help you develop your machine learning models in a clearer and faster way. These tools let you analyze, monitor and understand your models by allowing you to see what they have actually learned and why. To achieve this, PySS3 provides you with 3  main components: the ``SS3`` class, the ``Live_Test`` class, and the ``Evaluation`` class, as pointed out below.
 
 
 ### :point_right: The ``SS3`` class
