@@ -84,9 +84,9 @@ learning.
 .. image:: _static/ss3_live_test.gif
 
 For example, we have uploaded two of these live tests online for you to
-try out: `"Movie Review (Sentiment Analysis)" <http://tworld.io/ss3/live_test_online/#30305>`__ and
+try out: `"Movie Review (Sentiment Analysis)" <https://sergioburdisso.github.io/ss3/live_test_online/#30305>`__ and
 `"Topic
-Categorization" <http://tworld.io/ss3/live_test_online/#30303>`__, both
+Categorization" <https://sergioburdisso.github.io/ss3/live_test_online/#30303>`__, both
 were obtained following the :ref:`tutorials`.
 
 
@@ -189,5 +189,5 @@ Further Readings
    about/license
 
 .. _PySS3: https://github.com/sergioburdisso/pyss3
-.. _“Movie Review (Sentiment Analysis)”: http://tworld.io/ss3/live_test_online/#30305
-.. _“Topic Categorization”: http://tworld.io/ss3/live_test_online/#30303
+.. _“Movie Review (Sentiment Analysis)”: https://sergioburdisso.github.io/ss3/live_test_online/#30305
+.. _“Topic Categorization”: https://sergioburdisso.github.io/ss3/live_test_online/#30303

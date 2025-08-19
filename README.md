@@ -11,7 +11,7 @@
 
 # A Python package implementing a new simple and interpretable model for text classification
 
-:sushi: **Online live demos:** http://tworld.io/ss3/ :icecream::ice_cream::cake:
+:sushi: **Online live demos:** https://sergioburdisso.github.io/ss3/ :icecream::ice_cream::cake:
 
 <br>
 
@@ -74,7 +74,7 @@ As shown in the image below, this will open up, locally, an interactive tool in 
 
 ![img](https://raw.githubusercontent.com/sergioburdisso/pyss3/master/docs/_static/ss3_live_test.gif)
 
-For example, we have uploaded two of these live tests online for you to try out: ["Movie Review (Sentiment Analysis)"](http://tworld.io/ss3/live_test_online/#30305) and ["Topic Categorization"](http://tworld.io/ss3/live_test_online/#30303), both were obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html#tutorials).
+For example, we have uploaded two of these live tests online for you to try out: ["Movie Review (Sentiment Analysis)"](https://sergioburdisso.github.io/ss3/live_test_online/#30305) and ["Topic Categorization"](https://sergioburdisso.github.io/ss3/live_test_online/#30303), both were obtained following the [tutorials](https://pyss3.readthedocs.io/en/latest/user_guide/getting-started.html#tutorials).
 
 ### :point_right: And last but not least, the ``Evaluation`` class
 
