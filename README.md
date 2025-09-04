@@ -9,13 +9,13 @@
 
 ---
 
-# A Python package implementing a new simple and interpretable model for text classification
+# PySS3: Interpretable Machine Learning for Text Classification
 
 :sushi: Online **live demos** available **[here](https://sergioburdisso.github.io/ss3/)** :icecream::ice_cream::cake:
 
 <br>
 
-The SS3 text classifier is a novel and simple supervised machine learning model for text classification which is interpretable, that is, it has the **ability to naturally (self)explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ ([arXiv preprint](https://arxiv.org/abs/1905.08772)).
+The SS3 text classifier is a simple supervised machine learning model for text classification which is interpretable, that is, it has the **ability to naturally (self)explain its rationale**. It was originally introduced in Section 3 of the paper _["A text classification framework for simple and effective early depression detection over social media streams"](https://dx.doi.org/10.1016/j.eswa.2019.05.023)_ ([arXiv preprint](https://arxiv.org/abs/1905.08772)).
 This simple model obtained the best and second-best results, consecutively, in the three [CLEF eRisk](https://erisk.irlab.org/) editions from 2019 to 2021 [[Burdisso *et al.* 2019](http://ceur-ws.org/Vol-2380/paper_103.pdf); [Loyola *et al.* 2021](http://ceur-ws.org/Vol-2936/paper-81.pdf)].
 Given its white-box nature, it allows researchers and practitioners to deploy interpretable (i.e. self-explainable) and therefore more reliable, models for text classification (which could be especially useful for those working with classification problems by which people's lives could be somehow affected).
 
